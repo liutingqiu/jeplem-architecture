@@ -191,6 +191,7 @@
   },
   "minecraft_bridge": {
     "allowlist_enforced": true,
+    "request_outcomes_linked": true,
     "trace_integrity": true,
     "runtime_ticks": 1
   },

@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * A local, append-only bridge. It exposes no socket and never executes raw
@@ -26,6 +26,7 @@ import java.util.UUID;
 final class LocalTraceBridge {
     private static final Gson GSON = new Gson();
     private static final int OBSERVATION_INTERVAL_TICKS = 20;
+    private static final Pattern REQUEST_ID_PATTERN = Pattern.compile("[A-Za-z0-9][A-Za-z0-9._:-]{0,127}");
     private final Path root = FabricLoader.getInstance().getGameDir().resolve("plwm-training");
     private Path observationsPath;
     private Path actionsPath;
@@ -88,24 +89,28 @@ final class LocalTraceBridge {
         try {
             JsonObject action = JsonParser.parseString(line).getAsJsonObject();
             String name = action.get("name").getAsString();
+            String requestId = action.get("request_id").getAsString();
+            if (!REQUEST_ID_PATTERN.matcher(requestId).matches()) {
+                throw new IllegalArgumentException("invalid request ID");
+            }
             // Deliberate allowlist. Movement/interactions require a later client-side
             // capability layer; raw command execution is never permitted here.
             if ("observe".equals(name)) {
                 for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                     writeObservation(server, player);
                 }
-                writeRecord("outcome", "bridge", actionOutcome(name, "accepted"));
+                writeRecord("outcome", "bridge", actionOutcome(name, "accepted", requestId));
             } else if ("reset_episode".equals(name)) {
                 resetPlayers(server);
-                writeRecord("outcome", "bridge", actionOutcome(name, "accepted"));
+                writeRecord("outcome", "bridge", actionOutcome(name, "accepted", requestId));
             } else if ("set_episode".equals(name) && action.has("episode_id")) {
                 episodeId = action.get("episode_id").getAsString();
-                writeRecord("outcome", "bridge", actionOutcome(name, "accepted"));
+                writeRecord("outcome", "bridge", actionOutcome(name, "accepted", requestId));
             } else {
-                writeRecord("outcome", "bridge", actionOutcome(name, "rejected"));
+                writeRecord("outcome", "bridge", actionOutcome(name, "rejected", requestId));
             }
         } catch (RuntimeException error) {
-            writeRecord("outcome", "bridge", actionOutcome("invalid", "rejected"));
+            writeRecord("outcome", "bridge", actionOutcome("invalid", "rejected", null));
         }
     }
 
@@ -138,10 +143,13 @@ final class LocalTraceBridge {
         return payload;
     }
 
-    private JsonObject actionOutcome(String name, String status) {
+    private JsonObject actionOutcome(String name, String status, String requestId) {
         JsonObject payload = new JsonObject();
         payload.addProperty("name", name);
         payload.addProperty("status", status);
+        if (requestId != null) {
+            payload.addProperty("request_id", requestId);
+        }
         return payload;
     }
 

@@ -31,6 +31,19 @@ class MinecraftBridgeTests(unittest.TestCase):
                 bridge.write_action("run_command")
             actions = bridge.actions_path.read_text(encoding="utf-8").splitlines()
         self.assertEqual(len(actions), 3)
+        self.assertEqual({json.loads(line)["name"] for line in actions}, {"set_episode", "observe", "reset_episode"})
+        self.assertTrue(all("request_id" in json.loads(line) for line in actions))
+
+    def test_runtime_session_matches_each_outcome_to_its_pending_action(self):
+        with TemporaryDirectory() as directory:
+            runtime = TrainablePersistentRuntime(EndToEndPersistentPLWM(input_dim=5, latent_dim=12), belief_states=2)
+            session = MinecraftRuntimeSession(MinecraftFileBridge(Path(directory)), runtime, "e4")
+            request_id = session.begin()
+            session.ingest_outcome({"name": "set_episode", "status": "accepted", "request_id": request_id})
+            self.assertFalse(session.pending_action_ids)
+            with self.assertRaises(ValueError):
+                session.ingest_outcome({"name": "observe", "status": "accepted", "request_id": request_id})
+        self.assertEqual(session.trace.events[-1].kind, "outcome")
 
     def test_runtime_session_keeps_episode_trace_and_persistent_tick(self):
         with TemporaryDirectory() as directory:

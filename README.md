@@ -174,6 +174,9 @@ folder and accepts only `observe`, `set_episode`, and spawn-only
 `reset_episode` action records. Python
 normalizes those records into the same hash-chained `EpisodeTrace` used by
 other environments before passing state into `TrainablePersistentRuntime`.
+Every permitted action has a stable request ID and the server's terminal
+outcome echoes it, so episode replay can attribute each result to a specific
+capability-limited request.
 
 Build the Fabric mod with Java 21:
 

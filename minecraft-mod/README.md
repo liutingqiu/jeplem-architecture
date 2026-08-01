@@ -19,8 +19,9 @@ Minecraft game directory after a server starts.
 ## Protocol boundary
 
 The mod appends raw JSONL observations to `observations.jsonl` and consumes
-newline-delimited action objects from `actions.jsonl`. The only accepted action
-names are `observe`, `set_episode`, and `reset_episode`.
+newline-delimited action objects from `actions.jsonl`. Each action requires a
+unique ASCII `request_id`; its terminal outcome includes the same ID. The only
+accepted action names are `observe`, `set_episode`, and `reset_episode`.
 
 `reset_episode` only teleports online players to the overworld shared spawn.
 Movement, looking, block interaction, inventory changes, chat, commands, and

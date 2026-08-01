@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import math
+import re
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, Mapping
@@ -20,6 +22,7 @@ class MinecraftFileBridge:
 
     ACTIONS = frozenset({"observe", "set_episode", "reset_episode"})
     EVENT_KINDS = frozenset({"observation", "outcome", "reward", "commitment", "checkpoint"})
+    REQUEST_ID_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$")
 
     def __post_init__(self) -> None:
         self.root = Path(self.root)
@@ -32,10 +35,21 @@ class MinecraftFileBridge:
     def actions_path(self) -> Path:
         return self.root / "actions.jsonl"
 
-    def write_action(self, name: str, *, episode_id: str | None = None) -> None:
+    def write_action(
+        self,
+        name: str,
+        *,
+        episode_id: str | None = None,
+        request_id: str | None = None,
+    ) -> str:
+        """Append one capability-limited action and return its stable request ID."""
         if name not in self.ACTIONS:
             raise ValueError(f"action is not allowed by the Minecraft bridge: {name}")
+        request_id = request_id or uuid.uuid4().hex
+        if not self.REQUEST_ID_PATTERN.fullmatch(request_id):
+            raise ValueError("request_id must be 1-128 ASCII identifier characters")
         payload: dict[str, Any] = {"name": name}
+        payload["request_id"] = request_id
         if name == "set_episode":
             if not episode_id:
                 raise ValueError("set_episode requires a nonempty episode_id")
@@ -43,6 +57,7 @@ class MinecraftFileBridge:
         self.root.mkdir(parents=True, exist_ok=True)
         with self.actions_path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(payload, ensure_ascii=True, sort_keys=True) + "\n")
+        return request_id
 
     def read_episode(self, episode_id: str) -> EpisodeTrace:
         if not self.observations_path.exists():
@@ -90,17 +105,43 @@ class MinecraftRuntimeSession:
     runtime: TrainablePersistentRuntime
     episode_id: str
     trace: EpisodeTrace = field(init=False)
+    pending_action_ids: set[str] = field(default_factory=set, init=False)
 
     def __post_init__(self) -> None:
         self.trace = EpisodeTrace(self.episode_id)
 
-    def begin(self) -> None:
-        self.bridge.write_action("set_episode", episode_id=self.episode_id)
-        self.trace.append("action", "minecraft-action", {"name": "set_episode", "episode_id": self.episode_id})
+    def begin(self) -> str:
+        request_id = self.bridge.write_action("set_episode", episode_id=self.episode_id)
+        self._record_action(request_id, "set_episode", episode_id=self.episode_id)
+        return request_id
 
-    def request_observation(self) -> None:
-        self.bridge.write_action("observe")
-        self.trace.append("action", "minecraft-action", {"name": "observe"})
+    def request_observation(self) -> str:
+        request_id = self.bridge.write_action("observe")
+        self._record_action(request_id, "observe")
+        return request_id
+
+    def reset_episode(self) -> str:
+        request_id = self.bridge.write_action("reset_episode")
+        self._record_action(request_id, "reset_episode")
+        return request_id
+
+    def ingest_outcome(self, payload: Mapping[str, Any]) -> None:
+        """Accept only a terminal Fabric outcome linked to this live session."""
+        request_id = payload.get("request_id")
+        status = payload.get("status")
+        if not isinstance(request_id, str) or request_id not in self.pending_action_ids:
+            raise ValueError("outcome does not match a pending Minecraft action")
+        if status not in {"accepted", "rejected"}:
+            raise ValueError("Minecraft action outcome must be accepted or rejected")
+        self.pending_action_ids.remove(request_id)
+        self.trace.append("outcome", "minecraft-bridge", dict(payload))
+
+    def _record_action(self, request_id: str, name: str, *, episode_id: str | None = None) -> None:
+        payload: dict[str, Any] = {"name": name, "request_id": request_id}
+        if episode_id is not None:
+            payload["episode_id"] = episode_id
+        self.pending_action_ids.add(request_id)
+        self.trace.append("action", "minecraft-action", payload)
 
     def ingest_observation(self, payload: Mapping[str, Any]) -> TrainableRuntimeTick:
         self.trace.append("observation", "minecraft-state", observation_payload(state=payload))
