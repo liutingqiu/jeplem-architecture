@@ -162,6 +162,13 @@
     "language_port_is_stateless": true,
     "commitment_survives_delay": true
   },
+  "transformer_seed_scores": {
+    "73": 0.974609375,
+    "7": 0.900390625,
+    "19": 0.962890625,
+    "41": 0.962890625
+  },
+  "transformer_mean_score": 0.9501953125,
   "lifelong_memory": {
     "stable_retention": 1.0,
     "changed_fact_revision": true,

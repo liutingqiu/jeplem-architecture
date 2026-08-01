@@ -145,6 +145,11 @@ The benchmark's recurrent baseline is intentionally retained even when it
 matches or exceeds PLWM on a task. That result is evidence about the task, not
 silently discarded.
 
+The transformer comparison is evaluated across four fixed seeds. Its gate
+requires a mean score of at least 0.90 and no seed below 0.89; this avoids
+treating a single backend-specific initialization as proof that the baseline
+was fairly trained.
+
 The lifelong memory benchmark adds versioned provenance and sleep-time replay:
 
 ```text

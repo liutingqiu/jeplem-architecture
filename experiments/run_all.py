@@ -46,6 +46,14 @@ def main() -> None:
     causal = asdict(run_causal_world())
     multistep = asdict(run_multistep_world())
     continual = asdict(run_continual_benchmark())
+    transformer_seed_scores = {
+        "73": continual["transformer_context_success"],
+        **{
+            str(seed): run_continual_benchmark(seed=seed).transformer_context_success
+            for seed in (7, 19, 41)
+        },
+    }
+    transformer_mean_score = sum(transformer_seed_scores.values()) / len(transformer_seed_scores)
     lifelong = asdict(run_lifelong_benchmark())
     language_runtime = asdict(run_language_runtime())
     world_runtime = asdict(run_world_runtime())
@@ -131,7 +139,7 @@ def main() -> None:
             and lifelong["provenance_complete"]
             and lifelong["consolidation_count"] >= 1
         ),
-        "fair_transformer_baseline": continual["transformer_context_success"] >= 0.9,
+        "fair_transformer_baseline": transformer_mean_score >= 0.9 and min(transformer_seed_scores.values()) >= 0.89,
         "language_runtime_boundary": (
             language_runtime["checkpoint_continuity"]
             and language_runtime["runtime_ticks"] == 2
@@ -151,6 +159,7 @@ def main() -> None:
         ),
         "minecraft_bridge_contract": (
             minecraft_bridge["allowlist_enforced"]
+            and minecraft_bridge["request_outcomes_linked"]
             and minecraft_bridge["trace_integrity"]
             and minecraft_bridge["runtime_ticks"] == 1
         ),
@@ -166,6 +175,8 @@ def main() -> None:
         "causal_planning": causal,
         "multistep_rollout": multistep,
         "continual_partial_observability": continual,
+        "transformer_seed_scores": transformer_seed_scores,
+        "transformer_mean_score": transformer_mean_score,
         "lifelong_memory": lifelong,
         "language_runtime": language_runtime,
         "world_model_runtime": world_runtime,

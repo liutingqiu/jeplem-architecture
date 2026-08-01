@@ -1,0 +1,225 @@
+{
+  "continuity": [
+    {
+      "distractors": 1,
+      "seed": 5,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.49560546875,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.0002904568682424724,
+      "baseline_loss": 0.693713903427124
+    },
+    {
+      "distractors": 1,
+      "seed": 17,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.486083984375,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.00020058228983543813,
+      "baseline_loss": 0.6885683536529541
+    },
+    {
+      "distractors": 1,
+      "seed": 41,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.5048828125,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.00036873738281428814,
+      "baseline_loss": 0.6917510032653809
+    },
+    {
+      "distractors": 5,
+      "seed": 5,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.49560546875,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.0002523235743865371,
+      "baseline_loss": 0.693713903427124
+    },
+    {
+      "distractors": 5,
+      "seed": 17,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.486083984375,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.00020969434990547597,
+      "baseline_loss": 0.6885683536529541
+    },
+    {
+      "distractors": 5,
+      "seed": 41,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.5048828125,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.0003210253198631108,
+      "baseline_loss": 0.6917510032653809
+    },
+    {
+      "distractors": 12,
+      "seed": 5,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.49560546875,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.0003428040654398501,
+      "baseline_loss": 0.693713903427124
+    },
+    {
+      "distractors": 12,
+      "seed": 17,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.486083984375,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.00024896644754335284,
+      "baseline_loss": 0.6885683536529541
+    },
+    {
+      "distractors": 12,
+      "seed": 41,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.5048828125,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.0003760883118957281,
+      "baseline_loss": 0.6917510032653809
+    }
+  ],
+  "associative_memory": {
+    "memory_accuracy": 1.0,
+    "gated_memory_accuracy": 1.0,
+    "no_memory_accuracy": 0.64501953125,
+    "memory_loss": 7.61556439101696e-05,
+    "gated_memory_loss": 5.971115024294704e-05,
+    "no_memory_loss": 0.5940218567848206
+  },
+  "adaptive_compute": {
+    "accuracy": 1.0,
+    "expected_steps_by_difficulty": [
+      0.052301809191703796,
+      0.9165070056915283,
+      1.9261976480484009,
+      2.9322705268859863,
+      3.7654547691345215
+    ],
+    "fixed_max_compute": 4.0,
+    "learned_mean_compute": 1.9185463190078735
+  },
+  "multiscale_state": {
+    "fast_accuracy": 1.0,
+    "slow_accuracy": 1.0,
+    "slow_retention_after_contradiction": 0.99658203125,
+    "mean_slow_gate_during_contradiction": 0.3187442719936371
+  },
+  "belief_revision": {
+    "weak_evidence_confidence": 0.550000011920929,
+    "strong_evidence_confidence": 0.9998475313186646,
+    "confidence_after_first_contradiction": 0.998630166053772,
+    "final_revised_state": 0,
+    "entropy_declines_with_confirming_evidence": true
+  },
+  "commitment_recovery": {
+    "selected_initially": "ship",
+    "selected_after_interruption": "ship",
+    "selected_after_completion": "research",
+    "completed_status": "completed",
+    "cancelled_status": "cancelled",
+    "evidence_recorded": true
+  },
+  "integrated_runtime": {
+    "action_under_uncertainty": "think",
+    "selected_before_completion": "reach-state-one",
+    "completed_after_evidence": 1,
+    "selected_after_completion": "fallback",
+    "snapshot_has_all_layers": true,
+    "action_without_observation": "observe"
+  },
+  "causal_planning": {
+    "persistent_transition_accuracy": 1.0,
+    "persistent_planning_accuracy": 1.0,
+    "stateless_transition_accuracy": 0.4951171875,
+    "stateless_planning_accuracy": 0.494140625,
+    "persistent_loss": 0.018067559227347374,
+    "stateless_loss": 0.6933673620223999
+  },
+  "multistep_rollout": {
+    "persistent_transition_accuracy": 1.0,
+    "persistent_rollout_success": 1.0,
+    "stateless_transition_accuracy": 0.4527181088924408,
+    "stateless_rollout_success": 0.18701171875,
+    "persistent_loss": 0.16376030445098877,
+    "stateless_loss": 2.094841957092285
+  },
+  "continual_partial_observability": {
+    "plwm_success": 0.9609375,
+    "plwm_mean_cost": 0.100234375,
+    "plwm_observation_rate": 0.501953125,
+    "no_memory_success": 0.498046875,
+    "windowed_context_success": 0.501953125,
+    "recurrent_success": 0.9609375,
+    "transformer_context_success": 0.974609375,
+    "end_to_end_plwm_success": 0.9609375,
+    "end_to_end_commitment_recovery": 0.9609375,
+    "stale_memory_correction": 0.955078125,
+    "long_delay_recovery": 0.9765625,
+    "language_port_is_stateless": true,
+    "commitment_survives_delay": true
+  },
+  "transformer_seed_scores": {
+    "73": 0.974609375,
+    "7": 0.900390625,
+    "19": 0.962890625,
+    "41": 0.962890625
+  },
+  "transformer_mean_score": 0.9501953125,
+  "lifelong_memory": {
+    "stable_retention": 1.0,
+    "changed_fact_revision": true,
+    "stale_burst_resistance": true,
+    "provenance_complete": true,
+    "consolidation_count": 1,
+    "last_write_stable_retention": 1.0,
+    "last_write_changed_fact_revision": false
+  },
+  "language_runtime": {
+    "checkpoint_continuity": true,
+    "runtime_ticks": 2,
+    "strict_parser_rejects_invalid": true,
+    "emits_without_mutating_runtime": true
+  },
+  "world_model_runtime": {
+    "runtime_planning_accuracy": 1.0,
+    "checkpoint_action_exact": true,
+    "completion_requires_evidence": true,
+    "commitment_switches_after_evidence": true,
+    "mean_selected_utility": -0.03375344365485944
+  },
+  "trajectory_contract": {
+    "event_count": 4,
+    "hash_chain_valid": true,
+    "modalities_preserved": true
+  },
+  "minecraft_bridge": {
+    "allowlist_enforced": true,
+    "request_outcomes_linked": true,
+    "trace_integrity": true,
+    "runtime_ticks": 1
+  },
+  "accepted": {
+    "continuity": true,
+    "episodic_memory": true,
+    "causal_planning": true,
+    "multistep_rollout": true,
+    "adaptive_compute": true,
+    "multiscale_state": true,
+    "belief_revision": true,
+    "commitment_recovery": true,
+    "integrated_runtime": true,
+    "continual_partial_observability": true,
+    "end_to_end_persistent_control": true,
+    "stale_memory_and_language_boundary": true,
+    "lifelong_memory_consolidation": true,
+    "fair_transformer_baseline": true,
+    "language_runtime_boundary": true,
+    "world_model_persistent_runtime": true,
+    "multimodal_event_trace": true,
+    "minecraft_bridge_contract": true
+  }
+}

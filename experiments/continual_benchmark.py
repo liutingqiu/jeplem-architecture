@@ -68,9 +68,12 @@ def _train(
     control_targets: torch.Tensor,
     *,
     end_to_end: bool,
+    steps: int,
+    learning_rate: float = 0.012,
 ) -> None:
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.012)
-    for _ in range(180):
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    model.train()
+    for _ in range(steps):
         optimizer.zero_grad()
         if end_to_end:
             action_logits, _, _ = model(pre_observation)
@@ -81,6 +84,7 @@ def _train(
         loss = nn.functional.cross_entropy(action_logits, control_targets) + nn.functional.cross_entropy(route_logits, route_targets)
         loss.backward()
         optimizer.step()
+    model.eval()
 
 
 @torch.no_grad()
@@ -101,7 +105,9 @@ def _accuracy(model: nn.Module, pre_observation: torch.Tensor, post_observation:
     return float((prediction == y).float().mean().item())
 
 
-def run(*, seed: int = 73, device: str | torch.device | None = None) -> ContinualBenchmarkResult:
+def run(
+    *, seed: int = 73, device: str | torch.device | None = None, training_steps: int = 300
+) -> ContinualBenchmarkResult:
     torch.set_num_threads(1)
     torch.manual_seed(seed)
     device = resolve_device(device)
@@ -123,9 +129,18 @@ def run(*, seed: int = 73, device: str | torch.device | None = None) -> Continua
     recurrent = RecurrentPolicy().to(device)
     transformer = TransformerContextPolicy().to(device)
     learned_plwm = EndToEndPersistentPLWM().to(device)
-    _train(recurrent, train_x, train_verified_x, train_y, train_control, end_to_end=False)
-    _train(transformer, train_x, train_verified_x, train_y, train_control, end_to_end=False)
-    _train(learned_plwm, train_x, train_verified_x, train_y, train_control, end_to_end=True)
+    _train(recurrent, train_x, train_verified_x, train_y, train_control, end_to_end=False, steps=training_steps)
+    _train(
+        transformer,
+        train_x,
+        train_verified_x,
+        train_y,
+        train_control,
+        end_to_end=False,
+        steps=training_steps,
+        learning_rate=0.003,
+    )
+    _train(learned_plwm, train_x, train_verified_x, train_y, train_control, end_to_end=True, steps=training_steps)
 
     persistent = BayesianPersistentController()
     no_memory = NoMemoryController()
