@@ -202,6 +202,12 @@
     "trace_integrity": true,
     "runtime_ticks": 1
   },
+  "regime_switch": {
+    "revised_action_correct": true,
+    "stale_reports_ignored": true,
+    "unrelated_world_retained": true,
+    "naive_stale_action_correct": false
+  },
   "accepted": {
     "continuity": true,
     "episodic_memory": true,
@@ -220,6 +226,7 @@
     "language_runtime_boundary": true,
     "world_model_persistent_runtime": true,
     "multimodal_event_trace": true,
-    "minecraft_bridge_contract": true
+    "minecraft_bridge_contract": true,
+    "nonstationary_regime_switch": true
   }
 }
