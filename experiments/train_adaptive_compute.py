@@ -13,6 +13,7 @@ from torch import nn
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from plwm.adaptive import AdaptivePonderer
+from plwm.device import resolve_device
 
 
 STATES = 8
@@ -35,9 +36,9 @@ class Report:
     learned_mean_compute: float
 
 
-def run(steps: int = 800, seed: int = 37) -> Report:
+def run(steps: int = 800, seed: int = 37, device: str | torch.device | None = None) -> Report:
     torch.manual_seed(seed)
-    device = torch.device("cpu")
+    device = resolve_device(device)
     model = AdaptivePonderer(STATES, latent_dim=32, max_steps=MAX_STEPS).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=3e-3)
     loss_fn = nn.CrossEntropyLoss()

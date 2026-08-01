@@ -30,6 +30,7 @@ from plwm.continual import (
     WindowedContextController,
     batches,
 )
+from plwm.device import resolve_device
 
 
 @dataclass
@@ -97,12 +98,13 @@ def _accuracy(model: nn.Module, pre_observation: torch.Tensor, post_observation:
         else:
             _, routes = model(post_observation[observe_mask])
         prediction[observe_mask] = routes.argmax(dim=-1)
-    return float((prediction == y.cpu()).float().mean().item())
+    return float((prediction == y).float().mean().item())
 
 
-def run(*, seed: int = 73) -> ContinualBenchmarkResult:
+def run(*, seed: int = 73, device: str | torch.device | None = None) -> ContinualBenchmarkResult:
     torch.set_num_threads(1)
     torch.manual_seed(seed)
+    device = resolve_device(device)
     train = _tasks(1024, distractors=2, seed=seed)
     evaluation = _tasks(512, distractors=10, seed=seed + 1)
     train_x, train_y = batches(train)
@@ -110,10 +112,17 @@ def run(*, seed: int = 73) -> ContinualBenchmarkResult:
     eval_x, eval_y = batches(evaluation)
     eval_verified_x, _ = batches(evaluation, include_verification=True)
     train_control = _control_targets(train)
+    train_x, train_y, train_verified_x, train_control = (
+        train_x.to(device),
+        train_y.to(device),
+        train_verified_x.to(device),
+        train_control.to(device),
+    )
+    eval_x, eval_y, eval_verified_x = eval_x.to(device), eval_y.to(device), eval_verified_x.to(device)
 
-    recurrent = RecurrentPolicy()
-    transformer = TransformerContextPolicy()
-    learned_plwm = EndToEndPersistentPLWM()
+    recurrent = RecurrentPolicy().to(device)
+    transformer = TransformerContextPolicy().to(device)
+    learned_plwm = EndToEndPersistentPLWM().to(device)
     _train(recurrent, train_x, train_verified_x, train_y, train_control, end_to_end=False)
     _train(transformer, train_x, train_verified_x, train_y, train_control, end_to_end=False)
     _train(learned_plwm, train_x, train_verified_x, train_y, train_control, end_to_end=True)

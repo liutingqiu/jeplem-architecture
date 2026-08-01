@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from experiments.train_causal_world import make_batch_fixed, state_index, train_persistent
 from plwm.commitments import Commitment
+from plwm.device import resolve_device
 from plwm.world_model import ActionConditionedPLWM
 from plwm.world_runtime import WorldModelPersistentRuntime
 
@@ -25,11 +26,12 @@ class WorldRuntimeResult:
     mean_selected_utility: float
 
 
-def run(*, steps: int = 300, seed: int = 47) -> WorldRuntimeResult:
+def run(*, steps: int = 300, seed: int = 47, device: str | torch.device | None = None) -> WorldRuntimeResult:
     torch.manual_seed(seed)
-    model = ActionConditionedPLWM(3)
-    train_persistent(model, steps=steps, device=torch.device("cpu"))
-    context, decision, _action, _next_state, optimal = make_batch_fixed(128, torch.device("cpu"))
+    device = resolve_device(device)
+    model = ActionConditionedPLWM(3).to(device)
+    train_persistent(model, steps=steps, device=device)
+    context, decision, _action, _next_state, optimal = make_batch_fixed(128, device)
     goals = state_index(torch.where(decision[:, 2] > 0, torch.ones_like(optimal), -torch.ones_like(optimal)))
     correct = 0
     utility = []

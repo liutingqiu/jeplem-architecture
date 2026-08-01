@@ -18,6 +18,7 @@ from torch import Tensor, nn
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from plwm.world_model import ActionConditionedPLWM, StatelessWorldModel
+from plwm.device import resolve_device
 
 
 def state_index(signed_state: Tensor) -> Tensor:
@@ -98,9 +99,9 @@ class Report:
     stateless_loss: float
 
 
-def run(steps: int = 300, seed: int = 13) -> Report:
+def run(steps: int = 300, seed: int = 13, device: str | torch.device | None = None) -> Report:
     torch.manual_seed(seed)
-    device = torch.device("cpu")
+    device = resolve_device(device)
     persistent = ActionConditionedPLWM(3).to(device)
     stateless = StatelessWorldModel(3).to(device)
     persistent_loss = train_persistent(persistent, steps=steps, device=device)

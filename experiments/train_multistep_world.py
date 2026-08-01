@@ -13,6 +13,7 @@ from torch import nn
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from plwm.world_model import RolloutWorldModel
+from plwm.device import resolve_device
 
 
 STATES = 5
@@ -82,9 +83,9 @@ class Report:
     stateless_loss: float
 
 
-def run(steps: int = 400, seed: int = 29) -> Report:
+def run(steps: int = 400, seed: int = 29, device: str | torch.device | None = None) -> Report:
     torch.manual_seed(seed)
-    device = torch.device("cpu")
+    device = resolve_device(device)
     persistent = RolloutWorldModel(use_context=True).to(device)
     stateless = RolloutWorldModel(use_context=False).to(device)
     persistent_loss = train(persistent, steps=steps, device=device)

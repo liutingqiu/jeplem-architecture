@@ -252,11 +252,12 @@ class LearnedPersistentRuntime:
     def run(self, task: EvidenceTask) -> EpisodeResult:
         self.ledger = CommitmentLedger()
         self.ledger.add(Commitment("reach-correct-route", target_state=task.route, priority=1.0, deadline=4))
-        sequence = task.sequence(include_verification=False).unsqueeze(0)
+        device = next(self.model.parameters()).device
+        sequence = task.sequence(include_verification=False).unsqueeze(0).to(device)
         policy_logits, _route_logits, _ = self.model(sequence)
         proposal = int(policy_logits.argmax(dim=-1).item())
         if proposal == 0:
-            _policy, route_logits, _ = self.model(task.sequence(include_verification=True).unsqueeze(0))
+            _policy, route_logits, _ = self.model(task.sequence(include_verification=True).unsqueeze(0).to(device))
             route = int(route_logits.argmax(dim=-1).item())
         else:
             route = proposal - 1

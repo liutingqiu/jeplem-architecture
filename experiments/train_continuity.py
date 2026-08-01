@@ -19,6 +19,7 @@ from torch import Tensor, nn
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from plwm.torch_model import StatelessBaseline, TorchPLWM
+from plwm.device import resolve_device
 
 
 INPUT_DIM = 4
@@ -89,9 +90,9 @@ def checkpoint_equivalence(model: TorchPLWM, device: torch.device, distractors: 
     return bool(torch.allclose(model.classify(uninterrupted), model.classify(resumed), atol=1e-7))
 
 
-def run(steps: int = 350, distractors: int = 5, seed: int = 23) -> Report:
+def run(steps: int = 350, distractors: int = 5, seed: int = 23, device: str | torch.device | None = None) -> Report:
     torch.manual_seed(seed)
-    device = torch.device("cpu")
+    device = resolve_device(device)
     plwm = TorchPLWM(INPUT_DIM, latent_dim=48, memory_slots=8, thought_steps=3).to(device)
     baseline = StatelessBaseline(INPUT_DIM, hidden_dim=48).to(device)
     plwm_loss = train_model(plwm, steps=steps, distractors=distractors, device=device)

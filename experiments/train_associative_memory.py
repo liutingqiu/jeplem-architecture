@@ -18,6 +18,7 @@ from torch import Tensor, nn
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from plwm.torch_model import TorchPLWM
+from plwm.device import resolve_device
 
 
 KEYS = 8
@@ -74,9 +75,9 @@ class Report:
     no_memory_loss: float
 
 
-def run(steps: int = 550, seed: int = 31) -> Report:
+def run(steps: int = 550, seed: int = 31, device: str | torch.device | None = None) -> Report:
     torch.manual_seed(seed)
-    device = torch.device("cpu")
+    device = resolve_device(device)
     with_memory = TorchPLWM(
         INPUT_DIM, latent_dim=64, memory_slots=KEYS + 1, thought_steps=3, use_memory=True
     ).to(device)

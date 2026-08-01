@@ -136,6 +136,11 @@ Run the expanded benchmark directly with:
 python experiments/continual_benchmark.py
 ```
 
+Training experiments resolve `PLWM_DEVICE` explicitly. The default `auto`
+uses CUDA when available and otherwise CPU; setting `PLWM_DEVICE=cuda` fails
+instead of silently running on CPU when the installed PyTorch build has no CUDA
+backend.
+
 The benchmark's recurrent baseline is intentionally retained even when it
 matches or exceeds PLWM on a task. That result is evidence about the task, not
 silently discarded.

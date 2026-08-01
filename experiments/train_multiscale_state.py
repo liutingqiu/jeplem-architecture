@@ -13,6 +13,7 @@ from torch import nn
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from plwm.multiscale import MultiScalePLWM
+from plwm.device import resolve_device
 
 
 def make_batch(batch: int, steps: int, device: torch.device):
@@ -25,9 +26,9 @@ def make_batch(batch: int, steps: int, device: torch.device):
     return observations, stable, volatile
 
 
-def run(steps: int = 700, seed: int = 47):
+def run(steps: int = 700, seed: int = 47, device: str | torch.device | None = None):
     torch.manual_seed(seed)
-    device = torch.device("cpu")
+    device = resolve_device(device)
     model = MultiScalePLWM().to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=3e-3)
     loss_fn = nn.BCEWithLogitsLoss()

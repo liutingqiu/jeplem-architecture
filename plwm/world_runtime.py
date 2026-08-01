@@ -28,8 +28,9 @@ class WorldModelPersistentRuntime:
 
     def __init__(self, model: ActionConditionedPLWM, belief_states: int):
         self.model = model
-        self.world_state = model.initial_state(1, "cpu")
-        self.belief = CategoricalBelief.uniform(1, belief_states)
+        self.device = next(model.parameters()).device
+        self.world_state = model.initial_state(1, self.device)
+        self.belief = CategoricalBelief.uniform(1, belief_states, self.device)
         self.ledger = CommitmentLedger()
 
     def add_commitment(self, commitment: Commitment) -> None:
@@ -37,8 +38,10 @@ class WorldModelPersistentRuntime:
 
     def ingest(self, observation: Sequence[float], log_likelihood: Sequence[float] | None = None) -> WorldRuntimeTick:
         if log_likelihood is not None:
-            self.belief = self.belief.observe(torch.tensor([list(log_likelihood)], dtype=torch.float32))
-        self.world_state = self.model.advance(torch.tensor([list(observation)], dtype=torch.float32), self.world_state)
+            self.belief = self.belief.observe(torch.tensor([list(log_likelihood)], dtype=torch.float32, device=self.device))
+        self.world_state = self.model.advance(
+            torch.tensor([list(observation)], dtype=torch.float32, device=self.device), self.world_state
+        )
         probs = self.belief.probs.squeeze(0).tolist()
         self.ledger.tick()
         self.ledger.reconcile(probs)
@@ -50,8 +53,8 @@ class WorldModelPersistentRuntime:
     def propose(self, goal_state: int, action_costs: Sequence[float]) -> tuple[int, list[float]]:
         action, utility = self.model.plan_costed(
             self.world_state,
-            torch.tensor([goal_state]),
-            torch.tensor(list(action_costs), dtype=torch.float32),
+            torch.tensor([goal_state], device=self.device),
+            torch.tensor(list(action_costs), dtype=torch.float32, device=self.device),
         )
         return int(action.item()), utility.squeeze(0).tolist()
 
@@ -81,8 +84,8 @@ class WorldModelPersistentRuntime:
         if snapshot.get("integrity") != PersistentRuntime._integrity(snapshot):
             raise ValueError("world runtime snapshot integrity check failed")
         runtime = cls(model, belief_states)
-        runtime.world_state = WorldState(torch.tensor(snapshot["world_belief"], dtype=torch.float32))
-        runtime.belief = CategoricalBelief(torch.tensor(snapshot["belief_log_probs"], dtype=torch.float32))
+        runtime.world_state = WorldState(torch.tensor(snapshot["world_belief"], dtype=torch.float32, device=runtime.device))
+        runtime.belief = CategoricalBelief(torch.tensor(snapshot["belief_log_probs"], dtype=torch.float32, device=runtime.device))
         ledger_data = snapshot["ledger"]
         runtime.ledger.time = int(ledger_data["time"])
         runtime.ledger.commitments = [
