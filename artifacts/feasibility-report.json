@@ -1,0 +1,205 @@
+{
+  "continuity": [
+    {
+      "distractors": 1,
+      "seed": 5,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.5029296875,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.0002992479130625725,
+      "baseline_loss": 0.6985987424850464
+    },
+    {
+      "distractors": 1,
+      "seed": 17,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.503173828125,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.00020956947992090136,
+      "baseline_loss": 0.6916655898094177
+    },
+    {
+      "distractors": 1,
+      "seed": 41,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.493408203125,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.00031279155518859625,
+      "baseline_loss": 0.6956775188446045
+    },
+    {
+      "distractors": 5,
+      "seed": 5,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.50341796875,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.00025465531507506967,
+      "baseline_loss": 0.6947804689407349
+    },
+    {
+      "distractors": 5,
+      "seed": 17,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.50439453125,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.0001838890166254714,
+      "baseline_loss": 0.6925458908081055
+    },
+    {
+      "distractors": 5,
+      "seed": 41,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.50146484375,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.0002570376673247665,
+      "baseline_loss": 0.6950211524963379
+    },
+    {
+      "distractors": 12,
+      "seed": 5,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.494873046875,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.00032875873148441315,
+      "baseline_loss": 0.6973134875297546
+    },
+    {
+      "distractors": 12,
+      "seed": 17,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.50439453125,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.00023285855422727764,
+      "baseline_loss": 0.6917175650596619
+    },
+    {
+      "distractors": 12,
+      "seed": 41,
+      "plwm_accuracy": 1.0,
+      "baseline_accuracy": 0.502197265625,
+      "checkpoint_exact": true,
+      "plwm_loss": 0.00037519511533901095,
+      "baseline_loss": 0.6944283843040466
+    }
+  ],
+  "associative_memory": {
+    "memory_accuracy": 1.0,
+    "gated_memory_accuracy": 1.0,
+    "no_memory_accuracy": 0.6640625,
+    "memory_loss": 4.888086550636217e-05,
+    "gated_memory_loss": 7.056276081129909e-05,
+    "no_memory_loss": 0.6466842889785767
+  },
+  "adaptive_compute": {
+    "accuracy": 1.0,
+    "expected_steps_by_difficulty": [
+      0.049124475568532944,
+      0.9247751832008362,
+      1.9365577697753906,
+      2.9413564205169678,
+      3.7741007804870605
+    ],
+    "fixed_max_compute": 4.0,
+    "learned_mean_compute": 1.9251829385757446
+  },
+  "multiscale_state": {
+    "fast_accuracy": 1.0,
+    "slow_accuracy": 1.0,
+    "slow_retention_after_contradiction": 0.99560546875,
+    "mean_slow_gate_during_contradiction": 0.28712761402130127
+  },
+  "belief_revision": {
+    "weak_evidence_confidence": 0.550000011920929,
+    "strong_evidence_confidence": 0.9998475313186646,
+    "confidence_after_first_contradiction": 0.998630166053772,
+    "final_revised_state": 0,
+    "entropy_declines_with_confirming_evidence": true
+  },
+  "commitment_recovery": {
+    "selected_initially": "ship",
+    "selected_after_interruption": "ship",
+    "selected_after_completion": "research",
+    "completed_status": "completed",
+    "cancelled_status": "cancelled",
+    "evidence_recorded": true
+  },
+  "integrated_runtime": {
+    "action_under_uncertainty": "think",
+    "selected_before_completion": "reach-state-one",
+    "completed_after_evidence": 1,
+    "selected_after_completion": "fallback",
+    "snapshot_has_all_layers": true,
+    "action_without_observation": "observe"
+  },
+  "causal_planning": {
+    "persistent_transition_accuracy": 1.0,
+    "persistent_planning_accuracy": 1.0,
+    "stateless_transition_accuracy": 0.48681640625,
+    "stateless_planning_accuracy": 0.4951171875,
+    "persistent_loss": 0.015361764468252659,
+    "stateless_loss": 0.6985770463943481
+  },
+  "multistep_rollout": {
+    "persistent_transition_accuracy": 1.0,
+    "persistent_rollout_success": 1.0,
+    "stateless_transition_accuracy": 0.4593912661075592,
+    "stateless_rollout_success": 0.224365234375,
+    "persistent_loss": 0.1785832941532135,
+    "stateless_loss": 2.093259334564209
+  },
+  "continual_partial_observability": {
+    "plwm_success": 0.9609375,
+    "plwm_mean_cost": 0.100234375,
+    "plwm_observation_rate": 0.501953125,
+    "no_memory_success": 0.498046875,
+    "windowed_context_success": 0.501953125,
+    "recurrent_success": 0.9609375,
+    "transformer_context_success": 0.974609375,
+    "end_to_end_plwm_success": 0.9609375,
+    "end_to_end_commitment_recovery": 0.9609375,
+    "stale_memory_correction": 0.955078125,
+    "long_delay_recovery": 0.9765625,
+    "language_port_is_stateless": true,
+    "commitment_survives_delay": true
+  },
+  "lifelong_memory": {
+    "stable_retention": 1.0,
+    "changed_fact_revision": true,
+    "stale_burst_resistance": true,
+    "provenance_complete": true,
+    "consolidation_count": 1,
+    "last_write_stable_retention": 1.0,
+    "last_write_changed_fact_revision": false
+  },
+  "language_runtime": {
+    "checkpoint_continuity": true,
+    "runtime_ticks": 2,
+    "strict_parser_rejects_invalid": true,
+    "emits_without_mutating_runtime": true
+  },
+  "world_model_runtime": {
+    "runtime_planning_accuracy": 1.0,
+    "checkpoint_action_exact": true,
+    "completion_requires_evidence": true,
+    "commitment_switches_after_evidence": true,
+    "mean_selected_utility": -0.03238694756873883
+  },
+  "accepted": {
+    "continuity": true,
+    "episodic_memory": true,
+    "causal_planning": true,
+    "multistep_rollout": true,
+    "adaptive_compute": true,
+    "multiscale_state": true,
+    "belief_revision": true,
+    "commitment_recovery": true,
+    "integrated_runtime": true,
+    "continual_partial_observability": true,
+    "end_to_end_persistent_control": true,
+    "stale_memory_and_language_boundary": true,
+    "lifelong_memory_consolidation": true,
+    "fair_transformer_baseline": true,
+    "language_runtime_boundary": true,
+    "world_model_persistent_runtime": true
+  }
+}
