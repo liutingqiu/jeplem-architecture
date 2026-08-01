@@ -45,6 +45,17 @@ class MinecraftBridgeTests(unittest.TestCase):
                 session.ingest_outcome({"name": "observe", "status": "accepted", "request_id": request_id})
         self.assertEqual(session.trace.events[-1].kind, "outcome")
 
+    def test_action_caused_observation_requires_an_acknowledged_action(self):
+        with TemporaryDirectory() as directory:
+            runtime = TrainablePersistentRuntime(EndToEndPersistentPLWM(input_dim=5, latent_dim=12), belief_states=2)
+            session = MinecraftRuntimeSession(MinecraftFileBridge(Path(directory)), runtime, "e5")
+            request_id = session.reset_episode()
+            with self.assertRaises(ValueError):
+                session.ingest_observation({"caused_by": request_id})
+            session.ingest_outcome({"name": "reset_episode", "status": "accepted", "request_id": request_id})
+            session.ingest_observation({"health": 20, "food": 20, "x": 0, "z": 0, "game_time": 0, "caused_by": request_id})
+        self.assertEqual(session.trace.events[-1].kind, "observation")
+
     def test_runtime_session_keeps_episode_trace_and_persistent_tick(self):
         with TemporaryDirectory() as directory:
             runtime = TrainablePersistentRuntime(EndToEndPersistentPLWM(input_dim=5, latent_dim=12), belief_states=2)

@@ -101,7 +101,7 @@ final class LocalTraceBridge {
                 }
                 writeRecord("outcome", "bridge", actionOutcome(name, "accepted", requestId));
             } else if ("reset_episode".equals(name)) {
-                resetPlayers(server);
+                resetPlayers(server, requestId);
                 writeRecord("outcome", "bridge", actionOutcome(name, "accepted", requestId));
             } else if ("set_episode".equals(name) && action.has("episode_id")) {
                 episodeId = action.get("episode_id").getAsString();
@@ -114,16 +114,20 @@ final class LocalTraceBridge {
         }
     }
 
-    private void resetPlayers(MinecraftServer server) {
+    private void resetPlayers(MinecraftServer server, String requestId) {
         ServerLevel level = server.overworld();
         BlockPos spawn = level.getSharedSpawnPos();
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             player.teleportTo(level, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, player.getYRot(), player.getXRot());
-            writeObservation(server, player);
+            writeObservation(server, player, requestId);
         }
     }
 
     private void writeObservation(MinecraftServer server, ServerPlayer player) {
+        writeObservation(server, player, null);
+    }
+
+    private void writeObservation(MinecraftServer server, ServerPlayer player, String causedBy) {
         JsonObject payload = new JsonObject();
         payload.addProperty("player_id", player.getStringUUID());
         payload.addProperty("x", player.getX());
@@ -132,6 +136,9 @@ final class LocalTraceBridge {
         payload.addProperty("health", player.getHealth());
         payload.addProperty("food", player.getFoodData().getFoodLevel());
         payload.addProperty("game_time", server.overworld().getGameTime());
+        if (causedBy != null) {
+            payload.addProperty("caused_by", causedBy);
+        }
         writeRecord("observation", "minecraft-state", payload);
     }
 

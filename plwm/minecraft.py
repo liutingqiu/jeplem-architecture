@@ -106,6 +106,7 @@ class MinecraftRuntimeSession:
     episode_id: str
     trace: EpisodeTrace = field(init=False)
     pending_action_ids: set[str] = field(default_factory=set, init=False)
+    acknowledged_action_ids: set[str] = field(default_factory=set, init=False)
 
     def __post_init__(self) -> None:
         self.trace = EpisodeTrace(self.episode_id)
@@ -134,6 +135,7 @@ class MinecraftRuntimeSession:
         if status not in {"accepted", "rejected"}:
             raise ValueError("Minecraft action outcome must be accepted or rejected")
         self.pending_action_ids.remove(request_id)
+        self.acknowledged_action_ids.add(request_id)
         self.trace.append("outcome", "minecraft-bridge", dict(payload))
 
     def _record_action(self, request_id: str, name: str, *, episode_id: str | None = None) -> None:
@@ -144,5 +146,10 @@ class MinecraftRuntimeSession:
         self.trace.append("action", "minecraft-action", payload)
 
     def ingest_observation(self, payload: Mapping[str, Any]) -> TrainableRuntimeTick:
+        caused_by = payload.get("caused_by")
+        if caused_by is not None and (
+            not isinstance(caused_by, str) or caused_by not in self.acknowledged_action_ids
+        ):
+            raise ValueError("observation claims an unknown Minecraft action cause")
         self.trace.append("observation", "minecraft-state", observation_payload(state=payload))
         return self.runtime.ingest(MinecraftStateEncoder.encode(payload))

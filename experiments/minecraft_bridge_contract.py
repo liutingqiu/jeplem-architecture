@@ -19,6 +19,7 @@ from plwm.runtime import TrainablePersistentRuntime
 class MinecraftBridgeResult:
     allowlist_enforced: bool
     request_outcomes_linked: bool
+    action_state_causality_enforced: bool
     trace_integrity: bool
     runtime_ticks: int
 
@@ -34,6 +35,11 @@ def run() -> MinecraftBridgeResult:
         bridge.write_action("reset_episode")
         session.ingest_outcome({"name": "set_episode", "status": "accepted", "request_id": episode_request})
         session.ingest_outcome({"name": "observe", "status": "accepted", "request_id": observation_request})
+        try:
+            session.ingest_observation({"caused_by": "unknown"})
+            causal = False
+        except ValueError:
+            causal = True
         session.ingest_observation({"health": 18, "food": 16, "x": 8, "z": -4, "game_time": 6000})
         try:
             bridge.write_action("op")
@@ -41,7 +47,7 @@ def run() -> MinecraftBridgeResult:
         except ValueError:
             allowlist = True
         session.trace.verify()
-        return MinecraftBridgeResult(allowlist, not session.pending_action_ids, True, runtime.ledger.time)
+        return MinecraftBridgeResult(allowlist, not session.pending_action_ids, causal, True, runtime.ledger.time)
 
 
 if __name__ == "__main__":

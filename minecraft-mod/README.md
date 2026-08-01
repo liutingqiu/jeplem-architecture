@@ -24,6 +24,8 @@ unique ASCII `request_id`; its terminal outcome includes the same ID. The only
 accepted action names are `observe`, `set_episode`, and `reset_episode`.
 
 `reset_episode` only teleports online players to the overworld shared spawn.
+The resulting player observations carry that action's `request_id` as
+`caused_by`, preserving the action-to-state causal link in the raw trace.
 Movement, looking, block interaction, inventory changes, chat, commands, and
 network access are intentionally unavailable. Historical action lines are
 ignored after a server restart, so an action can be executed at most once by a

@@ -162,6 +162,7 @@ def main() -> None:
         "minecraft_bridge_contract": (
             minecraft_bridge["allowlist_enforced"]
             and minecraft_bridge["request_outcomes_linked"]
+            and minecraft_bridge["action_state_causality_enforced"]
             and minecraft_bridge["trace_integrity"]
             and minecraft_bridge["runtime_ticks"] == 1
         ),
