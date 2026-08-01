@@ -184,6 +184,16 @@
     "commitment_switches_after_evidence": true,
     "mean_selected_utility": -0.03238694756873883
   },
+  "trajectory_contract": {
+    "event_count": 4,
+    "hash_chain_valid": true,
+    "modalities_preserved": true
+  },
+  "minecraft_bridge": {
+    "allowlist_enforced": true,
+    "trace_integrity": true,
+    "runtime_ticks": 1
+  },
   "accepted": {
     "continuity": true,
     "episodic_memory": true,
@@ -200,6 +210,8 @@
     "lifelong_memory_consolidation": true,
     "fair_transformer_baseline": true,
     "language_runtime_boundary": true,
-    "world_model_persistent_runtime": true
+    "world_model_persistent_runtime": true,
+    "multimodal_event_trace": true,
+    "minecraft_bridge_contract": true
   }
 }

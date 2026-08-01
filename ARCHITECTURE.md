@@ -66,6 +66,21 @@ Language adapters must produce declared, schema-validated evidence. A backend
 may generate or parse text, but it cannot mutate runtime state directly; the
 runtime checkpoint remains the only source of continuity across backend calls.
 
+## Environment Protocol
+
+PLWM environments emit modality-neutral, ordered records rather than chat
+turns. `EpisodeTrace` preserves raw vector, text, image reference, game-state,
+action, reward, commitment, and checkpoint payloads in a SHA-256 hash chain.
+The core can use learned encoders per modality, but trace ownership and
+causality stay uniform across modalities.
+
+The local Minecraft pilot uses this boundary in two stages: a Fabric server
+mod writes append-only raw state/outcome JSONL and accepts only an explicit
+local action allowlist; the Python bridge normalizes it into `EpisodeTrace`
+before persistent runtime ingestion. The current server-side pilot does not
+claim player movement or arbitrary command execution. Those require a later,
+separately audited client capability layer.
+
 `TrainablePersistentRuntime` now makes the trainable latent state a runtime
 layer instead of a one-shot experiment artifact. Its `think_only` transition
 updates workspace without any observation, text emission, belief update, memory

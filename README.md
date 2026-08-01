@@ -166,6 +166,28 @@ the offline suite):
 python experiments/ollama_integration.py --required
 ```
 
+## Minecraft Pilot
+
+`minecraft-mod/` is a Fabric 1.21 server-side local training bridge. It writes
+raw Minecraft state/outcome JSONL under the game directory's `plwm-training/`
+folder and accepts only `observe`, `set_episode`, and spawn-only
+`reset_episode` action records. Python
+normalizes those records into the same hash-chained `EpisodeTrace` used by
+other environments before passing state into `TrainablePersistentRuntime`.
+
+Build the Fabric mod with Java 21:
+
+```text
+cd minecraft-mod
+gradlew.bat build
+```
+
+The offline bridge contract is separately executable:
+
+```text
+python experiments/minecraft_bridge_contract.py
+```
+
 The trainable runtime also exposes `think_only()`: a latent-only workspace
 transition that has no observation input and cannot write evidence, memory, or
 commitment state. `WorldModelPersistentRuntime` combines action-conditioned

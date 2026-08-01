@@ -22,6 +22,8 @@ from experiments.continual_benchmark import run as run_continual_benchmark
 from experiments.lifelong_benchmark import run as run_lifelong_benchmark
 from experiments.language_runtime import run as run_language_runtime
 from experiments.world_runtime import run as run_world_runtime
+from experiments.trajectory_contract import run as run_trajectory_contract
+from experiments.minecraft_bridge_contract import run as run_minecraft_bridge_contract
 
 
 def main() -> None:
@@ -47,6 +49,8 @@ def main() -> None:
     lifelong = asdict(run_lifelong_benchmark())
     language_runtime = asdict(run_language_runtime())
     world_runtime = asdict(run_world_runtime())
+    trajectory = asdict(run_trajectory_contract())
+    minecraft_bridge = asdict(run_minecraft_bridge_contract())
     accepted = {
         "continuity": all(
             row["plwm_accuracy"] >= 0.9
@@ -140,6 +144,16 @@ def main() -> None:
             and world_runtime["completion_requires_evidence"]
             and world_runtime["commitment_switches_after_evidence"]
         ),
+        "multimodal_event_trace": (
+            trajectory["event_count"] >= 4
+            and trajectory["hash_chain_valid"]
+            and trajectory["modalities_preserved"]
+        ),
+        "minecraft_bridge_contract": (
+            minecraft_bridge["allowlist_enforced"]
+            and minecraft_bridge["trace_integrity"]
+            and minecraft_bridge["runtime_ticks"] == 1
+        ),
     }
     report = {
         "continuity": continuity,
@@ -155,6 +169,8 @@ def main() -> None:
         "lifelong_memory": lifelong,
         "language_runtime": language_runtime,
         "world_model_runtime": world_runtime,
+        "trajectory_contract": trajectory,
+        "minecraft_bridge": minecraft_bridge,
         "accepted": accepted,
     }
     output = Path(__file__).resolve().parents[1] / "artifacts" / "feasibility-report.json"

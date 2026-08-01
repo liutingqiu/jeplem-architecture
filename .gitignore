@@ -4,3 +4,6 @@ __pycache__/
 build/
 *.egg-info/
 artifacts/wheelhouse/
+minecraft-mod/.gradle/
+minecraft-mod/build/
+minecraft-mod/gradle-*.zip

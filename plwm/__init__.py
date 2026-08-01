@@ -19,6 +19,8 @@ try:
     from .world_model import ActionConditionedPLWM, StatelessWorldModel, WorldState
     from .world_runtime import WorldModelPersistentRuntime, WorldRuntimeTick
     from .language import JsonLanguagePort, LanguageEvidence, OllamaBackend
+    from .events import EnvironmentEvent, EpisodeTrace, observation_payload
+    from .minecraft import MinecraftFileBridge, MinecraftRuntimeSession, MinecraftStateEncoder
 except ModuleNotFoundError:  # The dependency-free core remains importable.
     pass
 
@@ -51,4 +53,10 @@ __all__ = [
     "JsonLanguagePort",
     "LanguageEvidence",
     "OllamaBackend",
+    "EnvironmentEvent",
+    "EpisodeTrace",
+    "observation_payload",
+    "MinecraftFileBridge",
+    "MinecraftRuntimeSession",
+    "MinecraftStateEncoder",
 ]
