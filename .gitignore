@@ -7,3 +7,8 @@ artifacts/wheelhouse/
 minecraft-mod/.gradle/
 minecraft-mod/build/
 minecraft-mod/gradle-*.zip
+
+# Artifact logs (keep reports, ignore noise)
+artifacts/*.err.log
+artifacts/*.out.log
+artifacts/*.log
