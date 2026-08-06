@@ -1544,6 +1544,51 @@ position of the queried identity - run on the same addressed_balanced_2id
 course with the same frozen seeds, matched baselines, and held-out window,
 recorded here before any run.
 
+## 14. 数学探索裁决综合（2026-08-07）
+
+### 14.1 四卡裁决摘要
+
+| 卡 | 命题 | 判定 | 工程影响 |
+|---|---|---|---|
+| A-P1a | 可分离性 | 证实 | err ≤ (M-1)·exp(-βδ/√d) |
+| A-P1b | 容量上限 | 证实 | O(exp(cd))，d=16 充足 |
+| A-P1c | 训练可得多性 | 需正交初始化 | key_head QR 投影（每步） |
+| B-P2a | 模糊查询 | 证实 | Luanti 网格噪声安全（ε_max≈2.3） |
+| B-P2b | 谓词筛选 | 证实 | L1 单 score 足够（n=⌈log₂K/d⌉=1） |
+| B-P2c | 一致性 | 需元数据 | confidence-weighted softmax（已实现） |
+| C-P3a | 表达式表示 | 证实 | 矩阵半群 = 最小结构 |
+| C-P3b | 时序必要性 | 证实 | 非交换性必须；DAG 比偏序集精确 |
+| C-P3c | 值→命题统一 | 需类型系统 | value/rule 标签（L3 引入） |
+| D-P4a | 修订收敛 | 证实 | U₂ 贝叶斯合并推荐（渐近收敛） |
+| D-P4b | 新旧并存 | 证实（条件） | c_e 需反映证据可靠性 |
+| D-P4c | 冲突检测 | P（简化）/ NP-hard（完整） | L1 用同 key 比对即可 |
+
+### 14.2 工程修复状态
+
+- ✅ β 缩放（torch_model.py: scores *= beta, default=1.0）
+- ✅ 键正交初始化（torch_model.py: QR-based _init_keys_orthogonal）
+- ✅ QR 投影保正交（torch_model.py: enforce_key_orthogonality，每步 O(d³)）
+- ✅ confidence-weighted retrieval（torch_model.py: confidence_head + weighted softmax）
+- ✅ 向后兼容旧 checkpoint（TorchCognitiveState.restore 自动填充零置信度）
+- ✅ 7 个训练脚本集成 QR 投影（E-001）
+- ✅ 6 项测试全部通过
+
+### 14.3 L1 下一步
+
+预声明合同（experiments/dispatch/card-B-002.md）：
+- 课程：addressed_balanced_2id
+- 辅助检索监督 loss（query 步训练 write-then-read 路径）
+- 验收线：PLWM held-out ≥ 0.75（当前 0.50，机会水平）
+
+### 14.4 开放问题（不影响当前决策）
+
+- Q1: 动态置信度更新公式（Kalman filter vs 在线贝叶斯）——需 C+D 联合分析
+- Q2: U₂ 收敛加速因子 γ（工程参数，需实验验证）
+- Q3: 多证据累积鲁棒性统计分析
+- Q4: c_e 来源与 fact_ledger.py 集成接口
+
+---
+
 ## Completion Rule
 
 There is no declared final intelligence threshold. The project proceeds while
