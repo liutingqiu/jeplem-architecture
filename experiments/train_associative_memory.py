@@ -53,6 +53,8 @@ def train(model: TorchPLWM, *, steps: int, device: torch.device) -> float:
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        if hasattr(model, 'core') and hasattr(model.core, 'enforce_key_orthogonality'):
+            model.core.enforce_key_orthogonality()
         loss_value = float(loss.detach())
     return loss_value
 

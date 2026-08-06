@@ -534,6 +534,8 @@ def _learn(model: QNetwork, target: QNetwork, replay: list[Episode], *, batch_si
     loss.backward()
     torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
     optimizer.step()
+    if hasattr(model, 'core') and hasattr(model.core, 'enforce_key_orthogonality'):
+        model.core.enforce_key_orthogonality()
 
 
 def _train(
