@@ -134,6 +134,14 @@ class TorchPLWM(nn.Module):
         I = torch.eye(G.shape[0], device=G.device)
         return ((G - I) ** 2).mean()
 
+    def enforce_key_orthogonality(self) -> None:
+        """A-P1c: project key_head weight onto orthogonal group after each optimizer step.
+        Uses QR decomposition: W ← Q guarantees rows are orthonormal.
+        """
+        W = self.key_head.weight
+        Q, _ = torch.linalg.qr(W)
+        self.key_head.weight.data = Q
+
     def step(
         self,
         observation: Tensor,
