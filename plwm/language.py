@@ -95,3 +95,61 @@ class JsonLanguagePort:
     def apply_to_runtime(self, runtime, evidence: LanguageEvidence):
         """Forward declared evidence; runtime authority decides all state changes."""
         return runtime.ingest(evidence.event, evidence.log_likelihood)
+
+
+@dataclass(frozen=True)
+class LuantiLanguageGoal:
+    """Schema-validated language intent; it owns no environment mutation."""
+
+    task: str
+    target: str
+    require_key: bool
+    avoid_decoy: bool
+    require_charge: bool = False
+    select_charged_object: bool = False
+
+
+def parse_luanti_language_goal(text: str) -> LuantiLanguageGoal:
+    """Parse one of the declared, non-authoritative object-delivery intents."""
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError as error:
+        raise ValueError("Luanti language goal must be strict JSON") from error
+    if not isinstance(payload, dict):
+        raise ValueError("Luanti language goal has an invalid schema")
+    basic_schema = {"task", "target", "require_key", "avoid_decoy"}
+    charged_schema = basic_schema | {"require_charge"}
+    polarity_schema = {"task", "target", "require_key", "require_charge", "select_charged_object"}
+    task = payload.get("task")
+    if task == "object_delivery" and set(payload) == basic_schema:
+        require_charge = False
+    elif task == "charged_object_delivery" and set(payload) == charged_schema:
+        require_charge = payload.get("require_charge")
+        avoid_decoy = payload["avoid_decoy"]
+        select_charged_object = False
+    elif task == "polarity_object_delivery" and set(payload) == polarity_schema:
+        require_charge = payload.get("require_charge")
+        avoid_decoy = False
+        select_charged_object = payload.get("select_charged_object")
+    else:
+        raise ValueError("Luanti language goal has an invalid schema")
+    if task == "object_delivery":
+        avoid_decoy = payload["avoid_decoy"]
+        select_charged_object = False
+    if task not in {"object_delivery", "charged_object_delivery", "polarity_object_delivery"} or payload["target"] != "goal":
+        raise ValueError("unsupported Luanti language task")
+    if (
+        not isinstance(payload["require_key"], bool)
+        or not isinstance(avoid_decoy, bool)
+        or not isinstance(require_charge, bool)
+        or not isinstance(select_charged_object, bool)
+    ):
+        raise ValueError("Luanti language goal flags must be booleans")
+    return LuantiLanguageGoal(
+        task=payload["task"],
+        target=payload["target"],
+        require_key=payload["require_key"],
+        avoid_decoy=avoid_decoy,
+        require_charge=require_charge,
+        select_charged_object=select_charged_object,
+    )

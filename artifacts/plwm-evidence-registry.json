@@ -1,0 +1,267 @@
+{
+  "protocol": "plwm_evidence_registry_v1: completed artifact classification; bounded interfaces never imply end-to-end controller superiority",
+  "entries": [
+    {
+      "identifier": "reward_only_public_navigation",
+      "status": "rejected-current-controller",
+      "scope": "same-budget MiniGrid Empty-5x5 reward-only control",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\minigrid-empty-navigation-30x24-report.json",
+      "summary": "PLWM greedy 0/64; Transformer greedy 64/64."
+    },
+    {
+      "identifier": "current_observation_skip",
+      "status": "rejected-current-controller",
+      "scope": "switchable MiniGrid control mechanism audit",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\minigrid-plwm-observation-skip-report.json",
+      "summary": "Held-out greedy success 0/64."
+    },
+    {
+      "identifier": "causal_action_event",
+      "status": "rejected-current-controller",
+      "scope": "switchable MiniGrid control mechanism audit",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\minigrid-plwm-causal-event-sequence-report.json",
+      "summary": "Held-out greedy success 0/64."
+    },
+    {
+      "identifier": "concurrent_predictive_auxiliary",
+      "status": "rejected-current-controller",
+      "scope": "switchable MiniGrid control mechanism audit",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\minigrid-plwm-predictive-auxiliary-report.json",
+      "summary": "Held-out greedy success 0/64."
+    },
+    {
+      "identifier": "predictive_pretraining",
+      "status": "rejected-current-controller",
+      "scope": "switchable MiniGrid control mechanism audit",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\minigrid-plwm-predictive-pretraining-report.json",
+      "summary": "Held-out greedy success 0/64."
+    },
+    {
+      "identifier": "action_conditioned_model_based_planning",
+      "status": "rejected-current-controller",
+      "scope": "random-transition-trained latent world model with self-rolled counterfactual planning",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\minigrid-model-based-planning-report.json",
+      "summary": "Held-out planning success 0/64; one-step loss 0.0089; six-step reward Brier 0.0671."
+    },
+    {
+      "identifier": "multistep_action_conditioned_model_based_planning",
+      "status": "rejected-current-controller",
+      "scope": "six-step self-rolled world-model training and six-step counterfactual planning",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\minigrid-model-based-multistep-report.json",
+      "summary": "Held-out planning success 0/64; six-step reward Brier 0.1624; training loss 1.2031->0.4839."
+    },
+    {
+      "identifier": "plwm_transformer_hybrid_curriculum",
+      "status": "rejected-current-controller",
+      "scope": "reward-only two-stage navigation-to-delayed-memory curriculum with capacity-matched Transformer and switchable PLWM side state",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\minigrid-hybrid-curriculum-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\minigrid-hybrid-curriculum-replication-report.json",
+      "summary": "Independent held-out blocks: 37/64 and 36/64; the replicated block did not meet the PLWM-side contribution gate."
+    },
+    {
+      "identifier": "verified_delayed_fact_interface",
+      "status": "supported-bounded-interface",
+      "scope": "source-bound, checkpoint-restored delayed facts in Luanti; not end-to-end control",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-two-fact-composition-report.json",
+      "summary": "Fact memory 8/8; no-fact 0/8; provenance=True."
+    },
+    {
+      "identifier": "replicated_luanti_polarity_delay_fact_interface",
+      "status": "supported-bounded-interface",
+      "scope": "two independent real-Luanti two-object delayed-reward fact-memory blocks; teacher-labelled policy, not end-to-end control",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-polarity-delay-32-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-polarity-delay-32-replication-report.json",
+      "summary": "32-hidden-observation fact-memory / no-memory / public-event GRU / 16-event Transformer successes: 8/8, 0/8, 0/8, 0/8; replication 8/8, 0/8, 0/8, 0/8; disjoint-seeds=True."
+    },
+    {
+      "identifier": "versioned_source_bound_fact_ledger",
+      "status": "supported-bounded-interface",
+      "scope": "source/time/confidence/version fact revision with weak-conflict isolation; not end-to-end control",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\versioned-fact-ledger-report.json",
+      "summary": "Strong revision, weak/stale conflict isolation, unrelated fact retention, and snapshot restoration=True."
+    },
+    {
+      "identifier": "versioned_fact_ledger_long_distractor_matrix",
+      "status": "supported-bounded-interface",
+      "scope": "source-bound fact revision under weak/stale conflict distractors; not end-to-end control",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\fact-ledger-distractor-matrix-report.json",
+      "summary": "Ledger 64/64; naive last-write 0/64; restored=True."
+    },
+    {
+      "identifier": "luanti_reward_ledger_replay",
+      "status": "supported-bounded-interface",
+      "scope": "read-only replay of local Luanti reward provenance into versioned facts; not end-to-end control",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-reward-ledger-replay-report.json",
+      "summary": "Real reward episodes replayed=8; source-bound restore complete=True."
+    },
+    {
+      "identifier": "visual_evidence_replacement",
+      "status": "rejected-default-robustness-path",
+      "scope": "Luanti stale/replayed visual evidence replacement",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-multi-object-visual-evidence-report.json",
+      "summary": "Conservative filter success 6/8 versus raw 7/8."
+    },
+    {
+      "identifier": "crafter_short_budget_ppo_baseline",
+      "status": "rejected-baseline-protocol",
+      "scope": "pixels-only 17-action Crafter short-budget PPO sentinel; not a PLWM architecture test",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\crafter-reward-only-sentinel-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\crafter-reward-only-sentinel-v2-smoke-report.json",
+      "summary": "Two independently written artifacts failed the basic greedy-return gate: v1 best=-0.0563 versus random=0.9375; streaming-inference v2 best=-0.2250 versus random=0.6250. The protocol is rejected, not the environment or PLWM architecture."
+    },
+    {
+      "identifier": "learned_source_bound_fact_revision",
+      "status": "replicated-diagnostic-signal-not-control-ready",
+      "scope": "supervised long-conflict fact-memory diagnostic; not reward-only control",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\learned-fact-revision-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\learned-fact-revision-replication-report.json",
+      "summary": "64-distractor learned-store margin over the strongest standard baseline: first=0.2969, replication=0.2559; both reports failed their absolute reliability gate and remain excluded from control."
+    },
+    {
+      "identifier": "crafter_sb3_short_budget_stability",
+      "status": "rejected-baseline-protocol",
+      "scope": "three independent Stable-Baselines3 PPO blocks on RGB-only Crafter; not a PLWM test",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\crafter-sb3-pixels-baseline-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\crafter-sb3-pixels-baseline-replication-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\crafter-sb3-pixels-baseline-third-block-report.json",
+      "summary": "Fixed 16,384-step PPO deltas over random=[0.6312499999999999, 0.21875, -0.16874999999999996]; mean=0.2271; gate passes=1/3. The fixed-budget baseline is not stable enough for PLWM comparison."
+    },
+    {
+      "identifier": "luanti_reward_only_end_to_end_ppo_first_block",
+      "status": "rejected-current-controller",
+      "scope": "real-Luanti local-vision/action/reward-only PPO controller comparison with no teacher, symbolic state, or external planner",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-reward-only-ppo-formal-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-reward-only-ppo-formal-audit.json",
+      "summary": "Held-out success PLWM/no-memory/GRU/16-event Transformer=0/8, 0/8, 0/8, 0/8; independent audit accepted=False."
+    },
+    {
+      "identifier": "luanti_visible_goal_public_feature_qlearning_baseline",
+      "status": "supported-standard-baseline-only",
+      "scope": "real-Luanti visible-goal public-feature standard baseline; not raw visual representation or PLWM",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-micro-navigation-qlearning-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-micro-navigation-qlearning-audit.json",
+      "summary": "Held-out Q-learning/random success=16/16/3/16; independent audit accepted=True."
+    },
+    {
+      "identifier": "luanti_gated_delayed_goal_public_cue_diagnostic",
+      "status": "requires-independent-replication",
+      "scope": "real-Luanti public-vision retained-cue versus reactive tabular Q diagnostic; not a PLWM or neural-controller result",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-delayed-goal-gated-compact-binary-qlearning-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-delayed-goal-gated-compact-binary-qlearning-audit.json",
+      "summary": "Held-out retained-cue/reactive/random success=16/16/8/16/12/16. The random reference is unusually high in this 16-world block, so a disjoint larger held-out replication is mandatory."
+    },
+    {
+      "identifier": "replicated_luanti_gated_delayed_goal_public_cue_diagnostic",
+      "status": "supported-task-diagnostic-only",
+      "scope": "two real-Luanti public-vision retained-cue versus reactive tabular Q blocks; validated task diagnostic, not PLWM or neural-controller evidence",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-delayed-goal-gated-compact-binary-qlearning-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-delayed-goal-gated-compact-binary-qlearning-audit.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-delayed-goal-gated-compact-binary-replication-qlearning-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-delayed-goal-gated-compact-binary-replication-qlearning-audit.json",
+      "summary": "Held-out retained-cue/reactive/random success: first=16/16/8/16/12/16; replication=64/64/33/64/32/64; disjoint-seeds=True; replication action-seed-base=1942337."
+    },
+    {
+      "identifier": "luanti_gated_reward_only_dqn_neural_diagnostic",
+      "status": "supported-neural-task-diagnostic-only",
+      "scope": "real-Luanti two-step public-cue reward-only DQN neural task diagnostic; not an architecture comparison result",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-gated-memory-dqn-formal-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-gated-memory-dqn-formal-audit.json",
+      "summary": "Held-out no-memory/GRU/Transformer/PLWM-state-off/PLWM success=31/64/64/64/64/64/31/64/64/64. GRU and Transformer match full PLWM, so this result cannot support a PLWM advantage claim."
+    },
+    {
+      "identifier": "luanti_long_delay_reward_only_dqn_memory_span_diagnostic",
+      "status": "supported-neural-task-diagnostic-only",
+      "scope": "real-Luanti six-event public-cue reward-only DQN memory-span diagnostic; not a PLWM architecture comparison result",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-long-delay-dqn-formal-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-long-delay-dqn-formal-audit.json",
+      "summary": "Held-out no-memory/GRU/2-event Transformer/PLWM-state-off/PLWM success=34/64/64/64/30/64/30/64/64/64. The result validates a delay beyond the Transformer context, not superiority over GRU."
+    },
+    {
+      "identifier": "luanti_paired_delay_reward_only_dqn_memory_span_diagnostic",
+      "status": "supported-neural-task-diagnostic-only",
+      "scope": "real-Luanti paired-cue eight-event reward-only DQN memory-span diagnostic; not a PLWM architecture comparison result",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-paired-delay-dqn-formal-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-paired-delay-dqn-formal-audit.json",
+      "summary": "Held-out no-memory/GRU/2-event Transformer/PLWM-state-off/PLWM success=43/128/128/128/44/128/44/128/128/128. The paired-cue task is a complexity point, not a claim of superiority over GRU."
+    },
+    {
+      "identifier": "luanti_addressed_legacy_smokes_invalidated_by_public_visual_contract",
+      "status": "invalidated-course-visual-contract",
+      "scope": "legacy six-channel addressed retrieval smokes; invalidated before architecture interpretation",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-addressed-gated-dqn-smoke-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-addressed-predictive-dqn-smoke-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-addressed-visual-contract-audit.json",
+      "summary": "The later real-Luanti public-vision audit proved that the repaired course requires a seventh beacon channel, four initial rendered identities, five forced south moves, and an identity-only query. The legacy smoke inputs did not meet that contract, so their scores are retained only as traceability artifacts."
+    },
+    {
+      "identifier": "luanti_addressed_repaired_current_writer_smoke_precheck",
+      "status": "rejected-smoke-precheck",
+      "scope": "real-Luanti repaired seven-channel addressed retrieval current-writer calibration; no architecture claim",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-addressed-repaired-current-writer-dqn-smoke-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-addressed-repaired-current-writer-dqn-smoke-audit.json",
+      "summary": "Held-out no-memory/GRU/2-event Transformer/PLWM-state-off/full current PLWM success=12/16/10/16/13/16/10/16/10/16. The repaired visual contract passed, but the predeclared current-writer memory-diagnostic gate did not."
+    },
+    {
+      "identifier": "public_vision_multi_candidate_writer_smoke_precheck",
+      "status": "rejected-smoke-precheck",
+      "scope": "bounded supervised public-vision storage/readout diagnostic; not a Luanti-control or architecture result",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\public-vision-multi-candidate-memory-smoke-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\public-vision-multi-candidate-memory-smoke-audit.json",
+      "summary": "Held-out multi-candidate/single-candidate accuracy=0.6836/0.6836; exact parameter match=True. The predeclared multi-candidate advantage gate did not pass, so no Luanti CUDA smoke was launched."
+    },
+    {
+      "identifier": "public_vision_sparse_candidate_writer_smoke_precheck",
+      "status": "rejected-smoke-precheck",
+      "scope": "bounded supervised public-vision sparse-allocation storage/readout diagnostic; not a Luanti-control or architecture result",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\public-vision-sparse-candidate-memory-smoke-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\public-vision-sparse-candidate-memory-smoke-audit.json",
+      "summary": "Held-out sparse-multi/single-candidate accuracy=0.4980/0.4980; exact parameter match=True. The predeclared sparse-allocation advantage gate did not pass, so no Luanti CUDA smoke was launched."
+    },
+    {
+      "identifier": "public_vision_query_binding_short_budget_calibration",
+      "status": "rejected-visual-readout-calibration",
+      "scope": "supervised public-vision initial-cue/delayed-query binding calibration; not reward-only control or PLWM evidence",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\public-vision-binding-calibration-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\public-vision-binding-calibration-audit.json",
+      "summary": "Held-out visual binding accuracy=0.6865; the fixed short-budget visual readout gate did not pass, so candidate-writer failures do not isolate memory writing."
+    },
+    {
+      "identifier": "query_conditioned_public_vision_binding_short_budget_calibration",
+      "status": "rejected-visual-readout-calibration",
+      "scope": "same-parameter query-conditioned versus late-fusion supervised public-vision binding; not reward-only control or PLWM evidence",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\query-conditioned-public-vision-binding-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\query-conditioned-public-vision-binding-audit.json",
+      "summary": "Held-out query-conditioned/late-fusion visual binding accuracy=0.6763/0.6768; exact parameter match=True. The fixed query-conditioned visual readout gate did not pass."
+    },
+    {
+      "identifier": "public_vision_delayed_query_contract",
+      "status": "supported-course-contract-only",
+      "scope": "read-only public-pixel reconstruction of the synthetic delayed-query label; not a model input, control result, or architecture claim",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\public-vision-binding-contract-audit.json",
+      "summary": "Public-pixel oracle reconstructed 2048 generated labels exactly; this validates task determinacy, not learned visual binding."
+    },
+    {
+      "identifier": "public_vision_fixed_identity_side_short_budget_calibration",
+      "status": "supported-visual-readout-calibration-only",
+      "scope": "supervised one-frame fixed-identity public-vision side readout; not variable query binding, reward-only control, or PLWM evidence",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\public-vision-fixed-identity-calibration-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\public-vision-fixed-identity-calibration-audit.json",
+      "summary": "Held-out fixed-identity side accuracy=1.0000; this localizes the rejected short-budget visual task to variable query-to-object binding."
+    },
+    {
+      "identifier": "object_token_public_vision_binding_short_budget_calibration",
+      "status": "supported-visual-readout-calibration-only",
+      "scope": "same-parameter object-token query matching versus query-independent object-token readout; not reward-only control or PLWM evidence",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\object-token-public-vision-binding-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\object-token-public-vision-binding-audit.json",
+      "summary": "Held-out object-token matching/query-independent object-token accuracy=1.0000/0.6899; exact parameter match=True. This establishes an object-token visual-binding signal only."
+    },
+    {
+      "identifier": "object_token_episodic_memory_short_budget_diagnostic",
+      "status": "supported-visual-memory-diagnostic-only",
+      "scope": "same-parameter object-token multi-writer versus aggregated-writer and memory-disabled storage/readout diagnostic; not reward-only control or PLWM architecture evidence",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\object-token-episodic-memory-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\object-token-episodic-memory-audit.json",
+      "summary": "Held-out multi/single/memory-disabled accuracy=1.0000/0.6704/0.6758; exact parameter match=True. This establishes an object-token writer/readout signal only."
+    },
+    {
+      "identifier": "luanti_addressed_object_token_writer_cuda_smoke",
+      "status": "rejected-smoke-precheck",
+      "scope": "single capacity-matched CUDA object-token PLWM writer smoke on repaired addressed retrieval; never an architecture conclusion",
+      "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-addressed-object-token-dqn-smoke-report.json; D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-addressed-object-token-dqn-smoke-audit.json",
+      "summary": "Held-out no-memory/GRU/2-event Transformer/state-off/full object-token PLWM success rates=0.6250/0.6250/0.6250/0.6250/0.7812. One smoke can at most require an independent replication."
+    }
+  ],
+  "counts": {
+    "invalidated-course-visual-contract": 1,
+    "rejected-baseline-protocol": 2,
+    "rejected-current-controller": 9,
+    "rejected-default-robustness-path": 1,
+    "rejected-smoke-precheck": 4,
+    "rejected-visual-readout-calibration": 2,
+    "replicated-diagnostic-signal-not-control-ready": 1,
+    "requires-independent-replication": 1,
+    "supported-bounded-interface": 5,
+    "supported-course-contract-only": 1,
+    "supported-neural-task-diagnostic-only": 3,
+    "supported-standard-baseline-only": 1,
+    "supported-task-diagnostic-only": 1,
+    "supported-visual-memory-diagnostic-only": 1,
+    "supported-visual-readout-calibration-only": 2
+  }
+}

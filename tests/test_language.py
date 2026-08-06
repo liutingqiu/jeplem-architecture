@@ -2,7 +2,7 @@ import unittest
 
 from plwm.commitments import Commitment
 from plwm.continual import EndToEndPersistentPLWM
-from plwm.language import JsonLanguagePort
+from plwm.language import JsonLanguagePort, parse_luanti_language_goal
 from plwm.runtime import TrainablePersistentRuntime
 
 
@@ -34,6 +34,25 @@ class LanguagePortTests(unittest.TestCase):
             port.decode_evidence("right")
         with self.assertRaises(ValueError):
             port.decode_evidence('{"route":"up","confidence":0.9}')
+
+    def test_luanti_goal_parser_accepts_only_declared_object_delivery_schema(self):
+        goal = parse_luanti_language_goal(
+            '{"task":"object_delivery","target":"goal","require_key":true,"avoid_decoy":true}'
+        )
+        self.assertTrue(goal.require_key)
+        charged = parse_luanti_language_goal(
+            '{"task":"charged_object_delivery","target":"goal","require_key":true,"avoid_decoy":true,"require_charge":true}'
+        )
+        self.assertTrue(charged.require_charge)
+        polarity = parse_luanti_language_goal(
+            '{"task":"polarity_object_delivery","target":"goal","require_key":true,"require_charge":true,"select_charged_object":true}'
+        )
+        self.assertTrue(polarity.select_charged_object)
+        self.assertFalse(polarity.avoid_decoy)
+        with self.assertRaises(ValueError):
+            parse_luanti_language_goal('{"task":"run_command","target":"goal","require_key":true,"avoid_decoy":true}')
+        with self.assertRaises(ValueError):
+            parse_luanti_language_goal('{"task":"charged_object_delivery","target":"goal","require_key":true,"avoid_decoy":true}')
 
 
 if __name__ == "__main__":

@@ -99,8 +99,25 @@ class TorchPLWM(nn.Module):
         weights = torch.softmax(scores, dim=-1)
         return torch.einsum("bm,bmd->bd", weights, state.values)
 
-    def step(self, observation: Tensor, state: TorchCognitiveState, *, think: bool = False) -> tuple[TorchCognitiveState, Tensor]:
-        """Advance one event. Thought steps are latent-only recurrent updates."""
+    def step(
+        self,
+        observation: Tensor,
+        state: TorchCognitiveState,
+        *,
+        think: bool = False,
+        write_candidates: Tensor | None = None,
+        write_mask: Tensor | None = None,
+    ) -> tuple[TorchCognitiveState, Tensor]:
+        """Advance one event, optionally writing several latent candidates.
+
+        The default path writes the original single event summary exactly as
+        before. Multi-candidate writers supply latent vectors derived only
+        from their current public event. Each ``write_mask`` entry controls
+        allocation of its corresponding candidate, so inactive candidates do
+        not consume or evict an episodic slot.
+        """
+        if observation.ndim != 2 or observation.shape != (state.belief.shape[0], self.encoder[0].in_features):
+            raise ValueError("observation must match the state batch and input dimension")
         encoded = self.encoder(observation)
         prediction = self.predictor(state.belief)
         surprise = (prediction - observation).square().mean(dim=-1, keepdim=True)
@@ -110,24 +127,46 @@ class TorchPLWM(nn.Module):
         correction = torch.cat((encoded, retrieved), dim=-1)
         belief = self.belief_cell(correction, state.belief)
 
-        key = self.key_head(encoded).unsqueeze(1)
-        value = self.value_head(belief).unsqueeze(1)
-        candidate_keys = torch.cat((state.keys[:, 1:, :], key), dim=1)
-        candidate_values = torch.cat((state.values[:, 1:, :], value), dim=1)
-        if self.gated_memory:
-            # A differentiable gate allows the model to preserve salient early
-            # episodes through long distractor streams rather than blindly
-            # replacing every slot at every event.
-            learned_gate = torch.sigmoid(self.memory_write_gate(torch.cat((encoded, surprise), dim=-1)))
-            # Pure no-op/distractor events carry no observation energy and may
-            # update the latent state, but cannot evict an episodic slot.
-            salience = observation.abs().sum(dim=-1, keepdim=True).clamp(max=1.0)
-            write_gate = (learned_gate * salience).view(-1, 1, 1)
-            keys = state.keys * (1.0 - write_gate) + candidate_keys * write_gate
-            values = state.values * (1.0 - write_gate) + candidate_values * write_gate
+        if write_candidates is None:
+            write_source = encoded.unsqueeze(1)
+            write_values = self.value_head(belief).unsqueeze(1)
         else:
-            keys = candidate_keys
-            values = candidate_values
+            if (
+                write_candidates.ndim != 3
+                or write_candidates.shape[0] != observation.shape[0]
+                or write_candidates.shape[2] != self.latent_dim
+                or not 1 <= write_candidates.shape[1] <= self.memory_slots
+            ):
+                raise ValueError("write candidates must have [batch, 1..memory_slots, latent_dim] shape")
+            if write_candidates.device != observation.device or write_candidates.dtype != encoded.dtype:
+                raise ValueError("write candidates must share the observation device and floating-point dtype")
+            write_source = write_candidates
+            write_values = self.value_head(write_source)
+        writes = write_source.shape[1]
+        if write_mask is None:
+            active_writes = torch.ones(observation.shape[0], writes, device=observation.device, dtype=observation.dtype)
+        else:
+            if write_mask.shape != (observation.shape[0], writes):
+                raise ValueError("write mask must match the batch and candidate count")
+            active_writes = write_mask.to(device=observation.device, dtype=observation.dtype)
+            if not torch.isfinite(active_writes).all() or bool((active_writes < 0.0).any()) or bool((active_writes > 1.0).any()):
+                raise ValueError("write mask values must be finite probabilities")
+        keys, values = state.keys, state.values
+        salience = observation.abs().sum(dim=-1, keepdim=True).clamp(max=1.0)
+        for index in range(writes):
+            candidate_keys = torch.cat((keys[:, 1:, :], self.key_head(write_source[:, index]).unsqueeze(1)), dim=1)
+            candidate_values = torch.cat((values[:, 1:, :], write_values[:, index].unsqueeze(1)), dim=1)
+            if self.gated_memory:
+                # A differentiable per-candidate gate preserves existing facts
+                # when a public candidate is absent or not salient.
+                learned_gate = torch.sigmoid(
+                    self.memory_write_gate(torch.cat((write_source[:, index], surprise), dim=-1))
+                ).unsqueeze(1)
+                write_gate = learned_gate * salience.unsqueeze(1) * active_writes[:, index : index + 1].unsqueeze(-1)
+            else:
+                write_gate = active_writes[:, index : index + 1].unsqueeze(-1)
+            keys = keys * (1.0 - write_gate) + candidate_keys * write_gate
+            values = values * (1.0 - write_gate) + candidate_values * write_gate
         workspace = state.workspace
         if think:
             for _ in range(self.thought_steps):

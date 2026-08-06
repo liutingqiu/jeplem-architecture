@@ -19,6 +19,22 @@ a replacement for a pretrained language model.
 No domain can silently impersonate another: latent similarity cannot complete a
 commitment, and a commitment cannot override evidence without a state update.
 
+## Knowledge Storage Principle
+
+Specific facts and episodic details live in addressable memory slots, not in
+weights. Parameters learn abstract regularities (dynamics, perception,
+preference) and are allowed to change; memory survives those changes. This is
+supported by external evidence (Memory3 externalizes specific knowledge into
+explicit memory and beats larger in-parameter models) and is the structural
+answer to catastrophic forgetting: a parameter update never has to preserve a
+fact, because no fact lives in the weights.
+
+Memory reads must support precise retrieval, not only compressed similarity:
+a single recurrent hidden state blurs exact recall, the documented weakness of
+pure state-space and recurrent models. The episodic layer therefore combines
+address-priority lookup with intra-slot attention, and every memory mechanism
+must pass a held-out needle-in-slot retrieval exam.
+
 ## Verified Claims
 
 - Persistent state survives in-memory and disk checkpoint/restart.
