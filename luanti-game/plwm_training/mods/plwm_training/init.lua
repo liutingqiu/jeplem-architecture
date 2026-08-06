@@ -163,6 +163,18 @@ local function controls_inverted()
     if micro_navigation_mode then
         return false
     end
+    -- The counterbalanced retrieval courses isolate the memory signal.  The
+    -- identity->side shortcut is already nulled to 50/50; a second, fully
+    -- unobservable per-seed direction flip would re-introduce a purely random
+    -- 50% source of failure that no memory architecture can overcome, exactly
+    -- the collapsed "guess one direction" degeneration measured in every
+    -- balanced smoke.  So the flip that exists for the legacy high-seed tasks
+    -- is disabled here.
+    if addressed_gated_delayed_micro_navigation_mode
+        or addressed_balanced_delayed_micro_navigation_mode
+        or addressed_balanced_2id_delayed_micro_navigation_mode then
+        return false
+    end
     local base_inverted = math.floor(next_seed(task_seed + 29) / 65536) % 2 == 1
     -- Dedicated high-seed tasks change the control mechanism after seven
     -- directional actions. This fact is intentionally absent from observation.
