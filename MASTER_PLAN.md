@@ -1331,6 +1331,156 @@ single short smoke must not be retuned or relaunched; any future four-object
 retrieval study needs a new predeclared contract that first separates the
 learnable side bias from the memory signal.
 
+The side bias behind that rejection is now quantified. A faithful Lua PRNG
+replication (LCG multiplier 48271, modulus 2^31-1, side = parity of
+floor(v/65536)) shows the repaired addressed course assigns query sides at
+p(+1|query=1)=0.79, p(+1|query=2)=0.54, p(+1|query=3)=0.28, and
+p(+1|query=4)=0.03 over the full 12,000,000..13,000,000 window, and the exact
+training/held-out seed windows that were frozen into the smoke yield a
+query-marginal frequency oracle of exactly 75.0%. A memory-free model can
+therefore reach 20/32 (62.5%) by returning the marginal direction, which is
+precisely what every no-memory controller did. The learnable identity->side
+frequency shortcut and the delayed memory signal were jointly identifiable in
+the old course; that coupling is what invalidated the diagnostic.
+
+The separation course is now implemented and verified live inside the real
+server. A counterbalanced variant of the addressed course occupies the fresh
+seed range 16,000,000..17,000,000 with six events and no overlap with any
+existing mode. The addressed query is the seed offset modulo four and each
+identity's side is the parity of (floor(offset/4)+identity): every identity is
+left/right exactly half the time and every identity is queried equally on every
+contiguous multiple-of-four window, so the identity->side marginal carries no
+frequency signal at all. Live verification over the training window
+(16,000,000..16,000,256) and held-out window (16,001,000..16,001,032) matched
+the closed form: each of the four identities was left=right=128/128 and
+16/16 respectively, and each query occurred exactly 64 and 8 times. The four
+public tiles appeared in the expected addressed layout with the same wall set
+and six-event horizon. The frequency oracle on both windows is exactly 50.0%
+(a coerced no-memory model earns the 1.0 reward on at most half its worlds).
+
+The predeclared contract for the replacement CUDA smoke is therefore:
+- course `addressed_balanced` on seeds 16,000,000..17,000,000;
+- frozen smoke run: 256 training worlds from 16,000,000, 32 disjoint held-out
+  worlds from 16,001,000, action seed 9,042,337, six events, the same shared
+  object-token visual event encoder, capacity match within 5%;
+- acceptance: full PLWM, GRU, and two-event Transformer each >= 0.75 held-out,
+  and no-memory and PLWM state-off each <= 0.50 (the exact chance bound, not
+  the 0.60 shortcut window the biased course allowed);
+- supported acceptance mode `addressed_balanced_diagnostic` in the trainer and
+  a frozen independent audit recomputing exactly those gates;
+- interpretation ceiling: one local CUDA smoke validating a neural task
+  comparison on a side-bias-separated course, never an architecture-advantage
+  claim, never licensed retuning of the rejected addressed course.
+
+The trainer entry point and its one matching audit are `experiments/
+train_luanti_gated_memory_dqn.py` (`run_object_token_addressed_balanced_smoke`)
+and `experiments/audit_luanti_addressed_balanced_object_token_smoke.py`. This
+is a predeclaration, not a result: it is recorded before any new CUDA run so
+that no threshold is chosen after seeing numbers.
+
+The balanced smoke itself is now complete and is recorded as a supported but
+failing task diagnostic. On the real server the counterbalanced seed windows
+reproduced their closed form exactly (four identities left=right=128/128 on the
+256-window and 16/16 on the 32-window; every query sampled 64 and 8 times), so
+the free identity->side oracle is 50% and cannot push any model past chance.
+One capacity-matched CUDA run (256 worlds from 16,000,000, 32 disjoint held-out
+worlds from 16,001,000, action seed 9,042,337, six events, shared event
+encoder, all within 5% of the full model) gave every controller the same 3/32
+(9.4%) held-out success with identical action profiles, at or below the 19%
+fixed-random baseline; no-memory and state-off dropped from the 62.5% shortcut
+in the old course to chance, confirming the bias is gone. But the memory models
+did not learn the delayed query either: full PLWM, GRU, and the two-event
+Transformer all scored 3/32 with identical chosen-action counts, so there is no
+memory-signal separation to interpret and nothing passes the predeclared
+0.75/0.50 gates. The independent audit recomputed the same rejection with a
+clean contract (seeds, horizon, capacity, mode, and accounting all verified).
+The side-bias separation succeeded against its own goal, and exactly because
+it did, the six-step four-identity retrieval is evidently not learnable in 256
+worlds by any of the compared controllers; the memory claim remains
+unsupported, and this course records a truthful null rather than a false
+advantage over the shortcut. Reports live at `artifacts/
+luanti-addressed-balanced-object-token-dqn-smoke-report.json` and
+`artifacts/luanti-addressed-balanced-object-token-dqn-smoke-audit.json`. This
+single null does not license retuning; the next step is to interrogate why the
+balanced (and even the biased) retrieval is beyond a 256-world budget before
+any new contract is declared.
+
+The 256-world null is not being retuned; it is being escalated under a new
+predeclared budget, recorded before the run. The training budget rises to 1,024
+worlds from 16,000,000 and the held-out window moves forward to 32 disjoint
+worlds from 16,002,000 (16,001,000..16,001,031 now falls inside the training
+span and is no longer held out; all 1,056 windows stay inside the balanced
+course 16,000,000..17,000,000 and the counterbalanced closed form still holds
+exactly for every multiple-of-four window). Everything else is frozen: course,
+action seed 9,042,337, six events, shared object-token encoder, capacity match
+within 5%, and the acceptance gates plwm/gru/transformer_2 >= 0.75 with
+no_memory/plwm_state_off <= 0.50. Rationale: the training success rate was only
+26% at 256 worlds with identical collapsed action profiles, which reads as an
+exploration/budget failure rather than task insolubility; the larger budget
+tests whether the memory signal appears when the controllers are given four
+times more worlds, and if it still does not, the next step is a difficulty
+reduction (two-identity counterbalanced course), not pretraining, which would
+be unfair to the matched baselines.
+
+The 1,024-world budget escalation is complete and remains a null. On the same
+balanced course with 1,024 training worlds from 16,000,000 and 32 held-out
+worlds from 16,002,000, action seed 9,042,337and six events, all five matched
+controllers improved held-out success from 3/32 to exactly 8/32 (25.0%) with
+identically collapsed action profiles; no-memory and PLWM state-off sat at the
+balanced-chance bound while GRU, the two-event Transformer, and full PLWM were
+indistinguishable from them. The independent audit recomputed the same
+rejection with a clean contract. Quantitively, progress exists (the 9.4%
+floor rose past the 12.5% fixed-random baseline) but the delayed identity
+retrieval is still not learned by any controller, so the predeclared 0.75/0.50
+gates remain firmly unsatisfied and there is no memory-signal separation to
+interpret. This confirms the budget hypothesis is insufficient: the bottleneck
+is task difficulty, not exploration budget alone.
+
+Proceeding to the predeclared next step: a two-identity counterbalanced (soft)
+retrieval course, using the same balanced counterbalancing recipe over two
+identities (the identity->side marginal is exactly 50/50 over every
+multiple-of-four window) with the same public vision contract, six events, and
+capacity matching. This difficulty reduction is the natural successor to the
+history's successful paired-gated course and is recorded as a predeclaration
+before any run.
+
+In parallel, the Luanti interaction bottleneck (about 0.79 episodes/s on a
+single server, spending almost all time waiting on the game rather than on the
+GPU) was fixed by a multi-server worker pool. `plwm/luanti_workers.py`
+(`ParallelWorkerPool`) launches N independent Luanti servers with private
+worlds, bridges, and UDP ports; episode collection fans out across threads with
+one serial client per worker (guaranteeing causal correctness within each
+episode and no bridge file contention). The trainer's `_train` accepts a
+```worker_pool``` and its `--workers` flag chooses the count; ``workers=1``
+runs the exact original serial path. Measured on a live addressed balanced
+course: 0.79 / 1.58 / 3.15 episodes/s for 1 / 2 / 4 workers, i.e. linear in
+the worker count, so 1024-world runs drop from hours to tens of minutes. The
+verification confirmed identical public frames and rewards per seed across
+workers, so parallelism does not alter the course contract.
+
+The two-identity difficulty reduction is complete and is also a null, closing
+the difficulty-reduction hypothesis. On the two-identity counterbalanced
+course (seeds 18,000,000..19,000,000, query = offset mod 2, side = parity of
+(floor(offset/2)+identity), verified live at exactly 50/50 per identity over
+every window), a capacity-matched CUDA run with 256 training worlds from
+18,000,000, 32 held-out worlds from 18,001,000, action seed 9,042,337, six
+events, and eight parallel workers gave no_memory 10/32 and PLWM state-off
+8/32 held-out while GRU scored 10/32, the two-event Transformer 8/32, and full
+PLWM 8/32: every controller remained statistically indistinguishable from the
+9/32 fixed-random baseline and from the chance bound. Training success hovered
+at 22-25% for all five. Halving the identity count therefore did not make the
+delayed identity retrieval learnable either: the memory signal separation
+still never appears, and the predeclared 0.75/0.50 gates remain far
+unsatisfied. The independent audit recomputed the same rejection with a clean
+contract. Combined with the 1,024-world four-identity null, the evidence now
+points at the retrieval task shape (a six-event delayed identity->side choice
+under a sparse terminal reward) rather than the identity count or the training
+budget as the blocker; the next predeclared step is to interrogate the
+learning signal itself, e.g. an intermediate shaped reward on the correct
+lane, before any further architecture claims. Reports live at `artifacts/
+luanti-addressed-balanced-2id-object-token-dqn-smoke-report.json` and
+`artifacts/luanti-addressed-balanced-2id-object-token-dqn-smoke-audit.json`.
+
 ## Completion Rule
 
 There is no declared final intelligence threshold. The project proceeds while
