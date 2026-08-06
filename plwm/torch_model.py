@@ -19,6 +19,7 @@ class TorchCognitiveState:
     workspace: Tensor
     keys: Tensor
     values: Tensor
+    confidences: Tensor  # B x memory_slots confidence per slot (added for B-P2c fix)
 
     def detached_clone(self) -> "TorchCognitiveState":
         return TorchCognitiveState(
@@ -26,6 +27,7 @@ class TorchCognitiveState:
             workspace=self.workspace.detach().clone(),
             keys=self.keys.detach().clone(),
             values=self.values.detach().clone(),
+            confidences=self.confidences.detach().clone(),
         )
 
     def checkpoint(self, path: str | Path) -> None:
@@ -35,6 +37,7 @@ class TorchCognitiveState:
                 "workspace": self.workspace.detach().cpu(),
                 "keys": self.keys.detach().cpu(),
                 "values": self.values.detach().cpu(),
+                "confidences": self.confidences.detach().cpu(),
             },
             path,
         )
@@ -47,6 +50,7 @@ class TorchCognitiveState:
             workspace=payload["workspace"],
             keys=payload["keys"],
             values=payload["values"],
+            confidences=payload.get("confidences", torch.zeros_like(payload["keys"][:, :1, :])),
         )
 
 
@@ -63,6 +67,8 @@ class TorchPLWM(nn.Module):
         output_dim: int = 1,
         use_memory: bool = True,
         gated_memory: bool = False,
+        beta: float = 1.0,  # A-P1a: β controls softmax sharpness; err ≤ (M-1)·exp(-βδ/√d)
+        # default 1.0 matches original /sqrt(d) scaling; increase for sharper retrieval
     ) -> None:
         super().__init__()
         self.latent_dim = latent_dim
@@ -70,6 +76,7 @@ class TorchPLWM(nn.Module):
         self.thought_steps = thought_steps
         self.use_memory = use_memory
         self.gated_memory = gated_memory
+        self.temperature = beta  # A-P1a: β inverse-temperature; higher = sharper retrieval
 
         self.encoder = nn.Sequential(nn.Linear(input_dim, latent_dim), nn.Tanh())
         self.predictor = nn.Linear(latent_dim, input_dim)
@@ -86,18 +93,46 @@ class TorchPLWM(nn.Module):
             nn.Tanh(),
             nn.Linear(latent_dim, output_dim),
         )
+        # B-P2c fix: confidence head for weighted retrieval
+        self.confidence_head = nn.Linear(latent_dim, 1)
+        self._init_keys_orthogonal()
+
+    def _init_keys_orthogonal(self) -> None:
+        """A-P1c: initialize key_head with an orthogonal matrix so that
+        initially written keys are maximally separated (ρ_max ≈ 0).
+        Uses Gram-Schmidt QR on a random matrix.
+        """
+        d = self.latent_dim
+        # Random matrix, then orthogonalize rows
+        W = torch.randn(d, d)
+        Q, _ = torch.linalg.qr(W)
+        self.key_head.weight.data = Q
 
     def initial_state(self, batch_size: int, device: torch.device | str) -> TorchCognitiveState:
         zeros = torch.zeros(batch_size, self.latent_dim, device=device)
         memory = torch.zeros(batch_size, self.memory_slots, self.latent_dim, device=device)
-        return TorchCognitiveState(zeros, zeros.clone(), memory, memory.clone())
+        confidences = torch.zeros(batch_size, self.memory_slots, 1, device=device)
+        return TorchCognitiveState(zeros, zeros.clone(), memory, memory.clone(), confidences)
 
     def _read_memory(self, query: Tensor, state: TorchCognitiveState) -> Tensor:
         if not self.use_memory:
             return torch.zeros_like(state.belief)
-        scores = torch.einsum("bd,bmd->bm", query, state.keys) / (self.latent_dim**0.5)
-        weights = torch.softmax(scores, dim=-1)
+        # A-P1a: temperature-scaled softmax; higher β → sharper retrieval
+        # B-P2c: add confidence weighting so conflicting same-key entries don't average
+        scores = torch.einsum("bd,bmd->bm", query, state.keys) * self.temperature
+        conf_scores = state.confidences.squeeze(-1)  # B x M
+        weighted_scores = scores + conf_scores
+        weights = torch.softmax(weighted_scores, dim=-1)
         return torch.einsum("bm,bmd->bd", weights, state.values)
+
+    def _orthogonality_loss(self) -> Tensor:
+        """A-P1c: encourage key orthogonality during training.
+        Returns mean squared off-diagonal entries of (K^T K) / d.
+        """
+        K = self.key_head.weight  # latent_dim x latent_dim
+        G = K.t() @ K / self.latent_dim  # Gram matrix, should be I
+        I = torch.eye(G.shape[0], device=G.device)
+        return ((G - I) ** 2).mean()
 
     def step(
         self,
@@ -152,10 +187,16 @@ class TorchPLWM(nn.Module):
             if not torch.isfinite(active_writes).all() or bool((active_writes < 0.0).any()) or bool((active_writes > 1.0).any()):
                 raise ValueError("write mask values must be finite probabilities")
         keys, values = state.keys, state.values
+        confidences = state.confidences.clone()
         salience = observation.abs().sum(dim=-1, keepdim=True).clamp(max=1.0)
+        # B-P2c: compute confidence for new writes
+        new_confidence = torch.sigmoid(self.confidence_head(encoded) + salience)  # B x 1
         for index in range(writes):
             candidate_keys = torch.cat((keys[:, 1:, :], self.key_head(write_source[:, index]).unsqueeze(1)), dim=1)
             candidate_values = torch.cat((values[:, 1:, :], write_values[:, index].unsqueeze(1)), dim=1)
+            # B-P2c: shift confidence window alongside key/value
+            new_conf = new_confidence if index == 0 else torch.zeros(observation.shape[0], 1, device=observation.device)
+            candidate_confidences = torch.cat((state.confidences[:, 1:, :], new_conf.unsqueeze(1)), dim=1)
             if self.gated_memory:
                 # A differentiable per-candidate gate preserves existing facts
                 # when a public candidate is absent or not salient.
@@ -167,12 +208,13 @@ class TorchPLWM(nn.Module):
                 write_gate = active_writes[:, index : index + 1].unsqueeze(-1)
             keys = keys * (1.0 - write_gate) + candidate_keys * write_gate
             values = values * (1.0 - write_gate) + candidate_values * write_gate
+            confidences = confidences * (1.0 - write_gate) + candidate_confidences * write_gate
         workspace = state.workspace
         if think:
             for _ in range(self.thought_steps):
                 workspace = self.workspace_cell(torch.cat((belief, retrieved), dim=-1), workspace)
 
-        next_state = TorchCognitiveState(belief, workspace, keys, values)
+        next_state = TorchCognitiveState(belief, workspace, keys, values, confidences)
         return next_state, surprise
 
     def classify(self, state: TorchCognitiveState) -> Tensor:
