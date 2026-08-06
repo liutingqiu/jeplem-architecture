@@ -314,13 +314,13 @@
   "acceptance_mode": "object_token_writer_smoke",
   "random_evaluation": {
     "episodes": 32,
-    "successes": 9,
-    "mean_return": -0.054374970961362123,
+    "successes": 15,
+    "mean_return": -0.11249995231628418,
     "action_counts": [
       0,
-      174,
-      9,
-      9
+      160,
+      19,
+      13
     ]
   },
   "results": [
@@ -328,16 +328,16 @@
       "name": "no_memory",
       "parameters": 112988,
       "training_episodes": 256,
-      "training_successes": 57,
+      "training_successes": 121,
       "evaluation": {
         "episodes": 32,
-        "successes": 10,
-        "mean_return": 0.008125029038637877,
+        "successes": 16,
+        "mean_return": -0.04999995231628418,
         "action_counts": [
           0,
-          174,
+          160,
           0,
-          18
+          32
         ]
       }
     },
@@ -345,16 +345,16 @@
       "name": "gru",
       "parameters": 109828,
       "training_episodes": 256,
-      "training_successes": 64,
+      "training_successes": 135,
       "evaluation": {
         "episodes": 32,
-        "successes": 10,
-        "mean_return": 0.008125029038637877,
+        "successes": 16,
+        "mean_return": -0.04999995231628418,
         "action_counts": [
           0,
-          174,
+          160,
           0,
-          18
+          32
         ]
       }
     },
@@ -362,15 +362,15 @@
       "name": "transformer_2",
       "parameters": 112388,
       "training_episodes": 256,
-      "training_successes": 64,
+      "training_successes": 131,
       "evaluation": {
         "episodes": 32,
-        "successes": 8,
-        "mean_return": -0.11687497096136212,
+        "successes": 16,
+        "mean_return": -0.04999995231628418,
         "action_counts": [
           0,
-          174,
-          18,
+          160,
+          32,
           0
         ]
       }
@@ -379,15 +379,15 @@
       "name": "plwm_state_off",
       "parameters": 111846,
       "training_episodes": 256,
-      "training_successes": 62,
+      "training_successes": 128,
       "evaluation": {
         "episodes": 32,
-        "successes": 8,
-        "mean_return": -0.11687497096136212,
+        "successes": 16,
+        "mean_return": -0.04999995231628418,
         "action_counts": [
           0,
-          174,
-          18,
+          160,
+          32,
           0
         ]
       }
@@ -396,16 +396,16 @@
       "name": "plwm",
       "parameters": 111846,
       "training_episodes": 256,
-      "training_successes": 65,
+      "training_successes": 121,
       "evaluation": {
         "episodes": 32,
-        "successes": 8,
-        "mean_return": -0.11687497096136212,
+        "successes": 16,
+        "mean_return": -0.04999995231628418,
         "action_counts": [
           0,
-          174,
-          18,
-          0
+          160,
+          0,
+          32
         ]
       }
     }

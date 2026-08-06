@@ -1481,6 +1481,40 @@ lane, before any further architecture claims. Reports live at `artifacts/
 luanti-addressed-balanced-2id-object-token-dqn-smoke-report.json` and
 `artifacts/luanti-addressed-balanced-2id-object-token-dqn-smoke-audit.json`.
 
+A root-cause correction supersedes the interpretation above. All balanced (and
+all addressed) courses inherited a legacy per-seed direction flip from the
+high-seed task family: `controls_inverted()` returns the parity of
+`next_seed(task_seed+29)/65536` with probability about 50% for seeds outside
+the micro-navigation window, so about half of every window secretly mapped
+requested south to north. Live probes showed the agent standing still at
+(0,-7) with every south step blocked on exactly those seeds, i.e. the task
+actually presented two independent 50% uncertainties (identity->side plus the
+unobservable flip), which caps any controller at 25% and precisely reproduces
+the collapsed 25-31% measured in every prior smoke including the addressed
+12M runs. This was not a learnability property of the task; it was an
+environment bug that made the memory signal unrecoverable for any
+architecture. The fix disables the flip on the addressed courses (they are
+counterbalanced and must isolate the memory signal); live re-verification
+shows every balanced seed traversable and the final side judgement succeeding
+exactly when the counterbalanced identity side is chosen.
+
+The repaired two-identity smoke is rerun under the same frozen contract and
+is again a null, but now an informative one. Training success doubled to
+47-53% for all five controllers (from 22-25%), confirming the flip was the
+blocker of learning, yet every controller still lands at exactly 16/32 (50%)
+held-out with identical collapsed action profiles (five south then one fixed
+east or west) - the precise ceiling of a controller that picks one direction
+for the final step and never reads the public query tile that becomes visible
+at z=-2. So with the environment repaired the memory signal is present and
+physically reachable, and the remaining bottleneck is that no compared
+controller learns to read the delayed public query before committing the
+final move. That is now the focused, falsifiable question for the next
+predeclared contract (e.g. expose the query earlier, or shape a small reward
+for pausing to inspect it), rather than any claim about identity count,
+budget, or task insolubility. Reports live at `artifacts/
+luanti-addressed-balanced-2id-object-token-dqn-smoke-report.json` and
+`artifacts/luanti-addressed-balanced-2id-object-token-dqn-smoke-audit.json`.
+
 ## Completion Rule
 
 There is no declared final intelligence threshold. The project proceeds while
