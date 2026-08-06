@@ -1515,6 +1515,35 @@ budget, or task insolubility. Reports live at `artifacts/
 luanti-addressed-balanced-2id-object-token-dqn-smoke-report.json` and
 `artifacts/luanti-addressed-balanced-2id-object-token-dqn-smoke-audit.json`.
 
+Two further probes reverse the previous "task insolubility" reading and pin
+the bottleneck to the task's representation rather than to the memory
+mechanisms. (1) Negative teacher supervision: cross-entropy on the final
+identity action leaves all five capacity-matched controllers at 13/25 on the
+training window and 8/16 held-out - they cannot even fit the teaching signal,
+so exploration is not the blocker. (2) A linear head over hand-extracted
+symbolic features (the first-frame x of each identity tile plus which tile is
+queried at z=-2) also lands at 4/16 held-out, yet inspection of the features
+shows a fully deterministic rule: the answer is the goal tile's x when the
+query is the goal and the key tile's x when the query is the key. A shared
+identity-position auxiliary head (teaching "where the identity tiles are")
+also changes nothing (still 13/25, 8/16). These negatives converge on the
+true structure: the identity positions and the query are never co-visible. A
+vision-row dump shows the identities enter the visible window only in the
+first frame (they live near z=-7) and the query tile appears only when the
+agent reaches z=-2, by which time the identities have left the 5-row radius;
+no controller can ever pair the two informations in one frame, so the task is
+a genuine delayed cross-frame association. No terminal-only reward/DQN
+gradient and no terminal-only or identity-only auxiliary ever grades the
+binding step ("remember first-frame identity positions, then read the
+position of the queried identity"), which is why every architecture collapses
+to a fixed direction. The next predeclared contract must therefore grade that
+binding directly: an auxiliary retrieval objective that, at the query step,
+trains the write-then-read path - for PLWM the first-frame
+identity tokens are written to memory and the query frame must retrieve the
+position of the queried identity - run on the same addressed_balanced_2id
+course with the same frozen seeds, matched baselines, and held-out window,
+recorded here before any run.
+
 ## Completion Rule
 
 There is no declared final intelligence threshold. The project proceeds while
