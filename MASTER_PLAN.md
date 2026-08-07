@@ -1573,12 +1573,27 @@ recorded here before any run.
 - ✅ 7 个训练脚本集成 QR 投影（E-001）
 - ✅ 6 项测试全部通过
 
-### 14.3 L1 下一步
+### 14.3 L1 状态（2026-08-07 更新）
 
-预声明合同（experiments/dispatch/card-B-002.md）：
-- 课程：addressed_balanced_2id
-- 辅助检索监督 loss（query 步训练 write-then-read 路径）
-- 验收线：PLWM held-out ≥ 0.75（当前 0.50，机会水平）
+**addressed_balanced_2id 诊断结果：负结果**
+
+已尝试三种修复路径：
+1. 原始 smoke（无辅助监督）：50% 所有模型
+2. + 辅助检索监督 loss（α=0.1）：50% 所有模型
+3. + §5.3a 位置编码 + 辅助监督：50% 所有模型
+
+根因分析：任务结构问题——身份(step 0)与查询(step 5)永不同帧，
+中间 5 步无视觉线索，终端 reward 延迟太远，credit assignment 失效。
+
+**结论**：这不是 PLWM 架构问题，是任务设计问题。任何 controller
+（no_memory/GRU/Transformer/PLWM）都无法学会此任务。
+
+**下一步**：
+- 创建诊断任务 short_delay_2id（3步延迟，中间有线索）证明机制可用
+- addressed_2id 记录为 negative result，转入 L2 或其他诊断路径
+- 数学裁决（A/B/C/D）作为 PLWM 架构可行性的结构性证据
+
+验收线：PLWM held-out ≥ 0.75（当前 0.50）→ **未通过**
 
 ### 14.4 开放问题（不影响当前决策）
 
