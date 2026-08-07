@@ -37,12 +37,9 @@ from experiments.train_luanti_gated_memory_dqn import (
     _evaluate,
     _learn,
     _train,
-    bridge_root_arg,
-    device_arg,
-    max_steps_arg,
-    workers_arg,
 )
 from plwm.device import resolve_device
+from plwm.luanti_reward_only_env import DEFAULT_BRIDGE_ROOT
 
 # Predeclared contract constants (frozen before any training)
 AUX_RETRIEVAL_ALPHA = 0.1  # L_total = L_reward + α · L_aux
