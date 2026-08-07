@@ -54,7 +54,7 @@ from plwm.luanti_reward_only_env import DEFAULT_BRIDGE_ROOT, GymVisionOnlyLuanti
 # Predeclared contract constants (frozen before any training)
 AUX_RETRIEVAL_ALPHA = 0.1  # L_total = L_reward + α · L_aux
 IDENTITY_COUNT = 2  # 2id course: goal + key
-QUERY_STEP = 4  # query tile appears at step 4 (0-indexed) in 6-step episodes
+QUERY_STEP = 5  # query tile appears at step 4 (0-indexed) in 6-step episodes
 IDENTITY_LABELS = ("goal", "key")  # from VISION_TILES index mapping
 
 VISUAL_SIZE = int(np.prod(VISION_SHAPE))  # 847
