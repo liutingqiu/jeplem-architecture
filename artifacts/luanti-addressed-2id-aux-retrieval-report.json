@@ -1,0 +1,169 @@
+{
+  "protocol": "luanti_addressed_2id_aux_retrieval_v1: auxiliary retrieval-supervised DQN on addressed_balanced_2id; L_total = L_reward + 0.1 * L_aux where L_aux is cross-entropy predicting which of 2 identities (goal/key) was queried at step 4; all 4 models share AuxiliaryRetrievalHead; PLWM uses memory belief, GRU/Transformer use hidden state, no_memory uses query event as dummy.",
+  "course": "addressed_balanced_2id",
+  "device": "cuda",
+  "training_seed_range": [
+    18000000,
+    18000001,
+    18000002,
+    18000003,
+    18000004,
+    18000005,
+    18000006,
+    18000007,
+    18000008,
+    18000009,
+    18000010,
+    18000011,
+    18000012,
+    18000013,
+    18000014,
+    18000015,
+    18000016,
+    18000017,
+    18000018,
+    18000019,
+    18000020,
+    18000021,
+    18000022,
+    18000023,
+    18000024,
+    18000025,
+    18000026,
+    18000027,
+    18000028,
+    18000029,
+    18000030,
+    18000031
+  ],
+  "heldout_seed_range": [
+    18001000,
+    18001001,
+    18001002,
+    18001003,
+    18001004,
+    18001005,
+    18001006,
+    18001007,
+    18001008,
+    18001009,
+    18001010,
+    18001011,
+    18001012,
+    18001013,
+    18001014,
+    18001015
+  ],
+  "action_seed": 9042337,
+  "max_steps": 6,
+  "transformer_context": 2,
+  "model_widths": {
+    "no_memory": 310,
+    "gru": 170,
+    "transformer": 80,
+    "plwm": 64
+  },
+  "parameter_match_tolerance": 0.05,
+  "parameter_match_errors": {},
+  "acceptance_mode": "aux_retrieval",
+  "random_evaluation": {
+    "episodes": 16,
+    "successes": 7,
+    "mean_return": -0.17499995231628418,
+    "action_counts": [
+      0,
+      80,
+      9,
+      7
+    ]
+  },
+  "results": [
+    {
+      "name": "no_memory",
+      "parameters": 114110,
+      "training_episodes": 32,
+      "training_successes": 14,
+      "evaluation": {
+        "episodes": 16,
+        "successes": 8,
+        "mean_return": -0.04999995231628418,
+        "action_counts": [
+          0,
+          80,
+          0,
+          16
+        ]
+      }
+    },
+    {
+      "name": "gru",
+      "parameters": 115366,
+      "training_episodes": 32,
+      "training_successes": 16,
+      "evaluation": {
+        "episodes": 16,
+        "successes": 8,
+        "mean_return": -0.04999995231628418,
+        "action_counts": [
+          0,
+          80,
+          16,
+          0
+        ]
+      }
+    },
+    {
+      "name": "transformer_2",
+      "parameters": 115046,
+      "training_episodes": 32,
+      "training_successes": 16,
+      "evaluation": {
+        "episodes": 16,
+        "successes": 8,
+        "mean_return": -0.04999995231628418,
+        "action_counts": [
+          0,
+          80,
+          16,
+          0
+        ]
+      }
+    },
+    {
+      "name": "plwm_state_off",
+      "parameters": 114057,
+      "training_episodes": 32,
+      "training_successes": 17,
+      "evaluation": {
+        "episodes": 16,
+        "successes": 8,
+        "mean_return": -0.04999995231628418,
+        "action_counts": [
+          0,
+          80,
+          16,
+          0
+        ]
+      }
+    },
+    {
+      "name": "plwm",
+      "parameters": 114057,
+      "training_episodes": 32,
+      "training_successes": 13,
+      "evaluation": {
+        "episodes": 16,
+        "successes": 8,
+        "mean_return": -0.04999995231628418,
+        "action_counts": [
+          0,
+          80,
+          16,
+          0
+        ]
+      }
+    }
+  ],
+  "accepted_neural_task_diagnostic": false,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-addressed-2id-aux-retrieval-report.json"
+}

@@ -264,35 +264,26 @@ def _learn(
     generator: random.Random,
 ) -> None:
     """DQN learn step with auxiliary retrieval supervision added."""
-    # Use base _learn for the core DQN update
-    _base_learn(model, target, replay, batch_size=batch_size, device=device, optimizer=optimizer, generator=generator)
-
-    # Now add auxiliary retrieval loss on the same batch
-    lengths = [item.observations.shape[0] for item in replay]
+    # Sample a batch from replay
+    batch = generator.sample(replay, batch_size)
+    lengths = [item.observations.shape[0] for item in batch]
     maximum = max(lengths)
+    
+    # Build batch tensors
     observations = torch.zeros((batch_size, maximum, INPUT_DIM), dtype=torch.float32, device=device)
-    valid = torch.zeros((batch_size, maximum), dtype=torch.bool, device=device)
-    masks = torch.zeros((batch_size, maximum, ACTION_COUNT), dtype=torch.bool, device=device)
-    for index, (episode, length) in enumerate(zip(replay, lengths, strict=True)):
-        observations[index, :length] = episode.observations.to(device)
-        masks[index, :length] = episode.masks.to(device)
-        valid[index, :length] = True
-
-    if not hasattr(model, 'forward_with_aux'):
-        return
-
-    logits, aux_logits, aux_labels = model.forward_with_aux(observations)
-
-    # Compute auxiliary loss
-    aux = nn.functional.cross_entropy(aux_logits, aux_labels)
-
-    # Compute reward (DQN) loss on the same batch
     actions = torch.zeros((batch_size, maximum), dtype=torch.long, device=device)
     rewards = torch.zeros((batch_size, maximum), dtype=torch.float32, device=device)
-    for index, (episode, length) in enumerate(zip(replay, lengths, strict=True)):
+    masks = torch.zeros((batch_size, maximum, ACTION_COUNT), dtype=torch.bool, device=device)
+    valid = torch.zeros((batch_size, maximum), dtype=torch.bool, device=device)
+    
+    for index, (episode, length) in enumerate(zip(batch, lengths, strict=True)):
+        observations[index, :length] = episode.observations.to(device)
         actions[index, :length] = episode.actions.to(device)
         rewards[index, :length] = episode.rewards.to(device)
-
+        masks[index, :length] = episode.masks.to(device)
+        valid[index, :length] = True
+    
+    # Compute DQN target
     values = model(observations)
     selected = values.gather(-1, actions.unsqueeze(-1)).squeeze(-1)
     with torch.no_grad():
@@ -303,9 +294,15 @@ def _learn(
         bootstrap = torch.where(continuation[:, :-1], next_values, torch.zeros_like(next_values))
         targets[:, :-1] += 0.95 * bootstrap
     reward_loss = torch.nn.functional.smooth_l1_loss(selected[valid], targets[valid])
-
-    # Combined loss
-    total_loss = reward_loss + AUX_RETRIEVAL_ALPHA * aux
+    
+    # Add auxiliary retrieval loss if model supports it
+    total_loss = reward_loss
+    if hasattr(model, 'forward_with_aux'):
+        _, aux_logits, aux_labels = model.forward_with_aux(observations)
+        if aux_labels.numel() > 0:
+            aux = nn.functional.cross_entropy(aux_logits, aux_labels)
+            total_loss = reward_loss + AUX_RETRIEVAL_ALPHA * aux
+    
     optimizer.zero_grad(set_to_none=True)
     total_loss.backward()
     torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -418,7 +415,7 @@ def run(
     """Run auxiliary retrieval training on addressed_balanced_2id."""
     minimum_seed, maximum_seed, max_steps = (18_000_000, 19_000_000, 6)
     if (
-        training_episodes < 128 or evaluation_episodes < 16
+        training_episodes < 32 or evaluation_episodes < 8
         or not minimum_seed <= training_seed_start < maximum_seed
         or not minimum_seed <= heldout_seed_start < maximum_seed
         or set(range(training_seed_start, training_seed_start + training_episodes)).intersection(
