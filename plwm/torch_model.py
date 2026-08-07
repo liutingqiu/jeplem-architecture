@@ -50,7 +50,10 @@ class TorchCognitiveState:
             workspace=payload["workspace"],
             keys=payload["keys"],
             values=payload["values"],
-            confidences=payload.get("confidences", torch.zeros_like(payload["keys"][:, :1, :])),
+            confidences=payload.get(
+                "confidences",
+                torch.zeros(payload["keys"].shape[0], payload["keys"].shape[1], 1, device=device),
+            ),
         )
 
 
