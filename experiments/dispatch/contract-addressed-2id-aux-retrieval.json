@@ -1,0 +1,99 @@
+# PLWM 辅助检索监督预声明合同
+> 合同ID: `luanti-addressed-2id-aux-retrieval-v1`
+> 冻结时间: 2026-08-07
+> 依据: MASTER_PLAN.md §1536-1540, A-P1a/P1c, B-P2a, D-P4a
+
+## 1. 课程定义
+
+**课程**: `addressed_balanced_2id`（已修复 controls-inversion）
+- Seed 范围: 18,000,000..18,001,000（训练），18,001,000..18,001,032（held-out）
+- 事件数: 6（2 身份 + 1 移动 + 1 query + 2 终端决策）
+- 公平性: 无 cue/query 标签、无坐标、无教师轨迹、无 PLWM-only 输入
+- 参考: `experiments/train_luanti_gated_memory_dqn.py` 中的 addressed 课程
+
+## 2. 模型定义（4 模型对比）
+
+| 模型 | 结构 | 参数上限 |
+|---|---|---|
+| no_memory | StatelessBaseline | ±5% |
+| GRU | GRU(11→48) + readout | ±5% |
+| Transformer | 2-layer attention(48) + readout | ±5% |
+| PLWM | TorchPLWM(latent=32, slots=16, beta=1.0, gated=False) | ±5% |
+
+**共享**: ObjectTokenEventEncoder（11x11 视觉 → 16 维事件）
+**新增**: AuxiliaryRetrievalHead（所有模型共享同一结构）
+
+## 3. Auxiliary Retrieval Loss 设计
+
+### 3.1 监督信号
+
+在 query 步（agent 到达 z=-2，看到 query tile），给定：
+- Query token: 被查询身份的第一帧视觉编码
+- 目标: 该身份在 query 步的 2D 位置（相对于 agent）
+
+监督形式: **位置回归**（MSE）
+```
+L_aux = || predicted_position - true_position ||²
+```
+
+### 3.2 模型适配
+
+- **PLWM**: 从 memory retrieval 结果中提取位置（key_head → 位置编码）
+- **GRU/Transformer**: 从 hidden state 中预测位置（等价阅读头）
+- **no_memory**: 无记忆状态，预测随机（baseline）
+
+### 3.3 总损失
+
+```
+L_total = L_reward + α · L_aux
+```
+
+- L_reward: 任务成功奖励（终端信号）
+- L_aux: 辅助检索损失（中间监督）
+- α: 混合系数，预声明为 **0.1**（可扫参 [0.01, 0.1, 0.5]）
+
+### 3.4 公平性论证
+
+- 所有模型共享同一 AuxiliaryRetrievalHead 结构
+- 不引入 PLWM-only 监督（GRU/Transformer 也有 read head）
+- 符合蓝图 §8 公平性框架
+
+## 4. 训练合同
+
+- **设备**: CUDA
+- **训练世界数**: 256（seed 18,000,000..18,000,256）
+- **Held-out 世界数**: 32（seed 18,001,000..18,001,032）
+- **动作种子**: 9,042,337（与现有 smoke 一致）
+- **训练步数**: 256 episodes
+- **Worker 数**: 8（并行采集）
+- **优化器**: AdamW(lr=3e-4, weight_decay=1e-5)
+- **β**: 1.0（默认，A-P1c 保守值）
+- **QR 投影**: 每步 optimizer.step() 后调用 enforce_key_orthogonality()
+
+## 5. 验收线（预声明，不可修改）
+
+| 指标 | 验收线 |
+|---|---|
+| PLWM held-out success | ≥ 0.75 |
+| PLWM vs no_memory gap | ≥ +15pp |
+| PLWM vs GRU gap | ≥ +10pp |
+| PLWM vs Transformer gap | ≥ +10pp |
+| 所有模型 training success | ≥ 40% |
+
+**通过条件**: 以上全部满足
+**失败条件**: 任一不满足 → 记录为 negative result，不得 retune
+
+## 6. 冻结约束
+
+- 本合同在训练前落盘为 JSON
+- 训练过程中禁止修改 seed、α、验收线
+- 审计脚本独立复算
+- 报告格式: `artifacts/luanti-addressed-2id-aux-retrieval-report.json`
+
+## 7. 预期文件
+
+- 训练脚本: `experiments/train_luanti_addressed_balanced_2id_aux_retrieval.py`
+- 审计脚本: `experiments/audit_luanti_addressed_balanced_2id_aux_retrieval.py`
+- 合同: `artifacts/luanti-addressed-2id-aux-retrieval-contract.json`
+- 报告: `artifacts/luanti-addressed-2id-aux-retrieval-report.json`
+- 审计: `artifacts/luanti-addressed-2id-aux-retrieval-audit.json`
