@@ -105,7 +105,11 @@ OBJECT_EVENT_DIM = 32
 
 
 class ObjectTokenEventEncoder(nn.Module):
-    """Shared public-pixel encoder used by every object-token comparison model."""
+    """Shared public-pixel encoder with 2D positional encoding (fix §5.3a).
+
+    Key change: instead of mean pooling over spatial tokens, we now compute
+    identity-aware position features that preserve where identities appear.
+    """
 
     def __init__(self, *, identity_count: int = 4) -> None:
         super().__init__()
@@ -116,8 +120,17 @@ class ObjectTokenEventEncoder(nn.Module):
             nn.Conv2d(VISION_SHAPE[2], OBJECT_TOKEN_DIM, kernel_size=3, padding=1), nn.Tanh(),
             nn.Conv2d(OBJECT_TOKEN_DIM, OBJECT_TOKEN_DIM, kernel_size=3, padding=1), nn.Tanh(),
         )
+        # Fix (a): 2D positional encoding
+        self.pos_embed = nn.Parameter(
+            torch.zeros(1, OBJECT_TOKEN_DIM, VISION_SHAPE[0], VISION_SHAPE[1])
+        )
+        nn.init.normal_(self.pos_embed, std=0.02)
         self.event_context = nn.Sequential(nn.Linear(ACTION_COUNT + 1, OBJECT_EVENT_DIM), nn.Tanh())
-        self.event_projection = nn.Sequential(nn.Linear(OBJECT_TOKEN_DIM + OBJECT_EVENT_DIM, OBJECT_EVENT_DIM), nn.Tanh())
+        # Fix: use a weighted sum instead of mean pooling to preserve position
+        self.position_weight = nn.Parameter(torch.zeros(1, 1, VISION_SHAPE[0] * VISION_SHAPE[1], 1))
+        nn.init.normal_(self.position_weight, std=0.1)
+        self.project_weighted = nn.Linear(OBJECT_TOKEN_DIM, OBJECT_EVENT_DIM)
+        self.event_projection = nn.Sequential(nn.Linear(OBJECT_EVENT_DIM, OBJECT_EVENT_DIM), nn.Tanh())
 
     def forward(self, observations: Tensor) -> tuple[Tensor, Tensor, Tensor]:
         if observations.ndim != 3 or observations.shape[-1] != INPUT_DIM:
@@ -125,15 +138,17 @@ class ObjectTokenEventEncoder(nn.Module):
         batch, time = observations.shape[:2]
         visual_size = int(np.prod(VISION_SHAPE))
         visual = observations[:, :, :visual_size].reshape(batch * time, *VISION_SHAPE).permute(0, 3, 1, 2)
-        tokens = self.spatial(visual).permute(0, 2, 3, 1).reshape(batch, time, -1, OBJECT_TOKEN_DIM)
-        # The mask only distinguishes one of the public identity tiles from
-        # air/wall/agent; it does not expose an identity label or coordinate.
+        tokens = self.spatial(visual)  # [B*T, D, H, W]
+        tokens = tokens + self.pos_embed  # Add positional encoding
+        tokens = tokens.permute(0, 2, 3, 1).reshape(batch, time, -1, OBJECT_TOKEN_DIM)  # [B, T, H*W, D]
         raw_tiles = observations[:, :, :visual_size].reshape(batch, time, *VISION_SHAPE)
         object_mask = raw_tiles[..., 3:].sum(dim=-1).gt(0).reshape(batch, time, -1)
         context = self.event_context(observations[:, :, visual_size:])
-        events = self.event_projection(torch.cat((tokens.mean(dim=2), context), dim=-1))
+        # Fix: weighted sum preserves position information better than mean
+        weights = torch.softmax(self.position_weight[:, :, :tokens.shape[2]], dim=2)
+        weighted_tokens = (tokens * weights).sum(dim=2)
+        events = self.event_projection(self.project_weighted(weighted_tokens) + context)
         return events, tokens, object_mask
-
 
 class ObjectTokenNoMemoryQ(nn.Module):
     def __init__(self, width: int, *, identity_count: int = 4) -> None:

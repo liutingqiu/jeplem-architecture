@@ -44,15 +44,7 @@
     18001004,
     18001005,
     18001006,
-    18001007,
-    18001008,
-    18001009,
-    18001010,
-    18001011,
-    18001012,
-    18001013,
-    18001014,
-    18001015
+    18001007
   ],
   "action_seed": 9042337,
   "max_steps": 6,
@@ -67,99 +59,99 @@
   "parameter_match_errors": {},
   "acceptance_mode": "aux_retrieval",
   "random_evaluation": {
-    "episodes": 16,
-    "successes": 7,
-    "mean_return": -0.17499995231628418,
+    "episodes": 8,
+    "successes": 5,
+    "mean_return": 0.20000004768371582,
     "action_counts": [
       0,
-      80,
-      9,
-      7
+      40,
+      5,
+      3
     ]
   },
   "results": [
     {
       "name": "no_memory",
-      "parameters": 114110,
+      "parameters": 116199,
       "training_episodes": 32,
       "training_successes": 14,
       "evaluation": {
-        "episodes": 16,
-        "successes": 8,
+        "episodes": 8,
+        "successes": 4,
         "mean_return": -0.04999995231628418,
         "action_counts": [
           0,
-          80,
+          40,
           0,
-          16
+          8
         ]
       }
     },
     {
       "name": "gru",
-      "parameters": 115366,
+      "parameters": 117455,
       "training_episodes": 32,
       "training_successes": 16,
       "evaluation": {
-        "episodes": 16,
-        "successes": 8,
+        "episodes": 8,
+        "successes": 4,
         "mean_return": -0.04999995231628418,
         "action_counts": [
           0,
-          80,
-          16,
+          40,
+          8,
           0
         ]
       }
     },
     {
       "name": "transformer_2",
-      "parameters": 115046,
+      "parameters": 117135,
       "training_episodes": 32,
-      "training_successes": 16,
+      "training_successes": 18,
       "evaluation": {
-        "episodes": 16,
-        "successes": 8,
+        "episodes": 8,
+        "successes": 4,
         "mean_return": -0.04999995231628418,
         "action_counts": [
           0,
-          80,
-          16,
-          0
+          40,
+          0,
+          8
         ]
       }
     },
     {
       "name": "plwm_state_off",
-      "parameters": 114057,
+      "parameters": 116146,
       "training_episodes": 32,
       "training_successes": 17,
       "evaluation": {
-        "episodes": 16,
-        "successes": 8,
+        "episodes": 8,
+        "successes": 4,
         "mean_return": -0.04999995231628418,
         "action_counts": [
           0,
-          80,
-          16,
+          40,
+          8,
           0
         ]
       }
     },
     {
       "name": "plwm",
-      "parameters": 114057,
+      "parameters": 116146,
       "training_episodes": 32,
-      "training_successes": 13,
+      "training_successes": 15,
       "evaluation": {
-        "episodes": 16,
-        "successes": 8,
+        "episodes": 8,
+        "successes": 4,
         "mean_return": -0.04999995231628418,
         "action_counts": [
           0,
-          80,
-          16,
-          0
+          40,
+          4,
+          4
         ]
       }
     }
