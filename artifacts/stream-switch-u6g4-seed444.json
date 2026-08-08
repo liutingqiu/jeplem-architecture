@@ -1,0 +1,46 @@
+{
+  "protocol": "minigrid_decide_stream_rl_v1: continuous stream of episodes, each [identity frame, gap empty frames, query frame]; query one-hot selects current or previous episode's identity; reward only on query steps; PPO on-policy; no teacher, oracle, shaped reward, or privileged state; reports overall query accuracy, cross-episode accuracy, and before/after rule-switch accuracy (switch_at); rule 0: choice == identity, rule 1: choice == complement.",
+  "device": "cuda",
+  "units": 6,
+  "gap": 4,
+  "identity_count": 2,
+  "switch_at": 3,
+  "updates": 100,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "gru_policy",
+      "parameters": 13635,
+      "query_accuracy": 0.5234375,
+      "cross_episode_accuracy": 0.5036496350364964,
+      "before_switch_accuracy": 0.5364583333333334,
+      "after_switch_accuracy": 0.5104166666666666
+    },
+    {
+      "name": "evidence_policy",
+      "parameters": 50372,
+      "query_accuracy": 0.578125,
+      "cross_episode_accuracy": 0.49635036496350365,
+      "before_switch_accuracy": 0.6666666666666666,
+      "after_switch_accuracy": 0.4895833333333333
+    },
+    {
+      "name": "plwm_policy",
+      "parameters": 100106,
+      "query_accuracy": 0.4765625,
+      "cross_episode_accuracy": 0.49635036496350365,
+      "before_switch_accuracy": 0.4635416666666667,
+      "after_switch_accuracy": 0.4895833333333333
+    },
+    {
+      "name": "plwm_slots16_policy",
+      "parameters": 100106,
+      "query_accuracy": 0.4765625,
+      "cross_episode_accuracy": 0.49635036496350365,
+      "before_switch_accuracy": 0.4635416666666667,
+      "after_switch_accuracy": 0.4895833333333333
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\stream-switch-u6g4-seed444.json"
+}

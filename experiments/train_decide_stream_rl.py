@@ -37,16 +37,25 @@ from plwm.torch_model import TorchPLWM
 class DecideStreamEnv(gym.Env):
     metadata = {"render_modes": []}
 
-    def __init__(self, *, units: int = 3, gap: int = 4, identity_count: int = 2, seed: int = 0) -> None:
+    def __init__(self, *, units: int = 3, gap: int = 4, identity_count: int = 2, seed: int = 0, switch_at: int | None = None) -> None:
         if units < 2:
             raise ValueError("stream needs at least two episodes for cross-episode queries")
         self.units, self.gap, self.identity_count = units, gap, identity_count
+        self.switch_at = switch_at if switch_at is not None else units + 1
         self.unit_len = gap + 1
         self.total_steps = units * self.unit_len
         self.input_dim = identity_count + 2  # presence + query type (prev_0 / prev_1)
         self.action_space = gym.spaces.Discrete(identity_count)
         self.observation_space = gym.spaces.Box(0.0, 1.0, (self.input_dim,), dtype=np.float32)
         self._seed = seed
+
+    def target_action(self, unit: int, target_unit: int) -> int:
+        """Identity->choice mapping.  Rule 0 (before switch_at): identity and
+        choice agree.  Rule 1 (from switch_at): choice is the complement, so
+        the controller must detect the rule change from reward feedback."""
+        identity = self._identities[target_unit]
+        rule = 0 if unit < self.switch_at else 1
+        return identity if rule == 0 else (1 - identity)
 
     def reset(self, *, seed: int | None = None, options: dict | None = None) -> tuple[np.ndarray, dict]:
         super().reset(seed=seed)
@@ -74,7 +83,7 @@ class DecideStreamEnv(gym.Env):
         reward = 0.0
         if position == self.gap:  # query frame
             target_unit = unit - self._query_types[unit]
-            if int(action) == self._identities[target_unit]:
+            if int(action) == self.target_action(unit, target_unit):
                 reward = 1.0
         self._frame += 1
         terminated = self._frame >= self.total_steps
@@ -314,14 +323,11 @@ def _train_ppo(
 
 
 @torch.no_grad()
-def _evaluate(model: nn.Module, env: DecideStreamEnv, *, episodes: int, seed_start: int, device: torch.device) -> tuple[float, float]:
-    """Return (overall_query_accuracy, cross_episode_accuracy), streaming.
-
-    Every frame is fed to the model (the identity frame, the gap frames and
-    the query frame); only the query frame's logits are scored.
-    """
+def _evaluate(model: nn.Module, env: DecideStreamEnv, *, episodes: int, seed_start: int, device: torch.device) -> tuple[float, float, float, float]:
+    """Return (query_accuracy, cross_episode_accuracy, before_switch_acc, after_switch_acc)."""
     model.eval()
     correct = correct_prev = total = total_prev = 0
+    before_correct = before_total = after_correct = after_total = 0
     for episode_index in range(episodes):
         observation, _info = env.reset(seed=seed_start + episode_index)
         model.reset(1, device)
@@ -333,16 +339,26 @@ def _evaluate(model: nn.Module, env: DecideStreamEnv, *, episodes: int, seed_sta
             if position == env.gap:  # query frame
                 action = int(outputs[0][0].argmax().item())
                 target_unit = unit - env._query_types[unit]
-                hit = action == env._identities[target_unit]
-                correct += int(hit)
+                target = env.target_action(unit, target_unit)
+                hit = int(action == target)
+                correct += hit
                 total += 1
                 if env._query_types[unit] == 1:
-                    correct_prev += int(hit)
+                    correct_prev += hit
                     total_prev += 1
+                if unit < env.switch_at:
+                    before_correct += hit
+                    before_total += 1
+                else:
+                    after_correct += hit
+                    after_total += 1
             observation, _reward, terminated, truncated, _info = env.step(0)
             if terminated or truncated:
                 break
-    return (correct / max(total, 1), correct_prev / max(total_prev, 1))
+    return (
+        correct / max(total, 1), correct_prev / max(total_prev, 1),
+        before_correct / max(before_total, 1), after_correct / max(after_total, 1),
+    )
 
 
 @dataclass
@@ -351,6 +367,8 @@ class Result:
     parameters: int
     query_accuracy: float
     cross_episode_accuracy: float
+    before_switch_accuracy: float
+    after_switch_accuracy: float
 
 
 @dataclass
@@ -360,6 +378,7 @@ class Report:
     units: int
     gap: int
     identity_count: int
+    switch_at: int | None
     updates: int
     episodes_per_update: int
     results: list[Result]
@@ -372,13 +391,13 @@ def run(
     identity_count: int = 2, updates: int = 100, episodes_per_update: int = 24,
     evaluation_episodes: int = 64, experiment_seed: int = 41_123,
     train_seed_start: int = 10_000, heldout_seed_start: int = 1_000_000,
-    artifact: Path | None = None,
+    switch_at: int | None = None, artifact: Path | None = None,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
     np.random.seed(experiment_seed)
     random.seed(experiment_seed)
-    env = DecideStreamEnv(units=units, gap=gap, identity_count=identity_count)
+    env = DecideStreamEnv(units=units, gap=gap, identity_count=identity_count, switch_at=switch_at)
     input_dim = env.input_dim
     factories = (
         ("gru_policy", lambda: PolicyGRU(input_dim, identity_count)),
@@ -393,12 +412,12 @@ def run(
             model, env, updates=updates, episodes_per_update=episodes_per_update,
             seed_start=train_seed_start, device=resolved,
         )
-        query_acc, cross_acc = _evaluate(
+        query_acc, cross_acc, before_acc, after_acc = _evaluate(
             model, env, episodes=evaluation_episodes, seed_start=heldout_seed_start, device=resolved,
         )
         results.append(Result(
             name, sum(parameter.numel() for parameter in model.parameters()),
-            query_acc, cross_acc,
+            query_acc, cross_acc, before_acc, after_acc,
         ))
     by_name = {result.name: result for result in results}
     accepted = (
@@ -408,8 +427,8 @@ def run(
     target = artifact or ROOT / "artifacts" / "decide-stream-rl-report.json"
     target.parent.mkdir(exist_ok=True)
     report = Report(
-        "minigrid_decide_stream_rl_v1: continuous stream of episodes, each [identity frame, gap empty frames, query frame]; query one-hot selects current or previous episode's identity; reward only on query steps; PPO on-policy; no teacher, oracle, shaped reward, or privileged state; reports overall query accuracy and cross-episode accuracy.",
-        str(resolved), units, gap, identity_count, updates, episodes_per_update,
+        "minigrid_decide_stream_rl_v1: continuous stream of episodes, each [identity frame, gap empty frames, query frame]; query one-hot selects current or previous episode's identity; reward only on query steps; PPO on-policy; no teacher, oracle, shaped reward, or privileged state; reports overall query accuracy, cross-episode accuracy, and before/after rule-switch accuracy (switch_at); rule 0: choice == identity, rule 1: choice == complement.",
+        str(resolved), units, gap, identity_count, switch_at, updates, episodes_per_update,
         results, accepted, str(target),
     )
     target.write_text(json.dumps(asdict(report), indent=2), encoding="utf-8")
@@ -425,6 +444,7 @@ if __name__ == "__main__":
     parser.add_argument("--updates", type=int, default=100)
     parser.add_argument("--episodes-per-update", type=int, default=24)
     parser.add_argument("--evaluation-episodes", type=int, default=64)
+    parser.add_argument("--switch-at", type=int, default=None, help="unit index where the identity->choice rule flips (None = never)")
     parser.add_argument("--experiment-seed", type=int, default=41_123)
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
@@ -433,6 +453,6 @@ if __name__ == "__main__":
         identity_count=args.identity_count, updates=args.updates,
         episodes_per_update=args.episodes_per_update,
         evaluation_episodes=args.evaluation_episodes,
-        experiment_seed=args.experiment_seed, artifact=args.artifact,
+        experiment_seed=args.experiment_seed, switch_at=args.switch_at, artifact=args.artifact,
     )
     print(json.dumps(asdict(outcome), indent=2))
