@@ -95,6 +95,23 @@ DecideAfterDelay 改造成**事件流 RL 环境**（DecideEnv）：每步一个�
 
 待诊断：PLWM（0.818）低于 evidence（0.964）——可能是 TorchPLWM 的 think 计算/记忆写入门控在 RL 梯度下优化更困难，或 latent=32 容量限制。
 
+### 差距诊断（3 seed，100 updates）
+
+| 模型 | s222 | s333 | s444 | 均值 |
+|---|---|---|---|---|
+| evidence_policy（无预测头）| 1.000 | 0.891 | 1.000 | **0.964** |
+| **evidence_pred_policy（+predictor/surprise）** | 1.000 | 0.797 | 0.797 | **0.865（↓0.10）**|
+| plwm_policy（latent=32, 全写）| 0.781 | 0.891 | 0.797 | 0.823 |
+| plwm_latent64_policy | 0.781 | 0.891 | 0.891 | 0.854 |
+| plwm_gated_policy | 0.797 | 1.000 | 0.891 | 0.896 |
+
+**结论（架构修正证据）**：
+1. **主因是 surprise 重建目标**：给 evidence 加 predictor 头后掉 0.10（0.964→0.865）——预测误差目标在纯 RL 策略学习中是噪声/负担；PLWM 自带 predictor 所以系统性低于 evidence；
+2. 容量有影响（latent=32→64: 0.823→0.854）；
+3. 写入门控非主因（gated_memory 效果随 seed 波动，0.854-0.896）；
+4. **surprise 的价值是任务依赖的**：长延迟监督任务（d=32 scan）中 PLWM 的 surprise 门控优于 FIFO（0.862 vs 0.720），但在 RL 策略学习中是负担。
+5. **架构含义**：surprise 应作为门控/置信度/新奇检测的辅助信号（决策侧），而非作为通用训练目标强制混合——预测误差驱动写入保留，但不应进入策略梯度主损失。
+
 ## 七、下一步（已决策，待执行）
 
 1. **难度刻画像限**：延迟 8→16→32、身份 2→3→4、跨 episode 持久（GRU 隐状态无法跨序列保留 vs PLWM 槽位可持久化）——找到 GRU 失效的边界，确立 PLWM 优势域；

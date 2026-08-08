@@ -119,6 +119,7 @@ class PolicyEvidence(nn.Module):
             values = values * (1.0 - gate) + candidate_values * gate
             active = valid[:, index].view(batch, 1).float()
             outputs.append(self.head(torch.cat((state, recalled), dim=-1)) * active)
+        self._final_state = state
         output = torch.stack(outputs, dim=1)
         return output[..., :-1], output[..., -1]
 
@@ -175,8 +176,8 @@ def _collect(
         rewards: list[float] = []
         for _step in range(env.delay + 1):
             observations, valid = _pad([history], device, env.input_dim)
-            logits, _values = model(observations, valid)
-            current_logits = logits[0, len(history) - 1]
+            outputs = model(observations, valid)
+            current_logits = outputs[0][0, len(history) - 1]
             action = int(Categorical(logits=current_logits).sample().item()) if stochastic else int(current_logits.argmax().item())
             observation, reward, terminated, truncated, _info = env.step(action)
             actions.append(action)
@@ -206,6 +207,27 @@ def _gae(rewards: list[list[float]], values: Tensor, valid: Tensor, *, gamma: fl
     return advantages, returns
 
 
+class PolicyEvidenceWithPredictor(PolicyEvidence):
+    """Evidence policy plus a reconstruction predictor head, so the surprise
+    (prediction-error) objective used by TorchPLWM is mixed into the PPO loss.
+    Isolates whether the predictor target drags down RL learning."""
+
+    def __init__(self, input_dim: int, num_actions: int, *, width: int = 64, slots: int = 8, surprise_coefficient: float = 0.1) -> None:
+        super().__init__(input_dim, num_actions, width=width, slots=slots)
+        self.predictor = nn.Linear(width, input_dim)
+        self.surprise_coefficient = surprise_coefficient
+
+    def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        logits, values = super().forward(observations, valid)
+        prediction = self.predictor(self._final_state)
+        return logits, values, prediction
+
+
+def _predictor_loss(prediction: Tensor, observations: Tensor) -> Tensor:
+    target = observations[:, -1]
+    return ((prediction - target) ** 2).mean()
+
+
 def _train_ppo(
     model: nn.Module, env: DecideEnv, *, updates: int, episodes_per_update: int,
     seed_start: int, device: torch.device, ppo_epochs: int = 4,
@@ -223,14 +245,16 @@ def _train_ppo(
         for row, actions in enumerate(action_lists):
             action_tensor[row, : len(actions)] = torch.tensor(actions, dtype=torch.long, device=device)
         with torch.no_grad():
-            old_logits, old_values = model(observations, valid)
+            old_outputs = model(observations, valid)
+            old_logits, old_values = old_outputs[0], old_outputs[1]
             old_distribution = Categorical(logits=old_logits)
             old_selected = old_distribution.log_prob(action_tensor)
             advantages, returns = _gae(reward_lists, old_values, valid)
             normalized = advantages[valid]
             advantages = (advantages - normalized.mean()) / normalized.std().clamp_min(1e-5)
         for _ in range(ppo_epochs):
-            logits, values = model(observations, valid)
+            outputs = model(observations, valid)
+            logits, values = outputs[0], outputs[1]
             distribution = Categorical(logits=logits)
             ratio = (distribution.log_prob(action_tensor) - old_selected).exp()
             unclipped = ratio * advantages
@@ -239,6 +263,8 @@ def _train_ppo(
             critic = (returns[valid] - values[valid]).square().mean()
             entropy = distribution.entropy()[valid].mean()
             loss = actor + 0.5 * critic - entropy_coefficient * entropy
+            if len(outputs) > 2:
+                loss = loss + getattr(model, "surprise_coefficient", 0.1) * _predictor_loss(outputs[2], observations)
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -271,8 +297,8 @@ def _run_episode(model: nn.Module, env: DecideEnv, seed: int, device: torch.devi
     total = 0.0
     for _step in range(env.delay + 1):
         observations, valid = _pad([history], device, env.input_dim)
-        logits, _values = model(observations, valid)
-        action = int(logits[0, len(history) - 1].argmax().item())
+        outputs = model(observations, valid)
+        action = int(outputs[0][0, len(history) - 1].argmax().item())
         # Counterfactual: flip the choice the agent would need to make.
         if swap:
             action = (action + 1) % env.identity_count
@@ -323,6 +349,7 @@ def run(
     factories = (
         ("gru_policy", lambda: PolicyGRU(input_dim, identity_count)),
         ("evidence_policy", lambda: PolicyEvidence(input_dim, identity_count)),
+        ("evidence_pred_policy", lambda: PolicyEvidenceWithPredictor(input_dim, identity_count)),
         ("plwm_policy", lambda: PolicyPLWM(input_dim, identity_count)),
         ("plwm_latent64_policy", lambda: PolicyPLWM(input_dim, identity_count, latent=64)),
         ("plwm_gated_policy", lambda: PolicyPLWM(input_dim, identity_count, gated_memory=True)),
