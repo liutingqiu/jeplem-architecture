@@ -1,0 +1,50 @@
+{
+  "protocol": "minigrid_decide_stream_rule_adaptation: stage 1 learns identity->choice rule 0 on a 4-episode stream; stage 2 flips the rule (choice = complement) and the adaptation curve measures how quickly each controller recovers on reward feedback only; PPO on-policy throughout; no privileged state.",
+  "device": "cuda",
+  "units": 4,
+  "gap": 4,
+  "identity_count": 2,
+  "stage1_updates": 100,
+  "stage2_updates": 100,
+  "eval_every": 20,
+  "stage1_query_accuracy": 0.810546875,
+  "stage1_cross_accuracy": 0.6684782608695652,
+  "adaptation_curve": {
+    "gru_policy": [
+      0.48828125,
+      0.54296875,
+      0.48828125,
+      0.45703125,
+      0.45703125
+    ],
+    "evidence_policy": [
+      0.45703125,
+      0.45703125,
+      0.45703125,
+      0.45703125,
+      0.45703125
+    ],
+    "plwm_policy": [
+      0.30078125,
+      0.32421875,
+      0.7578125,
+      0.890625,
+      0.97265625
+    ],
+    "plwm_slots16_policy": [
+      0.54296875,
+      0.54296875,
+      0.54296875,
+      0.54296875,
+      0.80078125
+    ]
+  },
+  "final_query_accuracy": {
+    "gru_policy": 0.45703125,
+    "evidence_policy": 0.45703125,
+    "plwm_policy": 0.97265625,
+    "plwm_slots16_policy": 0.80078125
+  },
+  "accepted": true,
+  "artifact": "artifacts\\rule-adapt-u4g4-seed777.json"
+}

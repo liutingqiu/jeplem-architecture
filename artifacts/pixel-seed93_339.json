@@ -1,0 +1,38 @@
+{
+  "protocol": "decide_pixel_two_identity_v1: two identity frames rendered as RGB center cells (yellow=Key, purple=Ball) at frames 0 and 3 plus a query frame at 8 whose border color (red=first, blue=second) routes to one stored identity; raw 7x7x3 pixel input, no presence channels; counterfactual swap probe flips the identity->choice mapping; no teacher, oracle, or reward signal.",
+  "device": "cuda",
+  "training_examples": 1024,
+  "updates": 600,
+  "results": [
+    {
+      "name": "gru",
+      "parameters": 30498,
+      "heldout_accuracy": 0.734375,
+      "swapped_accuracy": 0.265625,
+      "memory_evidence": 0.46875
+    },
+    {
+      "name": "evidence_store",
+      "parameters": 53251,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    },
+    {
+      "name": "evidence_disabled",
+      "parameters": 53251,
+      "heldout_accuracy": 0.875,
+      "swapped_accuracy": 0.125,
+      "memory_evidence": 0.75
+    },
+    {
+      "name": "plwm",
+      "parameters": 38821,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\pixel-seed93_339.json"
+}
