@@ -335,6 +335,7 @@ def run(
         ("gru_policy", lambda: PolicyGRU(input_dim, identity_count)),
         ("evidence_policy", lambda: PolicyEvidence(input_dim, identity_count)),
         ("plwm_policy", lambda: PolicyPLWM(input_dim, identity_count)),
+        ("plwm_slots16_policy", lambda: PolicyPLWM(input_dim, identity_count, memory_slots=16)),
     )
     results = []
     for name, factory in factories:
