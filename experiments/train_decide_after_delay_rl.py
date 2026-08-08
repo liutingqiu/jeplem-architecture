@@ -124,11 +124,12 @@ class PolicyEvidence(nn.Module):
 
 
 class PolicyPLWM(nn.Module):
-    def __init__(self, input_dim: int, num_actions: int, *, latent: int = 32, memory_slots: int = 8, thought_steps: int = 1) -> None:
+    def __init__(self, input_dim: int, num_actions: int, *, latent: int = 32, memory_slots: int = 8, thought_steps: int = 1, gated_memory: bool = False) -> None:
         super().__init__()
         self.core = TorchPLWM(
             input_dim=input_dim, latent_dim=latent, memory_slots=memory_slots,
             thought_steps=thought_steps, output_dim=num_actions + 1,
+            gated_memory=gated_memory,
         )
 
     def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor]:
@@ -323,6 +324,8 @@ def run(
         ("gru_policy", lambda: PolicyGRU(input_dim, identity_count)),
         ("evidence_policy", lambda: PolicyEvidence(input_dim, identity_count)),
         ("plwm_policy", lambda: PolicyPLWM(input_dim, identity_count)),
+        ("plwm_latent64_policy", lambda: PolicyPLWM(input_dim, identity_count, latent=64)),
+        ("plwm_gated_policy", lambda: PolicyPLWM(input_dim, identity_count, gated_memory=True)),
     )
     results = []
     for name, factory in factories:

@@ -1,0 +1,41 @@
+{
+  "protocol": "minigrid_decide_after_delay_rl_v1: event-stream environment with one reward at the query step (+1 for matching the remembered identity); PPO on-policy, no teacher action, oracle, shaped reward, or privileged state; counterfactual swap probe flips identity->choice at evaluation; both = solved in original and swapped layouts (genuine memory-driven success).",
+  "device": "cuda",
+  "delay": 8,
+  "gap": 3,
+  "identity_count": 2,
+  "updates": 100,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "gru_policy",
+      "parameters": 13635,
+      "heldout_successes": 36,
+      "swapped_successes": 28,
+      "both_successes": 0
+    },
+    {
+      "name": "evidence_policy",
+      "parameters": 50372,
+      "heldout_successes": 64,
+      "swapped_successes": 0,
+      "both_successes": 0
+    },
+    {
+      "name": "plwm_policy",
+      "parameters": 25482,
+      "heldout_successes": 50,
+      "swapped_successes": 14,
+      "both_successes": 0
+    },
+    {
+      "name": "plwm_gated_policy",
+      "parameters": 25482,
+      "heldout_successes": 50,
+      "swapped_successes": 14,
+      "both_successes": 0
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\rl-gate-seed444.json"
+}
