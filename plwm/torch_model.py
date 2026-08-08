@@ -240,7 +240,7 @@ class TorchPLWM(nn.Module):
         retrieved = self._read_memory(query, state)
         for _ in range(self.thought_steps if steps is None else steps):
             workspace = self.workspace_cell(torch.cat((state.belief, retrieved), dim=-1), workspace)
-        return TorchCognitiveState(state.belief, workspace, state.keys, state.values)
+        return TorchCognitiveState(state.belief, workspace, state.keys, state.values, state.confidences)
 
     def forward(self, observations: Tensor, *, think_on_last: bool = True) -> tuple[Tensor, Tensor, TorchCognitiveState]:
         """Run an event sequence shaped ``[batch, time, input_dim]``."""
@@ -269,3 +269,4 @@ class StatelessBaseline(nn.Module):
 
     def forward(self, observations: Tensor) -> Tensor:
         return self.network(observations[:, -1, :])
+

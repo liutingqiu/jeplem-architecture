@@ -205,6 +205,7 @@ class HybridPLWMTransformerActorCritic(ActorCritic):
             torch.where(active_mask, candidate.workspace, state.workspace),
             torch.where(active_mask.unsqueeze(-1), candidate.keys, state.keys),
             torch.where(active_mask.unsqueeze(-1), candidate.values, state.values),
+            torch.where(active_mask.unsqueeze(-1), candidate.confidences, state.confidences),
         )
 
     def _persistent_feature(self, state: TorchCognitiveState) -> Tensor:
@@ -277,6 +278,7 @@ class PLWMActorCritic(ActorCritic):
             torch.where(active_mask, candidate.workspace, state.workspace),
             torch.where(active_mask.unsqueeze(-1), candidate.keys, state.keys),
             torch.where(active_mask.unsqueeze(-1), candidate.values, state.values),
+            torch.where(active_mask.unsqueeze(-1), candidate.confidences, state.confidences),
         )
 
     def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor]:
@@ -718,3 +720,4 @@ if __name__ == "__main__":
     )
     print(json.dumps(asdict(outcome), indent=2))
     if not outcome.accepted: raise SystemExit("MiniGrid actor-critic pilot did not meet its gate")
+

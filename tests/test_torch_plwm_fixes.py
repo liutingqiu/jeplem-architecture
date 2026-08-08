@@ -1,7 +1,7 @@
 """Tests for A-P1c orthogonality and B-P2c confidence-weighted retrieval fixes."""
 
 import torch
-import pytest
+# import pytest
 from pathlib import Path
 import tempfile
 
@@ -137,7 +137,7 @@ class TestCheckpointBackwardCompat:
             path = f.name
         try:
             restored = TorchCognitiveState.restore(path, "cpu")
-            assert restored.confidences[0, 0, 0].item() == pytest.approx(0.8)
+            assert restored.confidences[0, 0, 0].item() == torch.isclose(torch.tensor(0.8), torch.tensor([0.8]), atol=1e-4).item()
         finally:
             import os; os.unlink(path)
 
@@ -154,4 +154,5 @@ class TestBetaDefault:
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+    unittest.main()
+

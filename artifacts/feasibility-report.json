@@ -4,109 +4,109 @@
       "distractors": 1,
       "seed": 5,
       "plwm_accuracy": 1.0,
-      "baseline_accuracy": 0.49560546875,
+      "baseline_accuracy": 0.5029296875,
       "checkpoint_exact": true,
-      "plwm_loss": 0.0002904568682424724,
-      "baseline_loss": 0.693713903427124
+      "plwm_loss": 0.0002992479130625725,
+      "baseline_loss": 0.6985987424850464
     },
     {
       "distractors": 1,
       "seed": 17,
       "plwm_accuracy": 1.0,
-      "baseline_accuracy": 0.486083984375,
+      "baseline_accuracy": 0.503173828125,
       "checkpoint_exact": true,
-      "plwm_loss": 0.00020058228983543813,
-      "baseline_loss": 0.6885683536529541
+      "plwm_loss": 0.0002095694944728166,
+      "baseline_loss": 0.6916655898094177
     },
     {
       "distractors": 1,
       "seed": 41,
       "plwm_accuracy": 1.0,
-      "baseline_accuracy": 0.5048828125,
+      "baseline_accuracy": 0.493408203125,
       "checkpoint_exact": true,
-      "plwm_loss": 0.00036873738281428814,
-      "baseline_loss": 0.6917510032653809
+      "plwm_loss": 0.0003127915842924267,
+      "baseline_loss": 0.6956775188446045
     },
     {
       "distractors": 5,
       "seed": 5,
       "plwm_accuracy": 1.0,
-      "baseline_accuracy": 0.49560546875,
+      "baseline_accuracy": 0.50341796875,
       "checkpoint_exact": true,
-      "plwm_loss": 0.0002523235743865371,
-      "baseline_loss": 0.693713903427124
+      "plwm_loss": 0.00025465531507506967,
+      "baseline_loss": 0.6947804689407349
     },
     {
       "distractors": 5,
       "seed": 17,
       "plwm_accuracy": 1.0,
-      "baseline_accuracy": 0.486083984375,
+      "baseline_accuracy": 0.50439453125,
       "checkpoint_exact": true,
-      "plwm_loss": 0.00020969434990547597,
-      "baseline_loss": 0.6885683536529541
+      "plwm_loss": 0.00018388900207355618,
+      "baseline_loss": 0.6925458908081055
     },
     {
       "distractors": 5,
       "seed": 41,
       "plwm_accuracy": 1.0,
-      "baseline_accuracy": 0.5048828125,
+      "baseline_accuracy": 0.50146484375,
       "checkpoint_exact": true,
-      "plwm_loss": 0.0003210253198631108,
-      "baseline_loss": 0.6917510032653809
+      "plwm_loss": 0.0002570376673247665,
+      "baseline_loss": 0.6950211524963379
     },
     {
       "distractors": 12,
       "seed": 5,
       "plwm_accuracy": 1.0,
-      "baseline_accuracy": 0.49560546875,
+      "baseline_accuracy": 0.494873046875,
       "checkpoint_exact": true,
-      "plwm_loss": 0.0003428040654398501,
-      "baseline_loss": 0.693713903427124
+      "plwm_loss": 0.0003287587605882436,
+      "baseline_loss": 0.6973134875297546
     },
     {
       "distractors": 12,
       "seed": 17,
       "plwm_accuracy": 1.0,
-      "baseline_accuracy": 0.486083984375,
+      "baseline_accuracy": 0.50439453125,
       "checkpoint_exact": true,
-      "plwm_loss": 0.00024896644754335284,
-      "baseline_loss": 0.6885683536529541
+      "plwm_loss": 0.00023285855422727764,
+      "baseline_loss": 0.6917175650596619
     },
     {
       "distractors": 12,
       "seed": 41,
       "plwm_accuracy": 1.0,
-      "baseline_accuracy": 0.5048828125,
+      "baseline_accuracy": 0.502197265625,
       "checkpoint_exact": true,
-      "plwm_loss": 0.0003760883118957281,
-      "baseline_loss": 0.6917510032653809
+      "plwm_loss": 0.00037519511533901095,
+      "baseline_loss": 0.6944283843040466
     }
   ],
   "associative_memory": {
     "memory_accuracy": 1.0,
     "gated_memory_accuracy": 1.0,
-    "no_memory_accuracy": 0.64501953125,
-    "memory_loss": 7.61556439101696e-05,
-    "gated_memory_loss": 5.971115024294704e-05,
-    "no_memory_loss": 0.5940218567848206
+    "no_memory_accuracy": 0.6640625,
+    "memory_loss": 4.888576586381532e-05,
+    "gated_memory_loss": 7.056276081129909e-05,
+    "no_memory_loss": 0.6466842889785767
   },
   "adaptive_compute": {
     "accuracy": 1.0,
     "expected_steps_by_difficulty": [
-      0.052301809191703796,
-      0.9165070056915283,
-      1.9261976480484009,
-      2.9322705268859863,
-      3.7654547691345215
+      0.049124475568532944,
+      0.9247751832008362,
+      1.9365577697753906,
+      2.9413564205169678,
+      3.7741007804870605
     ],
     "fixed_max_compute": 4.0,
-    "learned_mean_compute": 1.9185463190078735
+    "learned_mean_compute": 1.9251829385757446
   },
   "multiscale_state": {
     "fast_accuracy": 1.0,
     "slow_accuracy": 1.0,
-    "slow_retention_after_contradiction": 0.99658203125,
-    "mean_slow_gate_during_contradiction": 0.3187442719936371
+    "slow_retention_after_contradiction": 0.99560546875,
+    "mean_slow_gate_during_contradiction": 0.28712761402130127
   },
   "belief_revision": {
     "weak_evidence_confidence": 0.550000011920929,
@@ -134,18 +134,18 @@
   "causal_planning": {
     "persistent_transition_accuracy": 1.0,
     "persistent_planning_accuracy": 1.0,
-    "stateless_transition_accuracy": 0.4951171875,
-    "stateless_planning_accuracy": 0.494140625,
-    "persistent_loss": 0.018067559227347374,
-    "stateless_loss": 0.6933673620223999
+    "stateless_transition_accuracy": 0.48681640625,
+    "stateless_planning_accuracy": 0.4951171875,
+    "persistent_loss": 0.015361764468252659,
+    "stateless_loss": 0.6985770463943481
   },
   "multistep_rollout": {
     "persistent_transition_accuracy": 1.0,
     "persistent_rollout_success": 1.0,
-    "stateless_transition_accuracy": 0.4527181088924408,
-    "stateless_rollout_success": 0.18701171875,
-    "persistent_loss": 0.16376030445098877,
-    "stateless_loss": 2.094841957092285
+    "stateless_transition_accuracy": 0.4593912661075592,
+    "stateless_rollout_success": 0.224365234375,
+    "persistent_loss": 0.1785832941532135,
+    "stateless_loss": 2.093259334564209
   },
   "continual_partial_observability": {
     "plwm_success": 0.9609375,
@@ -189,7 +189,7 @@
     "checkpoint_action_exact": true,
     "completion_requires_evidence": true,
     "commitment_switches_after_evidence": true,
-    "mean_selected_utility": -0.03375344365485944
+    "mean_selected_utility": -0.03238694756873883
   },
   "trajectory_contract": {
     "event_count": 4,

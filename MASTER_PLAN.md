@@ -1573,14 +1573,15 @@ recorded here before any run.
 - ✅ 7 个训练脚本集成 QR 投影（E-001）
 - ✅ 6 项测试全部通过
 
-### 14.3 L1 状态（2026-08-07 更新）
+### 14.3 L1 状态（2026-08-08 更新）
 
-**addressed_balanced_2id 诊断结果：负结果**
+**addressed_balanced_2id 诊断结果：负结果（已归档）**
 
-已尝试三种修复路径：
-1. 原始 smoke（无辅助监督）：50% 所有模型
-2. + 辅助检索监督 loss（α=0.1）：50% 所有模型
-3. + §5.3a 位置编码 + 辅助监督：50% 所有模型
+已尝试四种修复路径，全部失败：
+1. 原始 smoke（256 worlds）：所有模型 50%
+2. 预算升级（1024 worlds）：所有模型 25%
+3. 难度降低（2id 简化）：所有模型 50%
+4. + 辅助检索监督 loss（α=0.1）：所有模型 50%
 
 根因分析：任务结构问题——身份(step 0)与查询(step 5)永不同帧，
 中间 5 步无视觉线索，终端 reward 延迟太远，credit assignment 失效。
@@ -1588,10 +1589,17 @@ recorded here before any run.
 **结论**：这不是 PLWM 架构问题，是任务设计问题。任何 controller
 （no_memory/GRU/Transformer/PLWM）都无法学会此任务。
 
-**下一步**：
-- 创建诊断任务 short_delay_2id（3步延迟，中间有线索）证明机制可用
-- addressed_2id 记录为 negative result，转入 L2 或其他诊断路径
-- 数学裁决（A/B/C/D）作为 PLWM 架构可行性的结构性证据
+**已归档**：根据 MASTER_PLAN.md Completion Rule，停止此方向。
+
+**short_delay_2id 诊断结果：未通过（小批量）**
+
+- 配置：3 步延迟，辅助检索损失 α=0.1
+- 结果：PLWM 3/8 = 37.5%，GRU 3/8 = 37.5%，无记忆 0/8
+- 验收线：PLWM held-out ≥ 0.75 → **未通过**
+
+**下一步**：转向 MiniGrid 验证延迟检索能力。
+
+**数学裁决（A/B/C/D）作为 PLWM 架构可行性的结构性证据**
 
 验收线：PLWM held-out ≥ 0.75（当前 0.50）→ **未通过**
 
