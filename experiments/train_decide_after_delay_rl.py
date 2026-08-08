@@ -71,20 +71,31 @@ class DecideEnv(gym.Env):
 class PolicyGRU(nn.Module):
     def __init__(self, input_dim: int, num_actions: int, width: int = 64) -> None:
         super().__init__()
-        self.core = nn.GRU(input_dim, width, batch_first=True)
+        self.cell = nn.GRUCell(input_dim, width)
         self.head = nn.Linear(width, num_actions + 1)
+        self._hidden: Tensor | None = None
+
+    def reset(self, batch: int, device: torch.device) -> None:
+        self._hidden = torch.zeros(batch, self.cell.hidden_size, device=device)
+
+    def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor]:
+        """Advance one frame for a batch of episodes; returns (logits, value)."""
+        candidate = self.cell(observation_step, self._hidden)
+        active = valid_step.unsqueeze(-1)
+        self._hidden = torch.where(active, candidate, self._hidden)
+        output = self.head(self._hidden)
+        return output[..., :-1], output[..., -1]
 
     def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor]:
-        lengths = valid.sum(dim=1).clamp_min(1).cpu()
-        packed = nn.utils.rnn.pack_padded_sequence(
-            observations, lengths, batch_first=True, enforce_sorted=False,
-        )
-        encoded, _ = self.core(packed)
-        encoded, _ = nn.utils.rnn.pad_packed_sequence(
-            encoded, batch_first=True, total_length=observations.shape[1],
-        )
-        output = self.head(encoded)
-        return output[..., :-1], output[..., -1]
+        batch, length, _ = observations.shape
+        self.reset(batch, observations.device)
+        logits_list: list[Tensor] = []
+        values_list: list[Tensor] = []
+        for index in range(length):
+            logits, value = self.step(observations[:, index], valid[:, index])
+            logits_list.append(logits)
+            values_list.append(value)
+        return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
 
 
 class PolicyEvidence(nn.Module):
@@ -98,30 +109,47 @@ class PolicyEvidence(nn.Module):
         self.write_gate = nn.Linear(width, 1)
         self.state = nn.GRUCell(width * 2, width)
         self.head = nn.Linear(width * 2, num_actions + 1)
+        self._state: Tensor | None = None
+        self._keys: Tensor | None = None
+        self._values: Tensor | None = None
+        self._final_state: Tensor | None = None
+
+    def reset(self, batch: int, device: torch.device) -> None:
+        width = self.encoder[0].out_features
+        self._state = torch.zeros(batch, width, device=device)
+        self._keys = torch.zeros(batch, 8, width, device=device)
+        self._values = torch.zeros_like(self._keys)
+
+    def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor]:
+        batch = observation_step.shape[0]
+        encoded = self.encoder(observation_step)
+        weights = torch.softmax(
+            torch.einsum("bd,bmd->bm", self.query(encoded), self._keys) / self.encoder[0].out_features**0.5, dim=-1,
+        )
+        recalled = torch.einsum("bm,bmd->bd", weights, self._values)
+        candidate_state = self.state(torch.cat((encoded, recalled), dim=-1), self._state)
+        gate = torch.sigmoid(self.write_gate(encoded)).view(batch, 1, 1)
+        candidate_keys = torch.cat((self._keys[:, 1:], self.key(encoded).unsqueeze(1)), dim=1)
+        candidate_values = torch.cat((self._values[:, 1:], self.value(encoded).unsqueeze(1)), dim=1)
+        active = valid_step.unsqueeze(-1)
+        active_slots = active.unsqueeze(-1)
+        self._state = torch.where(active, candidate_state, self._state)
+        self._keys = torch.where(active_slots, candidate_keys, self._keys)
+        self._values = torch.where(active_slots, candidate_values, self._values)
+        self._final_state = self._state
+        output = self.head(torch.cat((self._state, recalled), dim=-1))
+        return output[..., :-1], output[..., -1]
 
     def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor]:
         batch, length, _ = observations.shape
-        state = torch.zeros(batch, self.encoder[0].out_features, device=observations.device)
-        keys = torch.zeros(batch, 8, self.encoder[0].out_features, device=observations.device)
-        values = torch.zeros_like(keys)
-        outputs = []
+        self.reset(batch, observations.device)
+        logits_list: list[Tensor] = []
+        values_list: list[Tensor] = []
         for index in range(length):
-            encoded = self.encoder(observations[:, index])
-            weights = torch.softmax(
-                torch.einsum("bd,bmd->bm", self.query(encoded), keys) / self.encoder[0].out_features**0.5, dim=-1,
-            )
-            recalled = torch.einsum("bm,bmd->bd", weights, values)
-            state = self.state(torch.cat((encoded, recalled), dim=-1), state)
-            gate = torch.sigmoid(self.write_gate(encoded)).view(batch, 1, 1)
-            candidate_keys = torch.cat((keys[:, 1:], self.key(encoded).unsqueeze(1)), dim=1)
-            candidate_values = torch.cat((values[:, 1:], self.value(encoded).unsqueeze(1)), dim=1)
-            keys = keys * (1.0 - gate) + candidate_keys * gate
-            values = values * (1.0 - gate) + candidate_values * gate
-            active = valid[:, index].view(batch, 1).float()
-            outputs.append(self.head(torch.cat((state, recalled), dim=-1)) * active)
-        self._final_state = state
-        output = torch.stack(outputs, dim=1)
-        return output[..., :-1], output[..., -1]
+            logits, value = self.step(observations[:, index], valid[:, index])
+            logits_list.append(logits)
+            values_list.append(value)
+        return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
 
 
 class PolicyPLWM(nn.Module):
@@ -133,22 +161,32 @@ class PolicyPLWM(nn.Module):
             gated_memory=gated_memory,
         )
 
-    def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor]:
-        state = self.core.initial_state(observations.shape[0], observations.device)
-        outputs = []
-        for index in range(observations.shape[1]):
-            active_mask = valid[:, index].view(-1, 1)
-            candidate, _surprise = self.core.step(observations[:, index], state, think=True)
-            state = TorchCognitiveState(
-                torch.where(active_mask, candidate.belief, state.belief),
-                torch.where(active_mask, candidate.workspace, state.workspace),
-                torch.where(active_mask.unsqueeze(-1), candidate.keys, state.keys),
-                torch.where(active_mask.unsqueeze(-1), candidate.values, state.values),
-                torch.where(active_mask.unsqueeze(-1), candidate.confidences, state.confidences),
-            )
-            outputs.append(self.core.classify(state))
-        output = torch.stack(outputs, dim=1)
+    def reset(self, batch: int, device: torch.device) -> None:
+        self._state = self.core.initial_state(batch, device)
+
+    def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor]:
+        active_mask = valid_step.unsqueeze(-1)
+        candidate, _surprise = self.core.step(observation_step, self._state, think=True)
+        self._state = TorchCognitiveState(
+            torch.where(active_mask, candidate.belief, self._state.belief),
+            torch.where(active_mask, candidate.workspace, self._state.workspace),
+            torch.where(active_mask.unsqueeze(-1), candidate.keys, self._state.keys),
+            torch.where(active_mask.unsqueeze(-1), candidate.values, self._state.values),
+            torch.where(active_mask.unsqueeze(-1), candidate.confidences, self._state.confidences),
+        )
+        output = self.core.classify(self._state)
         return output[..., :-1], output[..., -1]
+
+    def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor]:
+        batch, length, _ = observations.shape
+        self.reset(batch, observations.device)
+        logits_list: list[Tensor] = []
+        values_list: list[Tensor] = []
+        for index in range(length):
+            logits, value = self.step(observations[:, index], valid[:, index])
+            logits_list.append(logits)
+            values_list.append(value)
+        return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
 
 
 def _pad(episodes: list[list[Tensor]], device: torch.device, input_dim: int) -> tuple[Tensor, Tensor]:
@@ -166,28 +204,36 @@ def _collect(
     model: nn.Module, env: DecideEnv, *, count: int, seed_start: int,
     device: torch.device, stochastic: bool = True,
 ) -> tuple[list[list[Tensor]], list[list[int]], list[list[float]]]:
+    """Batch-parallel streaming collection: every episode advances together,
+    one batched forward per frame (O(T) total, GPU keeps a full batch busy)."""
     was_training = model.training
     model.eval()
-    histories, action_lists, reward_lists = [], [], []
-    for episode_index in range(count):
-        observation, _info = env.reset(seed=seed_start + episode_index)
-        history = [torch.tensor(observation)]
-        actions: list[int] = []
-        rewards: list[float] = []
-        for _step in range(env.delay + 1):
-            observations, valid = _pad([history], device, env.input_dim)
-            outputs = model(observations, valid)
-            current_logits = outputs[0][0, len(history) - 1]
-            action = int(Categorical(logits=current_logits).sample().item()) if stochastic else int(current_logits.argmax().item())
-            observation, reward, terminated, truncated, _info = env.step(action)
-            actions.append(action)
-            rewards.append(reward)
+    import copy
+    envs = [copy.deepcopy(env) for _ in range(count)]
+    observations = [envs[i].reset(seed=seed_start + i)[0] for i in range(count)]
+    model.reset(count, device)
+    histories: list[list[Tensor]] = [[] for _ in range(count)]
+    action_lists: list[list[int]] = [[] for _ in range(count)]
+    reward_lists: list[list[float]] = [[] for _ in range(count)]
+    done = [False] * count
+    for _step in range(env.delay + 1):
+        active = torch.tensor([not d for d in done], dtype=torch.bool, device=device)
+        if not bool(active.any()):
+            break
+        observation_step = torch.stack([torch.tensor(obs) for obs in observations]).to(device)
+        logits, _values = model.step(observation_step, active)
+        for index in range(count):
+            if done[index]:
+                continue
+            distribution = Categorical(logits=logits[index])
+            action = int(distribution.sample().item()) if stochastic else int(logits[index].argmax().item())
+            observation, reward, terminated, truncated, _info = envs[index].step(action)
+            histories[index].append(observation_step[index])
+            action_lists[index].append(action)
+            reward_lists[index].append(reward)
+            observations[index] = observation
             if terminated or truncated:
-                break
-            history.append(torch.tensor(observation))
-        histories.append(history)
-        action_lists.append(actions)
-        reward_lists.append(rewards)
+                done[index] = True
     if was_training:
         model.train()
     return histories, action_lists, reward_lists
@@ -293,12 +339,13 @@ def _evaluate(model: nn.Module, env: DecideEnv, *, episodes: int, seed_start: in
 @torch.no_grad()
 def _run_episode(model: nn.Module, env: DecideEnv, seed: int, device: torch.device, *, swap: bool) -> bool:
     observation, _info = env.reset(seed=seed)
-    history = [torch.tensor(observation)]
+    model.reset(1, device)
     total = 0.0
     for _step in range(env.delay + 1):
-        observations, valid = _pad([history], device, env.input_dim)
-        outputs = model(observations, valid)
-        action = int(outputs[0][0, len(history) - 1].argmax().item())
+        observation_step = torch.tensor(observation).unsqueeze(0).to(device)
+        valid_step = torch.ones(1, dtype=torch.bool, device=device)
+        outputs = model.step(observation_step, valid_step)
+        action = int(outputs[0][0].argmax().item())
         # Counterfactual: flip the choice the agent would need to make.
         if swap:
             action = (action + 1) % env.identity_count
@@ -306,7 +353,6 @@ def _run_episode(model: nn.Module, env: DecideEnv, seed: int, device: torch.devi
         total += float(reward)
         if terminated or truncated:
             break
-        history.append(torch.tensor(observation))
     return total > 0.0
 
 
