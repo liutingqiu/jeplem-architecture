@@ -112,7 +112,21 @@ DecideAfterDelay 改造成**事件流 RL 环境**（DecideEnv）：每步一个�
 4. **surprise 的价值是任务依赖的**：长延迟监督任务（d=32 scan）中 PLWM 的 surprise 门控优于 FIFO（0.862 vs 0.720），但在 RL 策略学习中是负担。
 5. **架构含义**：surprise 应作为门控/置信度/新奇检测的辅助信号（决策侧），而非作为通用训练目标强制混合——预测误差驱动写入保留，但不应进入策略梯度主损失。
 
-## 七、下一步（已决策，待执行）
+## 七、跨 episode 持久（连续流，3 seed，units=3 gap=4）
+
+连续事件流：每 episode [身份帧, gap 空帧, 查询帧]，查询 one-hot 指定当前或上一 episode 的身份（cross=上一 episode）。流不 reset，GRU 隐状态被后续 episode 稀释。
+
+| 模型 | query 均值 | cross 均值 |
+|---|---|---|
+| gru_policy | 0.595 | **0.517（≈随机）** |
+| evidence_policy | 0.889 | 0.796 |
+| **plwm_policy** | **0.924** | **0.821** |
+
+**结论**：连续流/跨 episode 场景下，GRU 压缩隐状态彻底无法保留早期身份（cross≈随机）；可寻址记忆保留能力（PLWM/evidence cross≈0.8）；**PLWM 在此任务 query 精度第一（0.924）**，且 gated_memory + latent=64 配置下反超 evidence。
+
+至此证据链完整：**监督（3 任务）→ 难度扫描（延迟/身份轴）→ RL 单 episode → RL 连续流**，四个维度一致——需要精确跨步回忆时，可寻址记忆 > 压缩隐状态；PLWM 在连续流（最贴近真实持久认知系统）场景表现最优。
+
+## 八、下一步（已决策，待执行）
 
 1. **难度刻画像限**：延迟 8→16→32、身份 2→3→4、跨 episode 持久（GRU 隐状态无法跨序列保留 vs PLWM 槽位可持久化）——找到 GRU 失效的边界，确立 PLWM 优势域；
 2. **真实流回归**：v3 语料改为 MemoryS13 真实流（v1/v2 已用）；
