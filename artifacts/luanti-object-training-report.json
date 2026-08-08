@@ -1,0 +1,34 @@
+{
+  "device": "cuda",
+  "training_seed_count": 16,
+  "heldout_seed_count": 8,
+  "training_samples": 224,
+  "learned": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 14.0
+  },
+  "no_memory": {
+    "successes": 2,
+    "episodes": 8,
+    "mean_steps": 17.0
+  },
+  "gru_context": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 14.0
+  },
+  "random": {
+    "successes": 0,
+    "episodes": 8,
+    "mean_steps": 18.0
+  },
+  "reactive": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 14.0
+  },
+  "accepted": true,
+  "checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-object-policy.pt",
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-object-training-report.json"
+}

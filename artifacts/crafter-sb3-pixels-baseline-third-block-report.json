@@ -1,0 +1,38 @@
+{
+  "protocol": "crafter_sb3_pixels_baseline_v1: Stable-Baselines3 PPO through GymPixelsOnlyCrafter. Observation is 64x64 uint8 RGB; action is 0..16; reward is scalar environment reward; Gym info is always {}. Semantic, inventory, achievements, player position, hidden state, teacher actions, and future observations are unavailable.",
+  "device": "cuda",
+  "total_timesteps": 16384,
+  "episode_length": 64,
+  "training_seed": 811337,
+  "training_world_seed": 500000,
+  "heldout_seed_range": [
+    40000000,
+    40000001,
+    40000002,
+    40000003,
+    40000004,
+    40000005,
+    40000006,
+    40000007,
+    40000008,
+    40000009,
+    40000010,
+    40000011,
+    40000012,
+    40000013,
+    40000014,
+    40000015
+  ],
+  "random_evaluation": {
+    "episodes": 16,
+    "mean_return": 1.125,
+    "mean_steps": 64.0
+  },
+  "ppo_evaluation": {
+    "episodes": 16,
+    "mean_return": 0.95625,
+    "mean_steps": 64.0
+  },
+  "accepted_standard_baseline": false,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\crafter-sb3-pixels-baseline-third-block-report.json"
+}

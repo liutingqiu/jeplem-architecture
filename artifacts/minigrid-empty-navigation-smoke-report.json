@@ -1,0 +1,209 @@
+{
+  "protocol": "minigrid_memory_actor_critic_v4: MiniGrid MemoryS7 with a fixed 64-step interaction/context budget; all models train on the same seed range; reports a fixed random-action reference plus greedy and stochastic held-out policies and action counts; intrinsic count bonus, when selected, is derived only from agent-visible local observations and is reported separately from environment reward; no teacher actions, shortest-path oracle, future observation, seed answer, or shaped-distance reward; independent held-out seeds; pilot only, not an architecture claim",
+  "learning_rule": "ppo_external_reward_v1",
+  "intrinsic_bonus": 0.0,
+  "action_mode": "movement_only",
+  "device": "cuda",
+  "environment": "MiniGrid-Empty-5x5-v0",
+  "train_seed_range": [
+    10000,
+    10001,
+    10002,
+    10003,
+    10004,
+    10005,
+    10006,
+    10007,
+    10008,
+    10009,
+    10010,
+    10011,
+    10012,
+    10013,
+    10014,
+    10015,
+    10016,
+    10017,
+    10018,
+    10019,
+    10020,
+    10021,
+    10022,
+    10023
+  ],
+  "heldout_seed_range": [
+    1000000,
+    1000001,
+    1000002,
+    1000003,
+    1000004,
+    1000005,
+    1000006,
+    1000007
+  ],
+  "updates": 2,
+  "episodes_per_update": 12,
+  "random_evaluation": {
+    "successes": 6,
+    "episodes": 8,
+    "mean_return": 0.36679687499999997,
+    "mean_steps": 43.25,
+    "action_counts": [
+      113,
+      120,
+      113,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "results": [
+    {
+      "name": "plwm",
+      "parameters": 119329,
+      "train_episodes": 24,
+      "train_successes": 13,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          88,
+          0,
+          424,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 5,
+        "episodes": 8,
+        "mean_return": 0.3560546875,
+        "mean_steps": 43.125,
+        "action_counts": [
+          106,
+          122,
+          117,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "no_memory",
+      "parameters": 10248,
+      "train_episodes": 24,
+      "train_successes": 16,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          512,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 5,
+        "episodes": 8,
+        "mean_return": 0.3982421875,
+        "mean_steps": 40.125,
+        "action_counts": [
+          101,
+          101,
+          119,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "gru",
+      "parameters": 42184,
+      "train_episodes": 24,
+      "train_successes": 18,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          512,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 4,
+        "episodes": 8,
+        "mean_return": 0.12558593749999997,
+        "mean_steps": 58.625,
+        "action_counts": [
+          126,
+          170,
+          173,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "transformer",
+      "parameters": 81288,
+      "train_episodes": 24,
+      "train_successes": 8,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          512,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 2,
+        "episodes": 8,
+        "mean_return": 0.1392578125,
+        "mean_steps": 55.875,
+        "action_counts": [
+          171,
+          116,
+          160,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\minigrid-empty-navigation-smoke-report.json"
+}

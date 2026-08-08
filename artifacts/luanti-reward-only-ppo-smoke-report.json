@@ -1,0 +1,103 @@
+{
+  "protocol": "luanti_reward_only_ppo_v1: real two-object Luanti worlds; local 11x11 vision plus previous chosen action and scalar environment reward only; all policies sample their own actions; no teacher trajectories, symbolic coordinates, seed, collection facts, external planning, shaped reward, or reset shortcut enters training/evaluation; Transformer context fixed to 16 events; first block is a prerequisite, not an architecture claim",
+  "device": "cuda",
+  "train_seed_range": [
+    4300000,
+    4300001
+  ],
+  "heldout_seed_range": [
+    4600000,
+    4600031
+  ],
+  "updates": 1,
+  "episodes_per_update": 2,
+  "transformer_context": 16,
+  "random_evaluation": {
+    "successes": 0,
+    "episodes": 2,
+    "mean_return": -0.4,
+    "mean_steps": 40.0,
+    "action_counts": [
+      14,
+      22,
+      25,
+      19
+    ]
+  },
+  "results": [
+    {
+      "name": "plwm",
+      "parameters": 364290,
+      "training_episodes": 2,
+      "training_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": -0.4,
+        "mean_steps": 40.0,
+        "action_counts": [
+          0,
+          0,
+          80,
+          0
+        ]
+      }
+    },
+    {
+      "name": "no_memory",
+      "parameters": 70757,
+      "training_episodes": 2,
+      "training_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": -0.4,
+        "mean_steps": 40.0,
+        "action_counts": [
+          0,
+          22,
+          58,
+          0
+        ]
+      }
+    },
+    {
+      "name": "gru",
+      "parameters": 239237,
+      "training_episodes": 2,
+      "training_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": -0.4,
+        "mean_steps": 40.0,
+        "action_counts": [
+          3,
+          0,
+          10,
+          67
+        ]
+      }
+    },
+    {
+      "name": "transformer_16",
+      "parameters": 221861,
+      "training_episodes": 2,
+      "training_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": -0.4,
+        "mean_steps": 40.0,
+        "action_counts": [
+          0,
+          0,
+          0,
+          80
+        ]
+      }
+    }
+  ],
+  "accepted": false,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-reward-only-ppo-smoke-report.json"
+}

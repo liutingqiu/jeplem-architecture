@@ -1,0 +1,191 @@
+{
+  "protocol": "minigrid_memory_actor_critic_v2: MiniGrid MemoryS7 with a fixed 64-step interaction/context budget; environment-reward-only on-policy actor-critic; all models train on the same seed range; reports both greedy and stochastic held-out policies plus action counts; no teacher actions, shortest-path oracle, future observation, seed answer, or shaped-distance reward; independent held-out seeds; pilot only, not an architecture claim",
+  "device": "cuda",
+  "environment": "MiniGrid-MemoryS7-v0",
+  "train_seed_range": [
+    10000,
+    10001,
+    10002,
+    10003,
+    10004,
+    10005,
+    10006,
+    10007,
+    10008,
+    10009,
+    10010,
+    10011,
+    10012,
+    10013,
+    10014,
+    10015,
+    10016,
+    10017,
+    10018,
+    10019,
+    10020,
+    10021,
+    10022,
+    10023
+  ],
+  "heldout_seed_range": [
+    1000000,
+    1000001,
+    1000002,
+    1000003,
+    1000004,
+    1000005,
+    1000006,
+    1000007
+  ],
+  "updates": 2,
+  "episodes_per_update": 12,
+  "results": [
+    {
+      "name": "plwm",
+      "parameters": 119329,
+      "train_episodes": 24,
+      "train_successes": 1,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          512,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 1,
+        "episodes": 8,
+        "mean_return": 0.0951171875,
+        "mean_steps": 58.125,
+        "action_counts": [
+          71,
+          75,
+          60,
+          54,
+          60,
+          89,
+          56
+        ]
+      }
+    },
+    {
+      "name": "no_memory",
+      "parameters": 10248,
+      "train_episodes": 24,
+      "train_successes": 3,
+      "evaluation": {
+        "successes": 1,
+        "episodes": 8,
+        "mean_return": 0.1197265625,
+        "mean_steps": 48.75,
+        "action_counts": [
+          8,
+          0,
+          382,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 2,
+        "episodes": 8,
+        "mean_return": 0.17265625,
+        "mean_steps": 53.5,
+        "action_counts": [
+          60,
+          64,
+          76,
+          53,
+          67,
+          53,
+          55
+        ]
+      }
+    },
+    {
+      "name": "gru",
+      "parameters": 42184,
+      "train_episodes": 24,
+      "train_successes": 5,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          512
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 2,
+        "episodes": 8,
+        "mean_return": 0.1638671875,
+        "mean_steps": 54.125,
+        "action_counts": [
+          51,
+          58,
+          61,
+          60,
+          68,
+          70,
+          65
+        ]
+      }
+    },
+    {
+      "name": "transformer",
+      "parameters": 81288,
+      "train_episodes": 24,
+      "train_successes": 2,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          380,
+          0,
+          4,
+          128,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 1,
+        "episodes": 8,
+        "mean_return": 0.096875,
+        "mean_steps": 58.0,
+        "action_counts": [
+          133,
+          59,
+          77,
+          38,
+          42,
+          59,
+          56
+        ]
+      }
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\minigrid-memory-actor-critic-streaming-smoke-report.json"
+}

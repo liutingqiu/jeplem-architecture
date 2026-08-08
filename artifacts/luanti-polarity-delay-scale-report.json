@@ -1,0 +1,73 @@
+{
+  "protocol": "polarity_delay_v1: real Luanti hidden-reward observations; raw public reward/state/vision history for all baselines; verified fact only for fact-memory controller; teacher-labelled training; not an end-to-end architecture claim",
+  "device": "cuda",
+  "history_length": 16,
+  "train_seeds": [
+    4100000,
+    4100001,
+    4100002,
+    4100003,
+    4100004,
+    4100005,
+    4100006,
+    4100007,
+    4100008,
+    4100009,
+    4100010,
+    4100011,
+    4100012,
+    4100013,
+    4100014,
+    4100015
+  ],
+  "heldout_seeds": [
+    4000000,
+    4000031,
+    4000062,
+    4000093,
+    4000124,
+    4000155,
+    4000186,
+    4000217
+  ],
+  "scale_points": [
+    {
+      "delay_observations": 16,
+      "training_samples": 528,
+      "fact_memory": {
+        "successes": 8,
+        "episodes": 8,
+        "mean_steps": 33.25
+      },
+      "no_memory": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_steps": 40.0
+      },
+      "recurrent": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_steps": 40.0
+      },
+      "transformer": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_steps": 40.0
+      },
+      "teacher": {
+        "successes": 8,
+        "episodes": 8,
+        "mean_steps": 33.25
+      },
+      "fact_memory_revisions": 8,
+      "parameter_counts": {
+        "fact_memory": 65892,
+        "no_memory": 65748,
+        "recurrent": 115252,
+        "transformer": 74884
+      }
+    }
+  ],
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-polarity-delay-scale-report.json"
+}

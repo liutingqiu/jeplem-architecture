@@ -1,0 +1,17 @@
+{
+  "episodes": 4,
+  "causal": {
+    "transitions": 48,
+    "displacement_accuracy": 0.875,
+    "blocked_accuracy": 1.0,
+    "revisions": 4
+  },
+  "stateless": {
+    "transitions": 48,
+    "displacement_accuracy": 0.5,
+    "blocked_accuracy": 1.0,
+    "revisions": 0
+  },
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-rule-switch-report.json"
+}

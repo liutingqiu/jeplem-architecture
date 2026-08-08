@@ -1,0 +1,33 @@
+{
+  "device": "cuda",
+  "training_samples": 528,
+  "learned": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 33.0
+  },
+  "no_memory": {
+    "successes": 2,
+    "episodes": 8,
+    "mean_steps": 38.25
+  },
+  "recurrent": {
+    "successes": 5,
+    "episodes": 8,
+    "mean_steps": 35.625
+  },
+  "random": {
+    "successes": 0,
+    "episodes": 8,
+    "mean_steps": 40.0
+  },
+  "teacher": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 33.75
+  },
+  "learned_revisions": 8,
+  "accepted": true,
+  "checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-two-fact-memory-policy.pt",
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-two-fact-memory-report.json"
+}

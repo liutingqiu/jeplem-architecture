@@ -1,0 +1,53 @@
+{
+  "protocol": "minigrid_decide_after_delay_v1: Key/Ball identity shown in the first sensor frame, eight later frames contain neither object, final decision must match the first-frame identity; inputs are position-invariant presence features; counterfactual swap probe flips the identity->choice mapping at evaluation time, so a controller that genuinely uses remembered identity shows large (heldout - swapped) evidence, while a route/shortcut scores identically under both mappings; no teacher action, path oracle, seed answer, or reward signal of any kind.",
+  "device": "cuda",
+  "delay": 8,
+  "training_examples": 512,
+  "updates": 300,
+  "results": [
+    {
+      "name": "no_memory",
+      "parameters": 6,
+      "heldout_accuracy": 0.5390625,
+      "swapped_accuracy": 0.4609375,
+      "memory_evidence": 0.078125
+    },
+    {
+      "name": "four_event_transformer",
+      "parameters": 33794,
+      "heldout_accuracy": 0.4609375,
+      "swapped_accuracy": 0.5390625,
+      "memory_evidence": -0.078125
+    },
+    {
+      "name": "gru",
+      "parameters": 13186,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    },
+    {
+      "name": "evidence_store",
+      "parameters": 50115,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    },
+    {
+      "name": "evidence_disabled",
+      "parameters": 50115,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    },
+    {
+      "name": "plwm",
+      "parameters": 25319,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\minigrid-decide-after-delay-report.json"
+}

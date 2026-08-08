@@ -1,0 +1,45 @@
+{
+  "protocol": "minigrid_decide_after_delay_two_identity_v1: two identity frames (frame 0 and frame 3) plus a one-hot query at frame 8 selecting which identity to output; a controller must retain both identities at exact positions and route the query to the requested one (precise-recall regime); counterfactual swap probe flips the identity->choice mapping; no teacher action, path oracle, seed answer, or reward signal.",
+  "device": "cuda",
+  "training_examples": 1024,
+  "updates": 400,
+  "results": [
+    {
+      "name": "no_memory",
+      "parameters": 10,
+      "heldout_accuracy": 0.5078125,
+      "swapped_accuracy": 0.4921875,
+      "memory_evidence": 0.015625
+    },
+    {
+      "name": "gru",
+      "parameters": 13570,
+      "heldout_accuracy": 0.875,
+      "swapped_accuracy": 0.125,
+      "memory_evidence": 0.75
+    },
+    {
+      "name": "evidence_store",
+      "parameters": 50243,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    },
+    {
+      "name": "evidence_disabled",
+      "parameters": 50243,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    },
+    {
+      "name": "plwm",
+      "parameters": 25449,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\two-identity-seed222-report.json"
+}

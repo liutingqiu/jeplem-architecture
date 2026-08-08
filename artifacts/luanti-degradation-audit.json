@@ -1,0 +1,21 @@
+{
+  "device": "cuda",
+  "clean_visual_successes": 4,
+  "noisy_visual_successes": 3,
+  "noisy_visual_episodes": 4,
+  "unfiltered_replay_successes": 3,
+  "recovery_latencies": [
+    9,
+    9,
+    9
+  ],
+  "interruption_completed": true,
+  "checkpoint_action_exact": true,
+  "stale_visual_rejected": true,
+  "stale_language_rejected": true,
+  "fresh_evidence_accepted": true,
+  "retained_mapping": true,
+  "unrelated_world_isolated": true,
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-degradation-audit.json"
+}

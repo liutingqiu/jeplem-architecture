@@ -1,0 +1,27 @@
+{
+  "protocol": "luanti_public_dynamics_pretrain_v1: fresh random exploration in real Luanti; corpus contains only 11x11 local vision, sampled action, scalar environment reward, terminal/truncation, and next local vision. It excludes symbolic bridge state, task seed from learner arrays, teacher trajectories, external planner actions, shaped reward, and Gym info.",
+  "episodes": 16,
+  "max_steps": 40,
+  "seed_range": [
+    4700000,
+    4700001,
+    4700002,
+    4700003,
+    4700004,
+    4700005,
+    4700006,
+    4700007,
+    4700008,
+    4700009,
+    4700010,
+    4700011,
+    4700012,
+    4700013,
+    4700014,
+    4700015
+  ],
+  "transitions": 640,
+  "successes": 0,
+  "artifact": "artifacts\\luanti-public-dynamics-pretrain-corpus.npz",
+  "metadata": "artifacts\\luanti-public-dynamics-pretrain-corpus.json"
+}

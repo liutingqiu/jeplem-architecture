@@ -1,0 +1,96 @@
+{
+  "protocol": "minigrid_memory_context_window_v1: reward-only Empty-5x5 bootstrap then MemoryS13 transfer; one-layer Transformer attention is either full causal history or exactly four events, which is below MemoryS13's audited seven-event minimum; no teacher actions, paths, future observations, seed answers, shaping, manual planning, or oracle audit data are used for training.",
+  "device": "cuda",
+  "bootstrap_updates": 1,
+  "memory_updates": 1,
+  "episodes_per_update": 2,
+  "heldout_seed_range": [
+    4000000,
+    4000001
+  ],
+  "random_evaluation": {
+    "successes": 0,
+    "episodes": 2,
+    "mean_return": 0.0,
+    "mean_steps": 64.0,
+    "action_counts": [
+      17,
+      19,
+      15,
+      24,
+      17,
+      18,
+      18
+    ]
+  },
+  "results": [
+    {
+      "name": "full_context_transformer",
+      "parameters": 97064,
+      "context_window": null,
+      "bootstrap_successes": 1,
+      "memory_successes": 1,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          6,
+          122,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "four_event_context_transformer",
+      "parameters": 97064,
+      "context_window": 4,
+      "bootstrap_successes": 2,
+      "memory_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          5,
+          123,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "no_memory",
+      "parameters": 10760,
+      "context_window": null,
+      "bootstrap_successes": 0,
+      "memory_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          128,
+          0
+        ]
+      }
+    }
+  ],
+  "accepted_context_diagnostic": false,
+  "artifact": "artifacts\\minigrid-memory-context-window-smoke-report.json"
+}

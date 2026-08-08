@@ -1,0 +1,7 @@
+{
+  "protocol": "luanti_micro_navigation_qlearning_audit_v1: independently validates the fixed public-feature standard baseline split and its held-out gate.",
+  "source_artifact": "artifacts\\luanti-micro-navigation-qlearning-report.json",
+  "accepted": true,
+  "recomputed_accepted": true,
+  "failures": []
+}

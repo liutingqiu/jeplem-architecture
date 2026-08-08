@@ -1,0 +1,9 @@
+{
+  "protocol": "minigrid_visible_object_separability_v2: classify currently visible Key/Ball using a position-invariant presence feature derived only from its current observation image; labels are extracted from that same image with no grid or hidden-state label access.",
+  "device": "cuda",
+  "training_examples": 512,
+  "updates": 200,
+  "heldout_accuracy": 1.0,
+  "accepted_sensor_label_contract": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\minigrid-visible-object-separability-report.json"
+}

@@ -1,0 +1,35 @@
+{
+  "protocol": "reward_only_contextual_bandit_v1: visible current context, one action, scalar environment reward only; no action label reaches the optimizer; validates policy-gradient learnability but is not a memory/planning or architecture benchmark",
+  "device": "cuda",
+  "updates": 40,
+  "batch_size": 128,
+  "ppo_epochs": 4,
+  "results": [
+    {
+      "name": "plwm",
+      "parameters": 119329,
+      "train_reward_rate": 0.457421875,
+      "heldout_accuracy": 1.0
+    },
+    {
+      "name": "no_memory",
+      "parameters": 10248,
+      "train_reward_rate": 0.3564453125,
+      "heldout_accuracy": 0.6666666865348816
+    },
+    {
+      "name": "gru",
+      "parameters": 42184,
+      "train_reward_rate": 0.3603515625,
+      "heldout_accuracy": 1.0
+    },
+    {
+      "name": "transformer",
+      "parameters": 81288,
+      "train_reward_rate": 0.8833984375,
+      "heldout_accuracy": 1.0
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\reward-only-policy-learnability-report.json"
+}

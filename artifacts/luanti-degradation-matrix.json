@@ -1,0 +1,51 @@
+{
+  "device": "cuda",
+  "conditions": [
+    {
+      "noise_rate": 0.0,
+      "stale_replay_steps": 0,
+      "episodes": 4,
+      "successes": 4,
+      "recovery_latencies": [
+        14,
+        14,
+        14,
+        14
+      ]
+    },
+    {
+      "noise_rate": 0.04,
+      "stale_replay_steps": 1,
+      "episodes": 4,
+      "successes": 4,
+      "recovery_latencies": [
+        7,
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "noise_rate": 0.08,
+      "stale_replay_steps": 1,
+      "episodes": 4,
+      "successes": 2,
+      "recovery_latencies": [
+        7,
+        7
+      ]
+    },
+    {
+      "noise_rate": 0.16,
+      "stale_replay_steps": 2,
+      "episodes": 4,
+      "successes": 0,
+      "recovery_latencies": []
+    }
+  ],
+  "repeated_interruptions": 3,
+  "interruption_action_exact": 3,
+  "interruption_completed": true,
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-degradation-matrix.json"
+}

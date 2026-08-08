@@ -1,0 +1,7 @@
+{
+  "protocol": "object_token_episodic_memory_audit_v1: independent recomputation of an object-token storage/readout comparison; never reward-only control or architecture evidence.",
+  "source_artifact": "artifacts\\object-token-episodic-memory-report.json",
+  "accepted": true,
+  "recomputed_accepted": true,
+  "failures": []
+}

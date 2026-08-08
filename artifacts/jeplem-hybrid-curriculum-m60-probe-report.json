@@ -1,0 +1,290 @@
+{
+  "protocol": "jeplem_hybrid_curriculum_v2: two-stage reward-only curriculum; tactical causal Transformer plus persistent PLWM side state; JEPLM adds online SPR-style action-conditioned multi-step latent prediction and a SIGReg-lite variance hinge; evaluation includes a paired counterfactual memory probe that swaps the hallway-end objects and the success/failure determination on every held-out world, so route-hitting policies (turn-right-then-forward scores ~27/64 on the plain held-out) are separated from genuine object-identity memory (both versions solved); no EMA teacher, no separate offline pretraining phase, no teacher action, path oracle, future observation at action time, seed answer, reward shaping, or replayed trajectory; fixed separated train/held-out seeds.",
+  "device": "cuda",
+  "experiment_seed": 41123,
+  "bootstrap_updates": 30,
+  "memory_updates": 60,
+  "episodes_per_update": 24,
+  "heldout_seed_range": [
+    1000000,
+    1000001,
+    1000002,
+    1000003,
+    1000004,
+    1000005,
+    1000006,
+    1000007,
+    1000008,
+    1000009,
+    1000010,
+    1000011,
+    1000012,
+    1000013,
+    1000014,
+    1000015,
+    1000016,
+    1000017,
+    1000018,
+    1000019,
+    1000020,
+    1000021,
+    1000022,
+    1000023,
+    1000024,
+    1000025,
+    1000026,
+    1000027,
+    1000028,
+    1000029,
+    1000030,
+    1000031,
+    1000032,
+    1000033,
+    1000034,
+    1000035,
+    1000036,
+    1000037,
+    1000038,
+    1000039,
+    1000040,
+    1000041,
+    1000042,
+    1000043,
+    1000044,
+    1000045,
+    1000046,
+    1000047,
+    1000048,
+    1000049,
+    1000050,
+    1000051,
+    1000052,
+    1000053,
+    1000054,
+    1000055,
+    1000056,
+    1000057,
+    1000058,
+    1000059,
+    1000060,
+    1000061,
+    1000062,
+    1000063
+  ],
+  "random_evaluation": {
+    "successes": 10,
+    "episodes": 64,
+    "mean_return": 0.0971435546875,
+    "mean_steps": 52.515625,
+    "action_counts": [
+      434,
+      494,
+      467,
+      477,
+      499,
+      487,
+      503
+    ]
+  },
+  "results": [
+    {
+      "name": "hybrid_jeplem",
+      "parameters": 232050,
+      "active_parameters": 232050,
+      "jeplem_coefficient": 0.1,
+      "anti_collapse_coefficient": 0.01,
+      "predict_horizon": 2,
+      "stages": [
+        {
+          "name": "reward_only_navigation_bootstrap",
+          "environment": "MiniGrid-Empty-5x5-v0",
+          "action_mode": "movement_only",
+          "updates": 30,
+          "episodes_per_update": 24,
+          "seed_start": 10000,
+          "train_episodes": 720,
+          "train_successes": 671
+        },
+        {
+          "name": "delayed_memory_transfer",
+          "environment": "MiniGrid-MemoryS7-v0",
+          "action_mode": "all",
+          "updates": 60,
+          "episodes_per_update": 24,
+          "seed_start": 10720,
+          "train_episodes": 1440,
+          "train_successes": 635
+        }
+      ],
+      "evaluation": {
+        "successes": 27,
+        "episodes": 64,
+        "mean_return": 0.348486328125,
+        "mean_steps": 15.125,
+        "action_counts": [
+          0,
+          64,
+          904,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 29,
+        "episodes": 64,
+        "mean_return": 0.4129150390625,
+        "mean_steps": 7.359375,
+        "action_counts": [
+          25,
+          55,
+          323,
+          14,
+          6,
+          24,
+          24
+        ]
+      },
+      "memory_probe": {
+        "original": 27,
+        "swapped": 0,
+        "both": 0
+      }
+    },
+    {
+      "name": "hybrid_baseline",
+      "parameters": 222834,
+      "active_parameters": 222834,
+      "jeplem_coefficient": 0.0,
+      "anti_collapse_coefficient": 0.0,
+      "predict_horizon": 2,
+      "stages": [
+        {
+          "name": "reward_only_navigation_bootstrap",
+          "environment": "MiniGrid-Empty-5x5-v0",
+          "action_mode": "movement_only",
+          "updates": 30,
+          "episodes_per_update": 24,
+          "seed_start": 10000,
+          "train_episodes": 720,
+          "train_successes": 681
+        },
+        {
+          "name": "delayed_memory_transfer",
+          "environment": "MiniGrid-MemoryS7-v0",
+          "action_mode": "all",
+          "updates": 60,
+          "episodes_per_update": 24,
+          "seed_start": 10720,
+          "train_episodes": 1440,
+          "train_successes": 600
+        }
+      ],
+      "evaluation": {
+        "successes": 27,
+        "episodes": 64,
+        "mean_return": 0.3974853515625,
+        "mean_steps": 4.453125,
+        "action_counts": [
+          0,
+          64,
+          221,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 26,
+        "episodes": 64,
+        "mean_return": 0.371533203125,
+        "mean_steps": 7.84375,
+        "action_counts": [
+          5,
+          66,
+          269,
+          23,
+          47,
+          52,
+          40
+        ]
+      },
+      "memory_probe": {
+        "original": 27,
+        "swapped": 0,
+        "both": 0
+      }
+    },
+    {
+      "name": "transformer_reference",
+      "parameters": 81800,
+      "active_parameters": 81800,
+      "jeplem_coefficient": 0.0,
+      "anti_collapse_coefficient": 0.0,
+      "predict_horizon": 2,
+      "stages": [
+        {
+          "name": "reward_only_navigation_bootstrap",
+          "environment": "MiniGrid-Empty-5x5-v0",
+          "action_mode": "movement_only",
+          "updates": 30,
+          "episodes_per_update": 24,
+          "seed_start": 10000,
+          "train_episodes": 720,
+          "train_successes": 690
+        },
+        {
+          "name": "delayed_memory_transfer",
+          "environment": "MiniGrid-MemoryS7-v0",
+          "action_mode": "all",
+          "updates": 60,
+          "episodes_per_update": 24,
+          "seed_start": 10720,
+          "train_episodes": 1440,
+          "train_successes": 646
+        }
+      ],
+      "evaluation": {
+        "successes": 27,
+        "episodes": 64,
+        "mean_return": 0.3974853515625,
+        "mean_steps": 4.453125,
+        "action_counts": [
+          0,
+          64,
+          221,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 27,
+        "episodes": 64,
+        "mean_return": 0.39375,
+        "mean_steps": 6.140625,
+        "action_counts": [
+          8,
+          83,
+          252,
+          13,
+          21,
+          3,
+          13
+        ]
+      },
+      "memory_probe": {
+        "original": 27,
+        "swapped": 0,
+        "both": 0
+      }
+    }
+  ],
+  "jeplem_increment_successes": 0,
+  "jeplem_memory_increment": 0,
+  "accepted": false,
+  "artifact": "artifacts\\jeplem-hybrid-curriculum-m60-probe-report.json"
+}

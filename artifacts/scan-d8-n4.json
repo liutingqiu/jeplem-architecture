@@ -1,0 +1,41 @@
+{
+  "protocol": "minigrid_decide_after_delay_scan_v1: two identity frames at positions 0 and gap, one-hot query at position delay selecting which identity to output; input channels = 2*identity_count; counterfactual swap probe flips identity->choice mapping; difficulty axes delay and identity_count; no teacher action, path oracle, seed answer, or reward signal.",
+  "device": "cuda",
+  "delay": 8,
+  "gap": 3,
+  "identity_count": 4,
+  "training_examples": 1024,
+  "updates": 400,
+  "results": [
+    {
+      "name": "gru",
+      "parameters": 14468,
+      "heldout_accuracy": 0.6171875,
+      "swapped_accuracy": 0.1328125,
+      "memory_evidence": 0.484375
+    },
+    {
+      "name": "evidence_store",
+      "parameters": 50757,
+      "heldout_accuracy": 0.875,
+      "swapped_accuracy": 0.07421875,
+      "memory_evidence": 0.80078125
+    },
+    {
+      "name": "evidence_disabled",
+      "parameters": 50757,
+      "heldout_accuracy": 0.671875,
+      "swapped_accuracy": 0.1328125,
+      "memory_evidence": 0.5390625
+    },
+    {
+      "name": "plwm",
+      "parameters": 25775,
+      "heldout_accuracy": 0.93359375,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 0.93359375
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\scan-d8-n4.json"
+}

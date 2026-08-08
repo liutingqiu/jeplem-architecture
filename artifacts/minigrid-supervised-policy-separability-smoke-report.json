@@ -1,0 +1,45 @@
+{
+  "protocol": "minigrid_supervised_policy_separability_v1: offline oracle labels are a diagnostic for observable policy representation only; no labels reach reward-only PPO or architecture acceptance results",
+  "device": "cpu",
+  "training_episodes": 6,
+  "heldout_episodes": 2,
+  "updates": 2,
+  "results": [
+    {
+      "name": "plwm",
+      "parameters": 120361,
+      "teacher_forced_accuracy": 0.20000000298023224,
+      "rollout_successes": 0,
+      "rollout_episodes": 2
+    },
+    {
+      "name": "plwm_observation_skip",
+      "parameters": 121641,
+      "teacher_forced_accuracy": 0.20000000298023224,
+      "rollout_successes": 0,
+      "rollout_episodes": 2
+    },
+    {
+      "name": "no_memory",
+      "parameters": 10760,
+      "teacher_forced_accuracy": 0.20000000298023224,
+      "rollout_successes": 0,
+      "rollout_episodes": 2
+    },
+    {
+      "name": "gru",
+      "parameters": 43720,
+      "teacher_forced_accuracy": 0.800000011920929,
+      "rollout_successes": 0,
+      "rollout_episodes": 2
+    },
+    {
+      "name": "transformer",
+      "parameters": 81800,
+      "teacher_forced_accuracy": 0.800000011920929,
+      "rollout_successes": 0,
+      "rollout_episodes": 2
+    }
+  ],
+  "artifact": "artifacts\\minigrid-supervised-policy-separability-smoke-report.json"
+}

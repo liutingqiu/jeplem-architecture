@@ -1,0 +1,66 @@
+{
+  "protocol": "luanti_addressed_visual_contract_v1: audits only public 11x11 tiles and public legal actions; no symbolic state, seed answer, query answer, teacher, planner, or reward enters the inspection.",
+  "seed": 12400004,
+  "initial_identity_counts": {
+    "goal": 1,
+    "key": 1,
+    "decoy": 1,
+    "beacon": 1
+  },
+  "intermediate_identity_counts": [
+    {
+      "goal": 0,
+      "key": 0,
+      "decoy": 0,
+      "beacon": 0
+    },
+    {
+      "goal": 0,
+      "key": 0,
+      "decoy": 0,
+      "beacon": 0
+    },
+    {
+      "goal": 0,
+      "key": 0,
+      "decoy": 0,
+      "beacon": 0
+    },
+    {
+      "goal": 0,
+      "key": 0,
+      "decoy": 0,
+      "beacon": 0
+    }
+  ],
+  "query_identity_counts": {
+    "goal": 0,
+    "key": 1,
+    "decoy": 0,
+    "beacon": 0
+  },
+  "forced_action_sets": [
+    [
+      1
+    ],
+    [
+      1
+    ],
+    [
+      1
+    ],
+    [
+      1
+    ],
+    [
+      1
+    ]
+  ],
+  "final_action_set": [
+    2,
+    3
+  ],
+  "accepted": true,
+  "failures": [],
+  "artifact": "artifacts\\luanti-addressed-visual-contract-audit-12400004.json"
+}

@@ -1,0 +1,49 @@
+{
+  "device": "cuda",
+  "heldout_seeds": [
+    1530000,
+    1530047,
+    1530094,
+    1530141,
+    1530188,
+    1530235,
+    1530282,
+    1530329
+  ],
+  "conditions": [
+    {
+      "policy": "clean",
+      "noise_rate": 0.08,
+      "stale_replay_steps": 1,
+      "raw_successes": 8,
+      "denoised_successes": 8,
+      "episodes": 8
+    },
+    {
+      "policy": "clean",
+      "noise_rate": 0.16,
+      "stale_replay_steps": 2,
+      "raw_successes": 8,
+      "denoised_successes": 8,
+      "episodes": 8
+    },
+    {
+      "policy": "noise-mixture",
+      "noise_rate": 0.08,
+      "stale_replay_steps": 1,
+      "raw_successes": 8,
+      "denoised_successes": 8,
+      "episodes": 8
+    },
+    {
+      "policy": "noise-mixture",
+      "noise_rate": 0.16,
+      "stale_replay_steps": 2,
+      "raw_successes": 7,
+      "denoised_successes": 8,
+      "episodes": 8
+    }
+  ],
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-temporal-denoiser-generalization.json"
+}

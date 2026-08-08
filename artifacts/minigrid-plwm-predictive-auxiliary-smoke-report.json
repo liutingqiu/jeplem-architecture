@@ -1,0 +1,87 @@
+{
+  "protocol": "minigrid_plwm_predictive_auxiliary_v1: reward-only public navigation PPO; PLWM auxiliary target is the current already-observed event predicted from its preceding state, without teacher actions, oracle paths, future observations, seed answers, distance shaping, or inference-time targets",
+  "device": "cpu",
+  "updates": 1,
+  "episodes_per_update": 2,
+  "random": {
+    "successes": 2,
+    "episodes": 2,
+    "mean_return": 0.28984374999999996,
+    "mean_steps": 50.5,
+    "action_counts": [
+      33,
+      37,
+      31,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "results": [
+    {
+      "name": "plwm_reward_only",
+      "parameters": 120361,
+      "predictive_coefficient": 0.0,
+      "training_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          12,
+          116,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "plwm_predictive_auxiliary",
+      "parameters": 120361,
+      "predictive_coefficient": 1.0,
+      "training_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          128,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "transformer_reward_only",
+      "parameters": 81800,
+      "predictive_coefficient": 0.0,
+      "training_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          128,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "artifact": "artifacts\\minigrid-plwm-predictive-auxiliary-smoke-report.json"
+}

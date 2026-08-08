@@ -1,0 +1,8 @@
+{
+  "device": "cuda",
+  "training_pairs": 438,
+  "training_steps": 1200,
+  "final_loss": 0.009056455455720425,
+  "checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-temporal-vision-denoiser.pt",
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-temporal-denoiser-training-report.json"
+}

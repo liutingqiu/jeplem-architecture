@@ -1,0 +1,22 @@
+{
+  "protocol": "public_vision_multi_candidate_memory_v1: bounded supervised storage/readout diagnostic only; each forward receives only current 11x11x7 public vision, previous chosen action, and previous scalar reward. Query/answer labels, coordinates, seeds, teachers, planners, and shaped rewards are excluded from model input and never transfer to Luanti control.",
+  "device": "cpu",
+  "train_seed": 13000000,
+  "heldout_seed": 13100000,
+  "train_steps": 240,
+  "batch_size": 64,
+  "parameter_match_error": 0.0,
+  "results": [
+    {
+      "name": "multi_candidate",
+      "parameters": 41892,
+      "heldout_accuracy": 0.68359375
+    },
+    {
+      "name": "single_candidate",
+      "parameters": 41892,
+      "heldout_accuracy": 0.68359375
+    }
+  ],
+  "accepted_mechanism_diagnostic": false
+}

@@ -1,0 +1,161 @@
+{
+  "protocol": "crafter_reward_only_sentinel_v1: pixels-only RGB, selected action, and scalar environment reward PPO; semantics, inventory, achievements, grid state, paths, future observations, and teacher actions are excluded. This short public interaction sentinel tests basic learnability only.",
+  "device": "cuda",
+  "updates": 16,
+  "episodes_per_update": 8,
+  "episode_length": 64,
+  "heldout_seed_range": [
+    20000000,
+    20000001,
+    20000002,
+    20000003,
+    20000004,
+    20000005,
+    20000006,
+    20000007,
+    20000008,
+    20000009,
+    20000010,
+    20000011,
+    20000012,
+    20000013,
+    20000014,
+    20000015
+  ],
+  "random_evaluation": {
+    "episodes": 16,
+    "mean_return": 0.9375,
+    "mean_steps": 64.0,
+    "action_counts": [
+      62,
+      58,
+      77,
+      55,
+      51,
+      49,
+      48,
+      49,
+      44,
+      69,
+      59,
+      62,
+      67,
+      71,
+      66,
+      71,
+      66
+    ]
+  },
+  "results": [
+    {
+      "name": "reactive_cnn",
+      "parameters": 39090,
+      "train_episodes": 128,
+      "train_mean_return": 1.165625,
+      "evaluation": {
+        "episodes": 16,
+        "mean_return": -0.16875,
+        "mean_steps": 60.0625,
+        "action_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          961,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "episodes": 16,
+        "mean_return": 1.125,
+        "mean_steps": 64.0,
+        "action_counts": [
+          55,
+          51,
+          57,
+          56,
+          70,
+          66,
+          66,
+          59,
+          46,
+          66,
+          66,
+          91,
+          68,
+          62,
+          53,
+          41,
+          51
+        ]
+      }
+    },
+    {
+      "name": "gru_pixels",
+      "parameters": 67506,
+      "train_episodes": 128,
+      "train_mean_return": 1.47265625,
+      "evaluation": {
+        "episodes": 16,
+        "mean_return": -0.05625,
+        "mean_steps": 61.125,
+        "action_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          978,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "episodes": 16,
+        "mean_return": 0.8875,
+        "mean_steps": 63.5625,
+        "action_counts": [
+          57,
+          62,
+          70,
+          43,
+          57,
+          63,
+          70,
+          83,
+          52,
+          58,
+          56,
+          58,
+          57,
+          64,
+          49,
+          62,
+          56
+        ]
+      }
+    }
+  ],
+  "accepted_learnability": false,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\crafter-reward-only-sentinel-report.json"
+}

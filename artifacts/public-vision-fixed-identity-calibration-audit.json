@@ -1,0 +1,7 @@
+{
+  "protocol": "public_vision_fixed_identity_side_calibration_audit_v1: independent recomputation of one-frame visual readout only; never reward-only control or architecture evidence.",
+  "source_artifact": "artifacts\\public-vision-fixed-identity-calibration-report.json",
+  "accepted": true,
+  "recomputed_accepted": true,
+  "failures": []
+}

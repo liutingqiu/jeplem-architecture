@@ -1,0 +1,84 @@
+{
+  "protocol": "minigrid_plwm_observation_skip_v1: same public navigation contract and budget; optional raw current-observation readout added only to the PLWM output path",
+  "device": "cuda",
+  "updates": 30,
+  "episodes_per_update": 24,
+  "random": {
+    "successes": 42,
+    "episodes": 64,
+    "mean_return": 0.3132568359375,
+    "mean_steps": 46.390625,
+    "action_counts": [
+      962,
+      985,
+      1022,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "results": [
+    {
+      "name": "plwm_full",
+      "parameters": 120361,
+      "train_successes": 548,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 64,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          4096,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "plwm_observation_skip",
+      "parameters": 121641,
+      "train_successes": 580,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 64,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          4096,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "transformer",
+      "parameters": 81800,
+      "train_successes": 589,
+      "evaluation": {
+        "successes": 64,
+        "episodes": 64,
+        "mean_return": 0.9296875,
+        "mean_steps": 5.0,
+        "action_counts": [
+          0,
+          64,
+          256,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "artifact": "artifacts\\minigrid-plwm-observation-skip-report.json"
+}

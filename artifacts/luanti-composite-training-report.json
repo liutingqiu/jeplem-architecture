@@ -1,0 +1,28 @@
+{
+  "device": "cuda",
+  "training_samples": 384,
+  "learned": {
+    "successes": 4,
+    "episodes": 8,
+    "mean_steps": 22.0
+  },
+  "no_memory": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 16.0
+  },
+  "random": {
+    "successes": 0,
+    "episodes": 8,
+    "mean_steps": 28.0
+  },
+  "teacher": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 16.0
+  },
+  "control_revisions": 8,
+  "accepted": false,
+  "checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-composite-vision-object-policy.pt",
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-composite-training-report.json"
+}

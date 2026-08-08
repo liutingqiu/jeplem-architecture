@@ -1,0 +1,22 @@
+{
+  "protocol": "query_conditioned_public_vision_binding_v1: bounded supervised visual readout only; each forward receives initial and delayed-query 11x11x7 public visual frames only. Query/answer labels, identity IDs, coordinates, seeds, actions, rewards, teachers, planners, and shaped rewards are excluded from input and never transfer to Luanti control.",
+  "device": "cpu",
+  "train_seed": 13600000,
+  "heldout_seed": 13700000,
+  "train_steps": 240,
+  "batch_size": 64,
+  "parameter_match_error": 0.0,
+  "results": [
+    {
+      "name": "query_conditioned",
+      "parameters": 11763,
+      "heldout_accuracy": 0.67626953125
+    },
+    {
+      "name": "late_fusion",
+      "parameters": 11763,
+      "heldout_accuracy": 0.6767578125
+    }
+  ],
+  "accepted_query_conditioned_binding": false
+}

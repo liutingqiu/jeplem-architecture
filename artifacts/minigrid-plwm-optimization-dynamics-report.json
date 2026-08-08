@@ -1,0 +1,2190 @@
+{
+  "protocol": "minigrid_plwm_optimization_dynamics_v1: exact reward-only public navigation PPO contract; logs only optimization statistics, with no added training signal",
+  "device": "cuda",
+  "updates": 30,
+  "episodes_per_update": 24,
+  "random": {
+    "successes": 42,
+    "episodes": 64,
+    "mean_return": 0.3132568359375,
+    "mean_steps": 46.390625,
+    "action_counts": [
+      962,
+      985,
+      1022,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "results": [
+    {
+      "name": "plwm",
+      "parameters": 120361,
+      "training_successes": 548,
+      "updates": [
+        {
+          "update": 0,
+          "successes": 14,
+          "actor_loss": -0.0019631095944596666,
+          "critic_loss": 0.029501101933419704,
+          "entropy": 1.0978381931781769,
+          "logit_stddev": 0.05228601023554802,
+          "greedy_action_counts": [
+            0,
+            1200,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.06353200320154428,
+            "belief_cell": 0.060410529375076294,
+            "workspace_cell": 0.04008378088474274,
+            "memory": 0.04400620749220252,
+            "readout": 0.17572211660444736
+          }
+        },
+        {
+          "update": 1,
+          "successes": 14,
+          "actor_loss": -0.0018405412801454357,
+          "critic_loss": 0.03677185159176588,
+          "entropy": 1.09750497341156,
+          "logit_stddev": 0.03367459401488304,
+          "greedy_action_counts": [
+            0,
+            1046,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.043589281383901834,
+            "belief_cell": 0.03930320404469967,
+            "workspace_cell": 0.029001910239458084,
+            "memory": 0.025054815923795104,
+            "readout": 0.13105781748890877
+          }
+        },
+        {
+          "update": 2,
+          "successes": 14,
+          "actor_loss": -0.0005030180786333993,
+          "critic_loss": 0.02371195238083601,
+          "entropy": 1.0936262905597687,
+          "logit_stddev": 0.07912988215684891,
+          "greedy_action_counts": [
+            0,
+            0,
+            1125,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.018862174591049552,
+            "belief_cell": 0.017519238404929638,
+            "workspace_cell": 0.011587335029616952,
+            "memory": 0.012483042548410594,
+            "readout": 0.050352382473647594
+          }
+        },
+        {
+          "update": 3,
+          "successes": 15,
+          "actor_loss": -0.0003147472951696706,
+          "critic_loss": 0.033469025045633316,
+          "entropy": 1.088080108165741,
+          "logit_stddev": 0.1292160451412201,
+          "greedy_action_counts": [
+            0,
+            0,
+            974,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.017395281000062823,
+            "belief_cell": 0.017374248476698995,
+            "workspace_cell": 0.012364833382889628,
+            "memory": 0.009614667389541864,
+            "readout": 0.0560403848066926
+          }
+        },
+        {
+          "update": 4,
+          "successes": 14,
+          "actor_loss": -0.0003809986722647929,
+          "critic_loss": 0.021332441829144955,
+          "entropy": 1.0822207927703857,
+          "logit_stddev": 0.16634565591812134,
+          "greedy_action_counts": [
+            0,
+            0,
+            1154,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.018182481173425913,
+            "belief_cell": 0.020096803084015846,
+            "workspace_cell": 0.013849860988557339,
+            "memory": 0.016165357315912843,
+            "readout": 0.06516861822456121
+          }
+        },
+        {
+          "update": 5,
+          "successes": 13,
+          "actor_loss": -0.0001523735671435933,
+          "critic_loss": 0.021299213636666536,
+          "entropy": 1.0778796672821045,
+          "logit_stddev": 0.19235698878765106,
+          "greedy_action_counts": [
+            0,
+            0,
+            1138,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.01382966642268002,
+            "belief_cell": 0.014092247001826763,
+            "workspace_cell": 0.00948126777075231,
+            "memory": 0.010851023369468749,
+            "readout": 0.039903770200908184
+          }
+        },
+        {
+          "update": 6,
+          "successes": 13,
+          "actor_loss": -0.001267594083844914,
+          "critic_loss": 0.020906977355480194,
+          "entropy": 1.0732859373092651,
+          "logit_stddev": 0.20594996213912964,
+          "greedy_action_counts": [
+            0,
+            0,
+            1132,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.039383601397275925,
+            "belief_cell": 0.03464321605861187,
+            "workspace_cell": 0.024204454850405455,
+            "memory": 0.023582423105835915,
+            "readout": 0.10765872336924076
+          }
+        },
+        {
+          "update": 7,
+          "successes": 19,
+          "actor_loss": -0.0005476757289558098,
+          "critic_loss": 0.04249511566013098,
+          "entropy": 1.0605469048023224,
+          "logit_stddev": 0.2419169545173645,
+          "greedy_action_counts": [
+            0,
+            0,
+            808,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.049901871010661125,
+            "belief_cell": 0.04015873419120908,
+            "workspace_cell": 0.03149653319269419,
+            "memory": 0.019634683849290013,
+            "readout": 0.14143620058894157
+          }
+        },
+        {
+          "update": 8,
+          "successes": 18,
+          "actor_loss": -0.0019504327210597694,
+          "critic_loss": 0.031760798301547766,
+          "entropy": 1.0362274944782257,
+          "logit_stddev": 0.3097911477088928,
+          "greedy_action_counts": [
+            0,
+            0,
+            877,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.03231164114549756,
+            "belief_cell": 0.028806662186980247,
+            "workspace_cell": 0.021051105577498674,
+            "memory": 0.016759343212470412,
+            "readout": 0.09452112950384617
+          }
+        },
+        {
+          "update": 9,
+          "successes": 16,
+          "actor_loss": -0.0010873018220061148,
+          "critic_loss": 0.023959366604685783,
+          "entropy": 1.002541035413742,
+          "logit_stddev": 0.39784547686576843,
+          "greedy_action_counts": [
+            0,
+            0,
+            991,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.02134788315743208,
+            "belief_cell": 0.024710315745323896,
+            "workspace_cell": 0.020377016626298428,
+            "memory": 0.020159943960607052,
+            "readout": 0.10416402295231819
+          }
+        },
+        {
+          "update": 10,
+          "successes": 19,
+          "actor_loss": -0.002063951621793847,
+          "critic_loss": 0.029998633079230785,
+          "entropy": 0.9709488600492477,
+          "logit_stddev": 0.47270286083221436,
+          "greedy_action_counts": [
+            0,
+            0,
+            871,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.039222268387675285,
+            "belief_cell": 0.035211232490837574,
+            "workspace_cell": 0.02519040508195758,
+            "memory": 0.019455683883279562,
+            "readout": 0.11055458150804043
+          }
+        },
+        {
+          "update": 11,
+          "successes": 18,
+          "actor_loss": -0.0023189290381882,
+          "critic_loss": 0.023790324572473764,
+          "entropy": 0.9249497205018997,
+          "logit_stddev": 0.5550657510757446,
+          "greedy_action_counts": [
+            0,
+            0,
+            911,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.040662054903805256,
+            "belief_cell": 0.037110039964318275,
+            "workspace_cell": 0.022425150498747826,
+            "memory": 0.02102236310020089,
+            "readout": 0.09931922517716885
+          }
+        },
+        {
+          "update": 12,
+          "successes": 18,
+          "actor_loss": -2.3341039195656776e-05,
+          "critic_loss": 0.017144691664725542,
+          "entropy": 0.8558684140443802,
+          "logit_stddev": 0.6834505796432495,
+          "greedy_action_counts": [
+            0,
+            0,
+            1024,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.017878244863823056,
+            "belief_cell": 0.018688975600525737,
+            "workspace_cell": 0.012421272462233901,
+            "memory": 0.012407983420416713,
+            "readout": 0.057173630222678185
+          }
+        },
+        {
+          "update": 13,
+          "successes": 19,
+          "actor_loss": -0.0001108585966309028,
+          "critic_loss": 0.03157311026006937,
+          "entropy": 0.8141325563192368,
+          "logit_stddev": 0.7675579786300659,
+          "greedy_action_counts": [
+            0,
+            0,
+            809,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.018495837692171335,
+            "belief_cell": 0.019252118188887835,
+            "workspace_cell": 0.016769819194450974,
+            "memory": 0.011250191368162632,
+            "readout": 0.09670422226190567
+          }
+        },
+        {
+          "update": 14,
+          "successes": 18,
+          "actor_loss": -0.00017723617948250947,
+          "critic_loss": 0.025040422566235065,
+          "entropy": 0.7910186499357224,
+          "logit_stddev": 0.8303601741790771,
+          "greedy_action_counts": [
+            0,
+            0,
+            872,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.03169516799971461,
+            "belief_cell": 0.03535923454910517,
+            "workspace_cell": 0.019548519980162382,
+            "memory": 0.02353698667138815,
+            "readout": 0.07135896943509579
+          }
+        },
+        {
+          "update": 15,
+          "successes": 20,
+          "actor_loss": -0.0011104657453222533,
+          "critic_loss": 0.026744806673377752,
+          "entropy": 0.823852151632309,
+          "logit_stddev": 0.8065595030784607,
+          "greedy_action_counts": [
+            0,
+            0,
+            830,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.02916167350485921,
+            "belief_cell": 0.03061682404950261,
+            "workspace_cell": 0.023006362840533257,
+            "memory": 0.022930089849978685,
+            "readout": 0.14060423523187637
+          }
+        },
+        {
+          "update": 16,
+          "successes": 21,
+          "actor_loss": -0.0010321378622111244,
+          "critic_loss": 0.022848738823086023,
+          "entropy": 0.864276573061943,
+          "logit_stddev": 0.7504138350486755,
+          "greedy_action_counts": [
+            0,
+            0,
+            871,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.0217151059769094,
+            "belief_cell": 0.023728408385068178,
+            "workspace_cell": 0.018171588890254498,
+            "memory": 0.014905891846865416,
+            "readout": 0.09359229728579521
+          }
+        },
+        {
+          "update": 17,
+          "successes": 20,
+          "actor_loss": -0.0006625494817213279,
+          "critic_loss": 0.026664369273930788,
+          "entropy": 0.8908903151750565,
+          "logit_stddev": 0.7185202240943909,
+          "greedy_action_counts": [
+            0,
+            0,
+            795,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.03443924291059375,
+            "belief_cell": 0.02830355241894722,
+            "workspace_cell": 0.0177473328076303,
+            "memory": 0.013569655595347285,
+            "readout": 0.07800047285854816
+          }
+        },
+        {
+          "update": 18,
+          "successes": 21,
+          "actor_loss": -0.002382045576840963,
+          "critic_loss": 0.02004195749759674,
+          "entropy": 0.8753053098917007,
+          "logit_stddev": 0.7615659832954407,
+          "greedy_action_counts": [
+            0,
+            0,
+            884,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.04341777507215738,
+            "belief_cell": 0.03984496742486954,
+            "workspace_cell": 0.028308595530688763,
+            "memory": 0.023129418026655912,
+            "readout": 0.14976738393306732
+          }
+        },
+        {
+          "update": 19,
+          "successes": 18,
+          "actor_loss": -0.0033959606889482075,
+          "critic_loss": 0.021748297847807407,
+          "entropy": 0.823016032576561,
+          "logit_stddev": 0.8874152898788452,
+          "greedy_action_counts": [
+            0,
+            0,
+            892,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.029965522699058056,
+            "belief_cell": 0.03388495231047273,
+            "workspace_cell": 0.02595990477129817,
+            "memory": 0.026143705938011408,
+            "readout": 0.1777089312672615
+          }
+        },
+        {
+          "update": 20,
+          "successes": 21,
+          "actor_loss": -0.0024667534047095874,
+          "critic_loss": 0.0319885304197669,
+          "entropy": 0.7515983134508133,
+          "logit_stddev": 1.0322669744491577,
+          "greedy_action_counts": [
+            0,
+            0,
+            667,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.039111264515668154,
+            "belief_cell": 0.03644461836665869,
+            "workspace_cell": 0.02271984750404954,
+            "memory": 0.017992257373407483,
+            "readout": 0.0908162398263812
+          }
+        },
+        {
+          "update": 21,
+          "successes": 18,
+          "actor_loss": 0.00018054734643480064,
+          "critic_loss": 0.024688341189175844,
+          "entropy": 0.6781335771083832,
+          "logit_stddev": 1.2333977222442627,
+          "greedy_action_counts": [
+            0,
+            0,
+            832,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.03430699510499835,
+            "belief_cell": 0.037078776862472296,
+            "workspace_cell": 0.02128650131635368,
+            "memory": 0.023458831245079637,
+            "readout": 0.10222532413899899
+          }
+        },
+        {
+          "update": 22,
+          "successes": 24,
+          "actor_loss": -0.0015577163721900433,
+          "critic_loss": 0.04149774927645922,
+          "entropy": 0.6616521775722504,
+          "logit_stddev": 1.2442303895950317,
+          "greedy_action_counts": [
+            0,
+            0,
+            448,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.0594459343701601,
+            "belief_cell": 0.06956419348716736,
+            "workspace_cell": 0.04814459104090929,
+            "memory": 0.03604357177391648,
+            "readout": 0.25207794830203056
+          }
+        },
+        {
+          "update": 23,
+          "successes": 19,
+          "actor_loss": -0.0005434549527754129,
+          "critic_loss": 0.023063733708113432,
+          "entropy": 0.6118022352457047,
+          "logit_stddev": 1.373205304145813,
+          "greedy_action_counts": [
+            0,
+            0,
+            797,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.05416115187108517,
+            "belief_cell": 0.07610434014350176,
+            "workspace_cell": 0.04547898890450597,
+            "memory": 0.050189508125185966,
+            "readout": 0.22191035374999046
+          }
+        },
+        {
+          "update": 24,
+          "successes": 20,
+          "actor_loss": -0.0005834842954328678,
+          "critic_loss": 0.03232683381065726,
+          "entropy": 0.6386245936155319,
+          "logit_stddev": 1.318226933479309,
+          "greedy_action_counts": [
+            0,
+            0,
+            702,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.03185664163902402,
+            "belief_cell": 0.05063233617693186,
+            "workspace_cell": 0.02786820800974965,
+            "memory": 0.038575561717152596,
+            "readout": 0.14597558975219727
+          }
+        },
+        {
+          "update": 25,
+          "successes": 22,
+          "actor_loss": -0.0005808011050983941,
+          "critic_loss": 0.039100450463593006,
+          "entropy": 0.6483217924833298,
+          "logit_stddev": 1.2642031908035278,
+          "greedy_action_counts": [
+            0,
+            0,
+            549,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.036399747245013714,
+            "belief_cell": 0.04298797622323036,
+            "workspace_cell": 0.027464379090815783,
+            "memory": 0.029239727649837732,
+            "readout": 0.1388285718858242
+          }
+        },
+        {
+          "update": 26,
+          "successes": 20,
+          "actor_loss": -0.002690120254719819,
+          "critic_loss": 0.027231536339968443,
+          "entropy": 0.6952411532402039,
+          "logit_stddev": 1.2426180839538574,
+          "greedy_action_counts": [
+            0,
+            0,
+            911,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.07530216686427593,
+            "belief_cell": 0.09584810584783554,
+            "workspace_cell": 0.056836883537471294,
+            "memory": 0.05918577779084444,
+            "readout": 0.23529061675071716
+          }
+        },
+        {
+          "update": 27,
+          "successes": 19,
+          "actor_loss": -0.0004537947896469108,
+          "critic_loss": 0.035748885944485664,
+          "entropy": 0.7298860996961594,
+          "logit_stddev": 1.149020791053772,
+          "greedy_action_counts": [
+            0,
+            0,
+            654,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.03136343276128173,
+            "belief_cell": 0.037050302606076,
+            "workspace_cell": 0.024806953966617584,
+            "memory": 0.025745354127138853,
+            "readout": 0.14784387685358524
+          }
+        },
+        {
+          "update": 28,
+          "successes": 20,
+          "actor_loss": -0.00042911878441120876,
+          "critic_loss": 0.030829107854515314,
+          "entropy": 0.726681724190712,
+          "logit_stddev": 1.1493757963180542,
+          "greedy_action_counts": [
+            0,
+            0,
+            681,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.02957089524716139,
+            "belief_cell": 0.03171373251825571,
+            "workspace_cell": 0.01596078835427761,
+            "memory": 0.021649213042110205,
+            "readout": 0.04928083252161741
+          }
+        },
+        {
+          "update": 29,
+          "successes": 23,
+          "actor_loss": -0.0016596835635553642,
+          "critic_loss": 0.030530178919434547,
+          "entropy": 0.720369279384613,
+          "logit_stddev": 1.122368574142456,
+          "greedy_action_counts": [
+            0,
+            0,
+            631,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.07220727112144232,
+            "belief_cell": 0.07012925203889608,
+            "workspace_cell": 0.043539725709706545,
+            "memory": 0.03380167135037482,
+            "readout": 0.1933472901582718
+          }
+        }
+      ],
+      "evaluation": {
+        "successes": 0,
+        "episodes": 64,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          4096,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "plwm_observation_skip",
+      "parameters": 121641,
+      "training_successes": 580,
+      "updates": [
+        {
+          "update": 0,
+          "successes": 19,
+          "actor_loss": -0.0018206055918883746,
+          "critic_loss": 0.05105315521359444,
+          "entropy": 1.0880281627178192,
+          "logit_stddev": 0.15434445440769196,
+          "greedy_action_counts": [
+            0,
+            930,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.04839089047163725,
+            "belief_cell": 0.0503726489841938,
+            "workspace_cell": 0.03529211040586233,
+            "memory": 0.02787464065477252,
+            "readout": 0.178851667791605
+          }
+        },
+        {
+          "update": 1,
+          "successes": 17,
+          "actor_loss": -0.003165444373403048,
+          "critic_loss": 0.032196000684052706,
+          "entropy": 1.0896961987018585,
+          "logit_stddev": 0.14230035245418549,
+          "greedy_action_counts": [
+            0,
+            986,
+            21,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.03909457102417946,
+            "belief_cell": 0.038982794620096684,
+            "workspace_cell": 0.02996180672198534,
+            "memory": 0.026274974923580885,
+            "readout": 0.135833652690053
+          }
+        },
+        {
+          "update": 2,
+          "successes": 14,
+          "actor_loss": -0.0012332991998017517,
+          "critic_loss": 0.03090963140130043,
+          "entropy": 1.085504412651062,
+          "logit_stddev": 0.15265882015228271,
+          "greedy_action_counts": [
+            0,
+            274,
+            736,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.02162864152342081,
+            "belief_cell": 0.019984574988484383,
+            "workspace_cell": 0.011668082792311907,
+            "memory": 0.014206467662006617,
+            "readout": 0.06693469732999802
+          }
+        },
+        {
+          "update": 3,
+          "successes": 16,
+          "actor_loss": -0.002532485164773446,
+          "critic_loss": 0.03479726705700159,
+          "entropy": 1.0731062293052673,
+          "logit_stddev": 0.20222774147987366,
+          "greedy_action_counts": [
+            0,
+            0,
+            929,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.03045374294742942,
+            "belief_cell": 0.02807100396603346,
+            "workspace_cell": 0.017728654202073812,
+            "memory": 0.02009534277021885,
+            "readout": 0.09129342064261436
+          }
+        },
+        {
+          "update": 4,
+          "successes": 15,
+          "actor_loss": -0.00225829122193949,
+          "critic_loss": 0.024716561194509268,
+          "entropy": 1.0485036671161652,
+          "logit_stddev": 0.2790905237197876,
+          "greedy_action_counts": [
+            0,
+            0,
+            1054,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.0263731824234128,
+            "belief_cell": 0.025024319998919964,
+            "workspace_cell": 0.015250764321535826,
+            "memory": 0.0186852365732193,
+            "readout": 0.0730139184743166
+          }
+        },
+        {
+          "update": 5,
+          "successes": 17,
+          "actor_loss": -0.0019466919247045356,
+          "critic_loss": 0.037869587540626526,
+          "entropy": 1.0112949907779694,
+          "logit_stddev": 0.3710525333881378,
+          "greedy_action_counts": [
+            0,
+            0,
+            903,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.029391831252723932,
+            "belief_cell": 0.030128844548016787,
+            "workspace_cell": 0.020691436249762774,
+            "memory": 0.017996541690081358,
+            "readout": 0.08924849703907967
+          }
+        },
+        {
+          "update": 6,
+          "successes": 18,
+          "actor_loss": -0.0020835442429316675,
+          "critic_loss": 0.02522599557414651,
+          "entropy": 0.953660637140274,
+          "logit_stddev": 0.4793785810470581,
+          "greedy_action_counts": [
+            0,
+            0,
+            965,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.020278367679566145,
+            "belief_cell": 0.023662184830754995,
+            "workspace_cell": 0.014973256271332502,
+            "memory": 0.017242699628695846,
+            "readout": 0.06465962063521147
+          }
+        },
+        {
+          "update": 7,
+          "successes": 19,
+          "actor_loss": -0.0021406757015061117,
+          "critic_loss": 0.026346060913056135,
+          "entropy": 0.8787618726491928,
+          "logit_stddev": 0.595385730266571,
+          "greedy_action_counts": [
+            0,
+            0,
+            928,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.02059314539656043,
+            "belief_cell": 0.02413104847073555,
+            "workspace_cell": 0.015862853964790702,
+            "memory": 0.01768407318741083,
+            "readout": 0.07755875959992409
+          }
+        },
+        {
+          "update": 8,
+          "successes": 19,
+          "actor_loss": -0.0016718253807175287,
+          "critic_loss": 0.0368466405197978,
+          "entropy": 0.8159412145614624,
+          "logit_stddev": 0.7032585740089417,
+          "greedy_action_counts": [
+            0,
+            0,
+            793,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.021758473943918943,
+            "belief_cell": 0.024477141443639994,
+            "workspace_cell": 0.014841541182249784,
+            "memory": 0.01644006441347301,
+            "readout": 0.06962595693767071
+          }
+        },
+        {
+          "update": 9,
+          "successes": 18,
+          "actor_loss": 0.0005233087029479222,
+          "critic_loss": 0.03449843358248472,
+          "entropy": 0.7693343162536621,
+          "logit_stddev": 0.8002426028251648,
+          "greedy_action_counts": [
+            0,
+            0,
+            790,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.02675340138375759,
+            "belief_cell": 0.033658712171018124,
+            "workspace_cell": 0.01982386549934745,
+            "memory": 0.026570717338472605,
+            "readout": 0.09518532827496529
+          }
+        },
+        {
+          "update": 10,
+          "successes": 18,
+          "actor_loss": -0.00013922135163380034,
+          "critic_loss": 0.027588820550590754,
+          "entropy": 0.7721881568431854,
+          "logit_stddev": 0.8139209747314453,
+          "greedy_action_counts": [
+            0,
+            0,
+            900,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.018557943403720856,
+            "belief_cell": 0.021261807531118393,
+            "workspace_cell": 0.013554745819419622,
+            "memory": 0.016954055055975914,
+            "readout": 0.08026397600769997
+          }
+        },
+        {
+          "update": 11,
+          "successes": 22,
+          "actor_loss": -0.0004777208755735174,
+          "critic_loss": 0.034411679953336716,
+          "entropy": 0.7859441190958023,
+          "logit_stddev": 0.7951831221580505,
+          "greedy_action_counts": [
+            0,
+            0,
+            719,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.031548206228762865,
+            "belief_cell": 0.04370987694710493,
+            "workspace_cell": 0.024224800057709217,
+            "memory": 0.03879573615267873,
+            "readout": 0.10844248719513416
+          }
+        },
+        {
+          "update": 12,
+          "successes": 21,
+          "actor_loss": -0.0007719045133418589,
+          "critic_loss": 0.029156253673136234,
+          "entropy": 0.8204465210437775,
+          "logit_stddev": 0.7591460943222046,
+          "greedy_action_counts": [
+            0,
+            0,
+            749,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.029690316412597895,
+            "belief_cell": 0.03275042586028576,
+            "workspace_cell": 0.01886178832501173,
+            "memory": 0.023364920634776354,
+            "readout": 0.06476419232785702
+          }
+        },
+        {
+          "update": 13,
+          "successes": 20,
+          "actor_loss": 0.00031300837900982703,
+          "critic_loss": 0.02664495212957263,
+          "entropy": 0.8656475394964218,
+          "logit_stddev": 0.6820905804634094,
+          "greedy_action_counts": [
+            0,
+            0,
+            819,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.02540105441585183,
+            "belief_cell": 0.029333267360925674,
+            "workspace_cell": 0.016166976420208812,
+            "memory": 0.02205932349897921,
+            "readout": 0.08252217061817646
+          }
+        },
+        {
+          "update": 14,
+          "successes": 19,
+          "actor_loss": -0.0004876370565658483,
+          "critic_loss": 0.02915418380871415,
+          "entropy": 0.8841923177242279,
+          "logit_stddev": 0.6385406255722046,
+          "greedy_action_counts": [
+            0,
+            0,
+            829,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.016382124507799745,
+            "belief_cell": 0.015367100946605206,
+            "workspace_cell": 0.009256016812287271,
+            "memory": 0.011110097751952708,
+            "readout": 0.04152242839336395
+          }
+        },
+        {
+          "update": 15,
+          "successes": 21,
+          "actor_loss": -0.0005388401892388733,
+          "critic_loss": 0.030988553538918495,
+          "entropy": 0.888083815574646,
+          "logit_stddev": 0.6275995969772339,
+          "greedy_action_counts": [
+            0,
+            0,
+            807,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.024664497934281826,
+            "belief_cell": 0.02357045840471983,
+            "workspace_cell": 0.01565581187605858,
+            "memory": 0.012387183960527182,
+            "readout": 0.07191041298210621
+          }
+        },
+        {
+          "update": 16,
+          "successes": 20,
+          "actor_loss": -0.0013717958645240724,
+          "critic_loss": 0.03131031524389982,
+          "entropy": 0.8657625764608383,
+          "logit_stddev": 0.6519188284873962,
+          "greedy_action_counts": [
+            0,
+            0,
+            771,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.023696830961853266,
+            "belief_cell": 0.022873269394040108,
+            "workspace_cell": 0.013072194065898657,
+            "memory": 0.014403641922399402,
+            "readout": 0.07422328181564808
+          }
+        },
+        {
+          "update": 17,
+          "successes": 18,
+          "actor_loss": 1.2130285867772983e-05,
+          "critic_loss": 0.028127528727054596,
+          "entropy": 0.8305443525314331,
+          "logit_stddev": 0.7183965444564819,
+          "greedy_action_counts": [
+            0,
+            0,
+            845,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.03522823425009847,
+            "belief_cell": 0.03541697142645717,
+            "workspace_cell": 0.01879427582025528,
+            "memory": 0.02636764431372285,
+            "readout": 0.10438721626996994
+          }
+        },
+        {
+          "update": 18,
+          "successes": 20,
+          "actor_loss": -7.405262409310165e-05,
+          "critic_loss": 0.03341537155210972,
+          "entropy": 0.8226600587368011,
+          "logit_stddev": 0.7446228861808777,
+          "greedy_action_counts": [
+            0,
+            0,
+            776,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.03512419015169144,
+            "belief_cell": 0.03731045871973038,
+            "workspace_cell": 0.020924091804772615,
+            "memory": 0.02767052175477147,
+            "readout": 0.09854887798428535
+          }
+        },
+        {
+          "update": 19,
+          "successes": 19,
+          "actor_loss": -0.0012884324927857627,
+          "critic_loss": 0.031178690493106842,
+          "entropy": 0.820491686463356,
+          "logit_stddev": 0.7331750392913818,
+          "greedy_action_counts": [
+            0,
+            0,
+            734,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.04179654736071825,
+            "belief_cell": 0.04575693607330322,
+            "workspace_cell": 0.02733291406184435,
+            "memory": 0.03226071270182729,
+            "readout": 0.13273861072957516
+          }
+        },
+        {
+          "update": 20,
+          "successes": 22,
+          "actor_loss": -0.002227559259218914,
+          "critic_loss": 0.02517477562651038,
+          "entropy": 0.7757433354854584,
+          "logit_stddev": 0.7821648716926575,
+          "greedy_action_counts": [
+            0,
+            0,
+            685,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.03228698717430234,
+            "belief_cell": 0.02599223330616951,
+            "workspace_cell": 0.01724822446703911,
+            "memory": 0.011106819845736027,
+            "readout": 0.13197898492217064
+          }
+        },
+        {
+          "update": 21,
+          "successes": 21,
+          "actor_loss": -0.0006114070624496648,
+          "critic_loss": 0.029014866799116135,
+          "entropy": 0.7295139878988266,
+          "logit_stddev": 0.8705922365188599,
+          "greedy_action_counts": [
+            0,
+            0,
+            637,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.02494486840441823,
+            "belief_cell": 0.02590671321377158,
+            "workspace_cell": 0.011835881741717458,
+            "memory": 0.02042862633243203,
+            "readout": 0.0529742194339633
+          }
+        },
+        {
+          "update": 22,
+          "successes": 23,
+          "actor_loss": -0.001113103175947705,
+          "critic_loss": 0.028503551613539457,
+          "entropy": 0.70975162088871,
+          "logit_stddev": 0.9278349280357361,
+          "greedy_action_counts": [
+            0,
+            0,
+            603,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.02195295738056302,
+            "belief_cell": 0.020370045211166143,
+            "workspace_cell": 0.00966707500629127,
+            "memory": 0.01393283624202013,
+            "readout": 0.06213943287730217
+          }
+        },
+        {
+          "update": 23,
+          "successes": 21,
+          "actor_loss": 0.0002539465275557262,
+          "critic_loss": 0.02892336528748274,
+          "entropy": 0.6964215934276581,
+          "logit_stddev": 0.9702221751213074,
+          "greedy_action_counts": [
+            0,
+            0,
+            671,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.0455345930531621,
+            "belief_cell": 0.037068190053105354,
+            "workspace_cell": 0.01719859102740884,
+            "memory": 0.024142133072018623,
+            "readout": 0.10829779133200645
+          }
+        },
+        {
+          "update": 24,
+          "successes": 18,
+          "actor_loss": -4.0233429141167676e-05,
+          "critic_loss": 0.025298376567661762,
+          "entropy": 0.7107171714305878,
+          "logit_stddev": 0.9809762239456177,
+          "greedy_action_counts": [
+            0,
+            0,
+            818,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.04553891532123089,
+            "belief_cell": 0.04810993280261755,
+            "workspace_cell": 0.022470886120572686,
+            "memory": 0.036754205357283354,
+            "readout": 0.09955111425369978
+          }
+        },
+        {
+          "update": 25,
+          "successes": 22,
+          "actor_loss": -0.0006518555765098188,
+          "critic_loss": 0.03407017979770899,
+          "entropy": 0.7063625603914261,
+          "logit_stddev": 0.9580127000808716,
+          "greedy_action_counts": [
+            0,
+            0,
+            615,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.04176895692944527,
+            "belief_cell": 0.04025971097871661,
+            "workspace_cell": 0.019283314934000373,
+            "memory": 0.029091152362525463,
+            "readout": 0.09028565138578415
+          }
+        },
+        {
+          "update": 26,
+          "successes": 22,
+          "actor_loss": -0.0005082782677058029,
+          "critic_loss": 0.022592693101614714,
+          "entropy": 0.6947676986455917,
+          "logit_stddev": 0.9744051694869995,
+          "greedy_action_counts": [
+            0,
+            0,
+            688,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.03324439562857151,
+            "belief_cell": 0.027093217708170414,
+            "workspace_cell": 0.0137550737708807,
+            "memory": 0.0184720647521317,
+            "readout": 0.04437043331563473
+          }
+        },
+        {
+          "update": 27,
+          "successes": 19,
+          "actor_loss": -0.0009460646516905591,
+          "critic_loss": 0.02462212461978197,
+          "entropy": 0.7383176535367966,
+          "logit_stddev": 0.9389969706535339,
+          "greedy_action_counts": [
+            0,
+            0,
+            761,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.05995050724595785,
+            "belief_cell": 0.054721688851714134,
+            "workspace_cell": 0.022988072130829096,
+            "memory": 0.041379461996257305,
+            "readout": 0.08915278594940901
+          }
+        },
+        {
+          "update": 28,
+          "successes": 20,
+          "actor_loss": -0.000919225422599701,
+          "critic_loss": 0.029202613048255444,
+          "entropy": 0.7897938191890717,
+          "logit_stddev": 0.8524781465530396,
+          "greedy_action_counts": [
+            0,
+            0,
+            736,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.02873680554330349,
+            "belief_cell": 0.024730099365115166,
+            "workspace_cell": 0.012127936817705631,
+            "memory": 0.01752298977226019,
+            "readout": 0.05237018037587404
+          }
+        },
+        {
+          "update": 29,
+          "successes": 22,
+          "actor_loss": -0.0025416238633635957,
+          "critic_loss": 0.034295784309506416,
+          "entropy": 0.8322121053934097,
+          "logit_stddev": 0.8046226501464844,
+          "greedy_action_counts": [
+            0,
+            0,
+            641,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "encoder": 0.060059549286961555,
+            "belief_cell": 0.04784215986728668,
+            "workspace_cell": 0.03134968411177397,
+            "memory": 0.03248564247041941,
+            "readout": 0.11682988330721855
+          }
+        }
+      ],
+      "evaluation": {
+        "successes": 0,
+        "episodes": 64,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          4096,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "transformer",
+      "parameters": 81800,
+      "training_successes": 589,
+      "updates": [
+        {
+          "update": 0,
+          "successes": 7,
+          "actor_loss": -0.0013878748414448694,
+          "critic_loss": 0.056713642552495,
+          "entropy": 1.0225705802440643,
+          "logit_stddev": 0.5013610124588013,
+          "greedy_action_counts": [
+            1322,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 1.5589964985847473,
+            "encoder": 0.8676976263523102,
+            "readout": 0.9361890777945518
+          }
+        },
+        {
+          "update": 1,
+          "successes": 5,
+          "actor_loss": -0.0004894089435488747,
+          "critic_loss": 0.021670192945748568,
+          "entropy": 1.0425397753715515,
+          "logit_stddev": 0.36552751064300537,
+          "greedy_action_counts": [
+            1331,
+            131,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.4716640040278435,
+            "encoder": 0.26085807755589485,
+            "readout": 0.33167051523923874
+          }
+        },
+        {
+          "update": 2,
+          "successes": 8,
+          "actor_loss": -0.0024403280421885706,
+          "critic_loss": 0.017726336373016238,
+          "entropy": 1.057267963886261,
+          "logit_stddev": 0.3244519829750061,
+          "greedy_action_counts": [
+            1368,
+            26,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.46316781640052795,
+            "encoder": 0.30703970789909363,
+            "readout": 0.4136621206998825
+          }
+        },
+        {
+          "update": 3,
+          "successes": 10,
+          "actor_loss": -0.003960675340112574,
+          "critic_loss": 0.01927680056542158,
+          "entropy": 1.0597968399524689,
+          "logit_stddev": 0.2847836911678314,
+          "greedy_action_counts": [
+            1289,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.3980448395013809,
+            "encoder": 0.25478796288371086,
+            "readout": 0.35934894531965256
+          }
+        },
+        {
+          "update": 4,
+          "successes": 16,
+          "actor_loss": -0.004227082262328152,
+          "critic_loss": 0.025448394939303398,
+          "entropy": 1.0397159457206726,
+          "logit_stddev": 0.3622731566429138,
+          "greedy_action_counts": [
+            872,
+            0,
+            223,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.4478967636823654,
+            "encoder": 0.32553432881832123,
+            "readout": 0.4318266659975052
+          }
+        },
+        {
+          "update": 5,
+          "successes": 16,
+          "actor_loss": -0.003806605697397103,
+          "critic_loss": 0.024081988260149956,
+          "entropy": 1.009146973490715,
+          "logit_stddev": 0.44034120440483093,
+          "greedy_action_counts": [
+            23,
+            0,
+            1029,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.25331518054008484,
+            "encoder": 0.18012381717562675,
+            "readout": 0.26955777034163475
+          }
+        },
+        {
+          "update": 6,
+          "successes": 16,
+          "actor_loss": -0.004445182450581342,
+          "critic_loss": 0.025142109021544456,
+          "entropy": 0.948637455701828,
+          "logit_stddev": 0.5304475426673889,
+          "greedy_action_counts": [
+            0,
+            0,
+            973,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.2501048520207405,
+            "encoder": 0.1956101804971695,
+            "readout": 0.30226435512304306
+          }
+        },
+        {
+          "update": 7,
+          "successes": 20,
+          "actor_loss": -0.0002960828259999104,
+          "critic_loss": 0.027823048643767834,
+          "entropy": 0.8988697975873947,
+          "logit_stddev": 0.6223767399787903,
+          "greedy_action_counts": [
+            0,
+            0,
+            844,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.45454879850149155,
+            "encoder": 0.3343365527689457,
+            "readout": 0.4607956111431122
+          }
+        },
+        {
+          "update": 8,
+          "successes": 19,
+          "actor_loss": -0.001451541795704392,
+          "critic_loss": 0.01830961462110281,
+          "entropy": 0.9146699011325836,
+          "logit_stddev": 0.6149952411651611,
+          "greedy_action_counts": [
+            0,
+            0,
+            983,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.32753461599349976,
+            "encoder": 0.24031450226902962,
+            "readout": 0.3640041649341583
+          }
+        },
+        {
+          "update": 9,
+          "successes": 17,
+          "actor_loss": -0.0015097434272300925,
+          "critic_loss": 0.023875197395682335,
+          "entropy": 0.9714997708797455,
+          "logit_stddev": 0.5274062156677246,
+          "greedy_action_counts": [
+            0,
+            0,
+            945,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.22788885608315468,
+            "encoder": 0.16194480471313,
+            "readout": 0.23596962913870811
+          }
+        },
+        {
+          "update": 10,
+          "successes": 20,
+          "actor_loss": -0.0003744530598197293,
+          "critic_loss": 0.03384034521877766,
+          "entropy": 1.0090858787298203,
+          "logit_stddev": 0.43138599395751953,
+          "greedy_action_counts": [
+            0,
+            0,
+            765,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.24065764620900154,
+            "encoder": 0.16947743855416775,
+            "readout": 0.2365119680762291
+          }
+        },
+        {
+          "update": 11,
+          "successes": 22,
+          "actor_loss": -0.0014612853047428764,
+          "critic_loss": 0.024481547065079212,
+          "entropy": 1.0185416042804718,
+          "logit_stddev": 0.38679322600364685,
+          "greedy_action_counts": [
+            0,
+            0,
+            762,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.26773127913475037,
+            "encoder": 0.19299359992146492,
+            "readout": 0.3111669346690178
+          }
+        },
+        {
+          "update": 12,
+          "successes": 22,
+          "actor_loss": -0.0012753248063737121,
+          "critic_loss": 0.025234419852495193,
+          "entropy": 0.9914444983005524,
+          "logit_stddev": 0.43730244040489197,
+          "greedy_action_counts": [
+            0,
+            0,
+            687,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.18637409806251526,
+            "encoder": 0.11879188567399979,
+            "readout": 0.16347970068454742
+          }
+        },
+        {
+          "update": 13,
+          "successes": 18,
+          "actor_loss": -0.004101438067514618,
+          "critic_loss": 0.026500016916543245,
+          "entropy": 0.9568832367658615,
+          "logit_stddev": 0.4900873303413391,
+          "greedy_action_counts": [
+            0,
+            0,
+            813,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.4417174905538559,
+            "encoder": 0.32276203110814095,
+            "readout": 0.45074860006570816
+          }
+        },
+        {
+          "update": 14,
+          "successes": 22,
+          "actor_loss": -0.0025062807284523536,
+          "critic_loss": 0.027248225174844265,
+          "entropy": 0.8877985775470734,
+          "logit_stddev": 0.5989015698432922,
+          "greedy_action_counts": [
+            0,
+            0,
+            752,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.32641003280878067,
+            "encoder": 0.21995097398757935,
+            "readout": 0.2954416871070862
+          }
+        },
+        {
+          "update": 15,
+          "successes": 21,
+          "actor_loss": -0.0021101296092644883,
+          "critic_loss": 0.02742314711213112,
+          "entropy": 0.834397166967392,
+          "logit_stddev": 0.7049034237861633,
+          "greedy_action_counts": [
+            0,
+            0,
+            677,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.22544975951313972,
+            "encoder": 0.14542838744819164,
+            "readout": 0.19444318860769272
+          }
+        },
+        {
+          "update": 16,
+          "successes": 21,
+          "actor_loss": -0.003791266564177498,
+          "critic_loss": 0.027640386018902063,
+          "entropy": 0.7718009501695633,
+          "logit_stddev": 0.8067370653152466,
+          "greedy_action_counts": [
+            0,
+            0,
+            674,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.2422132007777691,
+            "encoder": 0.14096549712121487,
+            "readout": 0.18486111238598824
+          }
+        },
+        {
+          "update": 17,
+          "successes": 23,
+          "actor_loss": -0.0031339692443306255,
+          "critic_loss": 0.028498932719230652,
+          "entropy": 0.7116026282310486,
+          "logit_stddev": 0.9168314337730408,
+          "greedy_action_counts": [
+            0,
+            0,
+            551,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.500792033970356,
+            "encoder": 0.29776764661073685,
+            "readout": 0.36401163786649704
+          }
+        },
+        {
+          "update": 18,
+          "successes": 23,
+          "actor_loss": -0.00569762158255771,
+          "critic_loss": 0.023542025592178106,
+          "entropy": 0.7315587252378464,
+          "logit_stddev": 0.9368793964385986,
+          "greedy_action_counts": [
+            0,
+            0,
+            464,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.6587146818637848,
+            "encoder": 0.35212285071611404,
+            "readout": 0.44140947610139847
+          }
+        },
+        {
+          "update": 19,
+          "successes": 23,
+          "actor_loss": -0.007040209560518207,
+          "critic_loss": 0.023104284424334764,
+          "entropy": 0.6995760500431061,
+          "logit_stddev": 0.9795955419540405,
+          "greedy_action_counts": [
+            0,
+            0,
+            443,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.3511958047747612,
+            "encoder": 0.15487804636359215,
+            "readout": 0.19837216660380363
+          }
+        },
+        {
+          "update": 20,
+          "successes": 24,
+          "actor_loss": -0.010074792160451373,
+          "critic_loss": 0.02448865957558155,
+          "entropy": 0.6972497403621674,
+          "logit_stddev": 1.0864735841751099,
+          "greedy_action_counts": [
+            0,
+            0,
+            357,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 0.995602086186409,
+            "encoder": 0.47514113783836365,
+            "readout": 0.4956435114145279
+          }
+        },
+        {
+          "update": 21,
+          "successes": 24,
+          "actor_loss": -0.009372933901017122,
+          "critic_loss": 0.01999050611630082,
+          "entropy": 0.7002070993185043,
+          "logit_stddev": 1.0984723567962646,
+          "greedy_action_counts": [
+            0,
+            0,
+            283,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 1.1237423568964005,
+            "encoder": 0.5082941949367523,
+            "readout": 0.49573059380054474
+          }
+        },
+        {
+          "update": 22,
+          "successes": 24,
+          "actor_loss": -0.0072266505848753715,
+          "critic_loss": 0.019174396991729736,
+          "entropy": 0.653970405459404,
+          "logit_stddev": 1.2015758752822876,
+          "greedy_action_counts": [
+            0,
+            4,
+            213,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 1.1326589733362198,
+            "encoder": 0.4768931418657303,
+            "readout": 0.45373284816741943
+          }
+        },
+        {
+          "update": 23,
+          "successes": 24,
+          "actor_loss": -0.010494622047990676,
+          "critic_loss": 0.010367432609200478,
+          "entropy": 0.5997140258550644,
+          "logit_stddev": 1.3194594383239746,
+          "greedy_action_counts": [
+            0,
+            13,
+            187,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 1.200829342007637,
+            "encoder": 0.48305679857730865,
+            "readout": 0.4236840456724167
+          }
+        },
+        {
+          "update": 24,
+          "successes": 24,
+          "actor_loss": -0.005456955161914578,
+          "critic_loss": 0.008043305133469403,
+          "entropy": 0.572047770023346,
+          "logit_stddev": 1.4627796411514282,
+          "greedy_action_counts": [
+            0,
+            30,
+            181,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 2.298563688993454,
+            "encoder": 0.8310669958591461,
+            "readout": 0.6299869269132614
+          }
+        },
+        {
+          "update": 25,
+          "successes": 24,
+          "actor_loss": -0.011656841030344367,
+          "critic_loss": 0.010065666632726789,
+          "entropy": 0.5192067623138428,
+          "logit_stddev": 1.571543574333191,
+          "greedy_action_counts": [
+            0,
+            37,
+            126,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 1.756933867931366,
+            "encoder": 0.6561303585767746,
+            "readout": 0.4650852605700493
+          }
+        },
+        {
+          "update": 26,
+          "successes": 24,
+          "actor_loss": -0.007865712814964398,
+          "critic_loss": 0.009149526711553335,
+          "entropy": 0.5066000372171402,
+          "logit_stddev": 1.6175988912582397,
+          "greedy_action_counts": [
+            2,
+            46,
+            112,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 1.262719288468361,
+            "encoder": 0.4736563414335251,
+            "readout": 0.49644531309604645
+          }
+        },
+        {
+          "update": 27,
+          "successes": 24,
+          "actor_loss": -0.017241639287575494,
+          "critic_loss": 0.014964435482397676,
+          "entropy": 0.5100921913981438,
+          "logit_stddev": 1.574965476989746,
+          "greedy_action_counts": [
+            11,
+            52,
+            121,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 2.834342658519745,
+            "encoder": 0.9840805977582932,
+            "readout": 0.6086334586143494
+          }
+        },
+        {
+          "update": 28,
+          "successes": 24,
+          "actor_loss": -0.004853136728932839,
+          "critic_loss": 0.008739067940041423,
+          "entropy": 0.39084190875291824,
+          "logit_stddev": 1.8364298343658447,
+          "greedy_action_counts": [
+            0,
+            39,
+            109,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 1.5213291943073273,
+            "encoder": 0.5335734933614731,
+            "readout": 0.3559207245707512
+          }
+        },
+        {
+          "update": 29,
+          "successes": 24,
+          "actor_loss": -0.010648474503042404,
+          "critic_loss": 0.006510109407827258,
+          "entropy": 0.3728165104985237,
+          "logit_stddev": 1.8959388732910156,
+          "greedy_action_counts": [
+            0,
+            35,
+            105,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gradient_norms": {
+            "input": 3.167983293533325,
+            "encoder": 1.0307819694280624,
+            "readout": 0.5845094546675682
+          }
+        }
+      ],
+      "evaluation": {
+        "successes": 64,
+        "episodes": 64,
+        "mean_return": 0.9296875,
+        "mean_steps": 5.0,
+        "action_counts": [
+          0,
+          64,
+          256,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "artifact": "artifacts\\minigrid-plwm-optimization-dynamics-report.json"
+}

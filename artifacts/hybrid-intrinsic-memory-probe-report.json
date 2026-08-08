@@ -1,0 +1,29 @@
+{
+  "protocol": "hybrid_intrinsic_memory_probe_v1: HybridPLWMTransformerActorCritic trained with the intrinsic-count learning rule (ppo_intrinsic_count_v1, bonus 0.05) through the two-stage curriculum, then evaluated on held-out MemoryS7 worlds with the paired counterfactual swap probe; only worlds solved in both the original and swapped layouts count as memory-driven success; no teacher action, path oracle, seed answer, or reward shaping.",
+  "device": "cuda",
+  "learning_rule": "ppo_intrinsic_count_v1",
+  "intrinsic_bonus": 0.05,
+  "experiment_seed": 41123,
+  "evaluation": {
+    "successes": 27,
+    "episodes": 64,
+    "mean_return": 0.3421142578125,
+    "mean_steps": 16.796875,
+    "action_counts": [
+      0,
+      64,
+      221,
+      0,
+      0,
+      0,
+      790
+    ]
+  },
+  "memory_probe": {
+    "original": 27,
+    "swapped": 0,
+    "both": 0
+  },
+  "accepted": false,
+  "artifact": "artifacts\\hybrid-intrinsic-memory-probe-report.json"
+}

@@ -1,0 +1,31 @@
+{
+  "protocol": "minigrid_delayed_object_identity_v2: classify Key versus Ball seen in an initial agent sensor frame after eight later agent-observed frames contain neither object; inputs are position-invariant Key/Ball presence features derived from each sensor image, while labels come exclusively from the initial image with no grid, route, policy, reward-answer, or hidden-state access.",
+  "device": "cuda",
+  "delay": 8,
+  "training_examples": 32,
+  "updates": 2,
+  "results": [
+    {
+      "name": "evidence_store",
+      "parameters": 50121,
+      "heldout_accuracy": 0.5390625
+    },
+    {
+      "name": "evidence_disabled",
+      "parameters": 50121,
+      "heldout_accuracy": 0.5390625
+    },
+    {
+      "name": "gru",
+      "parameters": 13192,
+      "heldout_accuracy": 0.4609375
+    },
+    {
+      "name": "four_event_transformer",
+      "parameters": 35848,
+      "heldout_accuracy": 0.4609375
+    }
+  ],
+  "accepted_object_identity_recall": false,
+  "artifact": "artifacts\\minigrid-delayed-object-identity-v2-smoke-report.json"
+}

@@ -1,0 +1,31 @@
+{
+  "device": "cuda",
+  "heldout_seeds": [
+    1480000,
+    1480037,
+    1480074,
+    1480111,
+    1480148,
+    1480185,
+    1480222,
+    1480259
+  ],
+  "conditions": [
+    {
+      "noise_rate": 0.08,
+      "stale_replay_steps": 1,
+      "clean_successes": 7,
+      "augmented_successes": 6,
+      "episodes": 8
+    },
+    {
+      "noise_rate": 0.16,
+      "stale_replay_steps": 2,
+      "clean_successes": 3,
+      "augmented_successes": 6,
+      "episodes": 8
+    }
+  ],
+  "accepted": false,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-noise-mixture-generalization-report.json"
+}

@@ -1,0 +1,171 @@
+{
+  "protocol": "luanti_reward_only_ppo_v1: real two-object Luanti worlds; local 11x11 vision plus previous chosen action and scalar environment reward only; all policies sample their own actions; no teacher trajectories, symbolic coordinates, seed, collection facts, external planning, shaped reward, or reset shortcut enters training/evaluation; Transformer context fixed to 16 events; first block is a prerequisite, not an architecture claim",
+  "device": "cuda",
+  "train_seed_range": [
+    4300000,
+    4300001,
+    4300002,
+    4300003,
+    4300004,
+    4300005,
+    4300006,
+    4300007,
+    4300008,
+    4300009,
+    4300010,
+    4300011,
+    4300012,
+    4300013,
+    4300014,
+    4300015,
+    4300016,
+    4300017,
+    4300018,
+    4300019,
+    4300020,
+    4300021,
+    4300022,
+    4300023,
+    4300024,
+    4300025,
+    4300026,
+    4300027,
+    4300028,
+    4300029,
+    4300030,
+    4300031,
+    4300032,
+    4300033,
+    4300034,
+    4300035,
+    4300036,
+    4300037,
+    4300038,
+    4300039,
+    4300040,
+    4300041,
+    4300042,
+    4300043,
+    4300044,
+    4300045,
+    4300046,
+    4300047,
+    4300048,
+    4300049,
+    4300050,
+    4300051,
+    4300052,
+    4300053,
+    4300054,
+    4300055,
+    4300056,
+    4300057,
+    4300058,
+    4300059,
+    4300060,
+    4300061,
+    4300062,
+    4300063
+  ],
+  "heldout_seed_range": [
+    4600000,
+    4600031,
+    4600062,
+    4600093,
+    4600124,
+    4600155,
+    4600186,
+    4600217
+  ],
+  "updates": 16,
+  "episodes_per_update": 4,
+  "transformer_context": 16,
+  "random_evaluation": {
+    "successes": 0,
+    "episodes": 8,
+    "mean_return": -0.4,
+    "mean_steps": 40.0,
+    "action_counts": [
+      90,
+      80,
+      85,
+      65
+    ]
+  },
+  "results": [
+    {
+      "name": "plwm",
+      "parameters": 364290,
+      "training_episodes": 64,
+      "training_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": -0.4,
+        "mean_steps": 40.0,
+        "action_counts": [
+          0,
+          0,
+          0,
+          320
+        ]
+      }
+    },
+    {
+      "name": "no_memory",
+      "parameters": 70757,
+      "training_episodes": 64,
+      "training_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": -0.35750000000000004,
+        "mean_steps": 40.0,
+        "action_counts": [
+          0,
+          232,
+          68,
+          20
+        ]
+      }
+    },
+    {
+      "name": "gru",
+      "parameters": 239237,
+      "training_episodes": 64,
+      "training_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": -0.4,
+        "mean_steps": 40.0,
+        "action_counts": [
+          158,
+          0,
+          100,
+          62
+        ]
+      }
+    },
+    {
+      "name": "transformer_16",
+      "parameters": 221861,
+      "training_episodes": 64,
+      "training_successes": 0,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": -0.4,
+        "mean_steps": 40.0,
+        "action_counts": [
+          0,
+          0,
+          0,
+          320
+        ]
+      }
+    }
+  ],
+  "accepted": false,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-reward-only-ppo-formal-report.json"
+}

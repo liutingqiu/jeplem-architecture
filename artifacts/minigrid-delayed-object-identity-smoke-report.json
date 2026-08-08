@@ -1,0 +1,31 @@
+{
+  "protocol": "minigrid_delayed_object_identity_v1: classify Key versus Ball seen in an initial agent sensor frame after eight later agent-observed frames contain neither object; labels come exclusively from the initial observation image, with no grid, route, policy, reward-answer, or hidden-state access.",
+  "device": "cuda",
+  "delay": 8,
+  "training_examples": 32,
+  "updates": 2,
+  "results": [
+    {
+      "name": "evidence_store",
+      "parameters": 80736,
+      "heldout_accuracy": 0.5390625
+    },
+    {
+      "name": "evidence_disabled",
+      "parameters": 80736,
+      "heldout_accuracy": 0.4609375
+    },
+    {
+      "name": "gru",
+      "parameters": 53855,
+      "heldout_accuracy": 0.6015625
+    },
+    {
+      "name": "four_event_transformer",
+      "parameters": 56415,
+      "heldout_accuracy": 0.46875
+    }
+  ],
+  "accepted_object_identity_recall": false,
+  "artifact": "artifacts\\minigrid-delayed-object-identity-smoke-report.json"
+}

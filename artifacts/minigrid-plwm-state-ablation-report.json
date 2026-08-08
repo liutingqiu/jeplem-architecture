@@ -1,0 +1,124 @@
+{
+  "protocol": "minigrid_plwm_state_ablation_v1: public Empty-5x5 navigation, movement-only PPO external reward, same train/held-out seed ranges and interaction budget; mechanisms vary only within PLWM; not a memory advantage claim",
+  "device": "cuda",
+  "updates": 12,
+  "episodes_per_update": 24,
+  "random": {
+    "successes": 24,
+    "episodes": 32,
+    "mean_return": 0.34658203125,
+    "mean_steps": 44.6875,
+    "action_counts": [
+      474,
+      471,
+      485,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "results": [
+    {
+      "name": "plwm_full",
+      "parameters": 119329,
+      "train_successes": 214,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          2048,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "plwm_no_memory",
+      "parameters": 119329,
+      "train_successes": 208,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          2048,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "plwm_ungated",
+      "parameters": 119329,
+      "train_successes": 219,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          2048,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "plwm_no_thought",
+      "parameters": 119329,
+      "train_successes": 202,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          2048,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "transformer",
+      "parameters": 81288,
+      "train_successes": 202,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          2048,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "artifact": "artifacts\\minigrid-plwm-state-ablation-report.json"
+}

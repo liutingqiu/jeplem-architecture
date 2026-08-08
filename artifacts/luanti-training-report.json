@@ -1,0 +1,47 @@
+{
+  "device": "cuda",
+  "training_seed_count": 24,
+  "heldout_seed_count": 8,
+  "trajectories": 48,
+  "training_samples": 336,
+  "final_policy_loss": 0.0009201448992826045,
+  "final_prediction_loss": 0.04505682736635208,
+  "action_world_model": {
+    "transitions": 96,
+    "displacement_accuracy": 0.9583333333333334,
+    "blocked_accuracy": 1.0
+  },
+  "stateless_action_world_model": {
+    "transitions": 96,
+    "displacement_accuracy": 0.5,
+    "blocked_accuracy": 0.9791666666666666
+  },
+  "learned": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 14.0
+  },
+  "no_memory": {
+    "successes": 4,
+    "episodes": 8,
+    "mean_steps": 16.0
+  },
+  "gru_context": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 14.0
+  },
+  "random": {
+    "successes": 0,
+    "episodes": 8,
+    "mean_steps": 18.0
+  },
+  "reactive": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 14.0
+  },
+  "accepted": true,
+  "checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-goal-policy.pt",
+  "rollout_artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-rollouts.jsonl"
+}

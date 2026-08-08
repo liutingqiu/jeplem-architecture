@@ -1,0 +1,38 @@
+{
+  "device": "cuda",
+  "training_samples": 528,
+  "learned": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 33.25
+  },
+  "no_memory": {
+    "successes": 0,
+    "episodes": 8,
+    "mean_steps": 40.0
+  },
+  "recurrent": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 33.25
+  },
+  "transformer": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 33.25
+  },
+  "random": {
+    "successes": 0,
+    "episodes": 8,
+    "mean_steps": 40.0
+  },
+  "teacher": {
+    "successes": 8,
+    "episodes": 8,
+    "mean_steps": 33.25
+  },
+  "learned_revisions": 8,
+  "accepted": true,
+  "checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-polarity-memory-policy.pt",
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-polarity-memory-report.json"
+}

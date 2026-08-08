@@ -1,0 +1,18 @@
+{
+  "device": "cuda",
+  "training_samples": 736,
+  "fact_memory": {
+    "successes": 4,
+    "episodes": 8,
+    "mean_steps": 26.0
+  },
+  "current_frame": {
+    "successes": 1,
+    "episodes": 8,
+    "mean_steps": 27.125
+  },
+  "control_revisions": 8,
+  "accepted": false,
+  "checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-symbolic-fact-memory-policy.pt",
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-symbolic-fact-memory-report.json"
+}

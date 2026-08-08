@@ -1,0 +1,22 @@
+{
+  "protocol": "crafter_sb3_pixels_baseline_v1: Stable-Baselines3 PPO through GymPixelsOnlyCrafter. Observation is 64x64 uint8 RGB; action is 0..16; reward is scalar environment reward; Gym info is always {}. Semantic, inventory, achievements, player position, hidden state, teacher actions, and future observations are unavailable.",
+  "device": "cuda",
+  "total_timesteps": 512,
+  "episode_length": 32,
+  "heldout_seed_range": [
+    20000000,
+    20000001
+  ],
+  "random_evaluation": {
+    "episodes": 2,
+    "mean_return": 0.0,
+    "mean_steps": 32.0
+  },
+  "ppo_evaluation": {
+    "episodes": 2,
+    "mean_return": 0.55,
+    "mean_steps": 29.5
+  },
+  "accepted_standard_baseline": true,
+  "artifact": "artifacts\\crafter-sb3-pixels-baseline-smoke-report.json"
+}

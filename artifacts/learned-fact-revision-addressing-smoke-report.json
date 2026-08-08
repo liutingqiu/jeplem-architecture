@@ -1,0 +1,37 @@
+{
+  "protocol": "learned_fact_revision_v1: supervised diagnostic over only agent-visible source/value/confidence/version evidence streams. The candidate learns a differentiable fact-addressed update gate; the generator's strong/weak/stale rule and current-value labels are never model inputs. Held-out worlds raise distractors from 8 to 32 and 64, with disjoint seeds. This is not reward-only control.",
+  "device": "cuda",
+  "training_examples": 256,
+  "updates": 40,
+  "train_distractors": 8,
+  "heldout_distractors": 32,
+  "long_distractors": 64,
+  "results": [
+    {
+      "name": "learned_fact_store",
+      "parameters": 12532,
+      "heldout_accuracy": 0.26953125,
+      "long_distractor_accuracy": 0.291015625
+    },
+    {
+      "name": "learned_store_no_addressing",
+      "parameters": 12532,
+      "heldout_accuracy": 0.248046875,
+      "long_distractor_accuracy": 0.267578125
+    },
+    {
+      "name": "gru",
+      "parameters": 19636,
+      "heldout_accuracy": 0.25,
+      "long_distractor_accuracy": 0.267578125
+    },
+    {
+      "name": "four_event_transformer",
+      "parameters": 24484,
+      "heldout_accuracy": 0.271484375,
+      "long_distractor_accuracy": 0.287109375
+    }
+  ],
+  "accepted_learned_fact_revision": false,
+  "artifact": "artifacts\\learned-fact-revision-addressing-smoke-report.json"
+}

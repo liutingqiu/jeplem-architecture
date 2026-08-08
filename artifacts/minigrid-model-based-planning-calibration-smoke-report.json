@@ -1,0 +1,46 @@
+{
+  "protocol": "minigrid_model_based_planning_v1: random training-world action transitions train a causal observation/reward model; held-out control enumerates only the model's own action-conditioned latent rollouts. No teacher action, path oracle, future action-time observation, seed answer, or shaped reward.",
+  "device": "cpu",
+  "parameters": 152224,
+  "corpus_episodes": 8,
+  "corpus_transitions": 346,
+  "positive_reward_transitions": 6,
+  "updates": 2,
+  "batch_episodes": 4,
+  "planning_horizon": 3,
+  "initial_loss": 1.2113771438598633,
+  "final_loss": 1.4820445775985718,
+  "heldout_one_step_observation_mse": 0.10352464940974383,
+  "heldout_six_step_observation_mse": 0.11240828103893172,
+  "heldout_one_step_reward_brier": 0.26647252280537675,
+  "heldout_six_step_reward_brier": 0.2827422622500396,
+  "training_seconds": 1.4324883000226691,
+  "random": {
+    "successes": 2,
+    "episodes": 2,
+    "mean_return": 0.28984374999999996,
+    "mean_steps": 50.5,
+    "action_counts": [
+      33,
+      37,
+      31,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "planner": {
+    "successes": 0,
+    "episodes": 2,
+    "mean_return": 0.0,
+    "mean_steps": 64.0,
+    "action_counts": [
+      0,
+      0,
+      128
+    ]
+  },
+  "accepted_model_based_feasibility": false,
+  "artifact": "artifacts\\minigrid-model-based-planning-calibration-smoke-report.json"
+}

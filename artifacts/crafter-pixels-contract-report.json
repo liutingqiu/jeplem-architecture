@@ -1,0 +1,16 @@
+{
+  "protocol": "crafter_pixels_contract_v1: public Crafter interaction exposes only 64x64 RGB sensor frames, selected action, scalar environment reward, and terminal status; semantic map, inventory, and achievements are discarded before agent code.",
+  "crafter_version": "1.8.3",
+  "episodes": 8,
+  "episode_length": 128,
+  "action_count": 17,
+  "observation_shape": [
+    64,
+    64,
+    3
+  ],
+  "random_mean_reward": 1.3875,
+  "all_rgb_only": true,
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\crafter-pixels-contract-report.json"
+}

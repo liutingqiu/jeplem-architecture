@@ -1,0 +1,51 @@
+{
+  "protocol": "luanti_micro_navigation_sb3_baseline_v1: real Luanti public visible-goal micro-navigation; only 11x11 local vision, selected four-direction action, scalar environment reward, termination/truncation, and empty Gym info are available. Goal is visible, controls are not inverted, and reaching it produces the sole terminal environment reward. Standard PPO validation only, not a PLWM architecture experiment.",
+  "device": "cuda",
+  "total_timesteps": 1024,
+  "max_steps": 10,
+  "training_seed_start": 6100000,
+  "heldout_seed_range": [
+    6200000,
+    6200001,
+    6200002,
+    6200003,
+    6200004,
+    6200005,
+    6200006,
+    6200007,
+    6200008,
+    6200009,
+    6200010,
+    6200011,
+    6200012,
+    6200013,
+    6200014,
+    6200015
+  ],
+  "random_evaluation": {
+    "episodes": 16,
+    "successes": 2,
+    "mean_return": 0.030000000000000006,
+    "mean_steps": 9.625,
+    "action_counts": [
+      37,
+      35,
+      41,
+      41
+    ]
+  },
+  "ppo_evaluation": {
+    "episodes": 16,
+    "successes": 0,
+    "mean_return": -0.09999999999999999,
+    "mean_steps": 10.0,
+    "action_counts": [
+      160,
+      0,
+      0,
+      0
+    ]
+  },
+  "accepted_standard_baseline": false,
+  "artifact": "artifacts\\luanti-micro-navigation-sb3-baseline-report.json"
+}

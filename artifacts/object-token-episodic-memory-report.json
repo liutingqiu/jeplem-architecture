@@ -1,0 +1,27 @@
+{
+  "protocol": "object_token_episodic_memory_v1: bounded supervised storage/readout diagnostic only; each forward receives only current 11x11x7 public vision, previous chosen action, and previous scalar reward. Object masks derive solely from raw public tile pixels and only distinguish object from air/agent; learned grid-index parameters are internal model weights, not coordinate inputs. Labels, identity IDs, coordinates, seeds, teachers, planners, and shaped rewards are excluded from input and never transfer to Luanti control.",
+  "device": "cpu",
+  "train_seed": 14300000,
+  "heldout_seed": 14400000,
+  "train_steps": 240,
+  "batch_size": 64,
+  "parameter_match_error": 0.0,
+  "results": [
+    {
+      "name": "object_token_multi_writer",
+      "parameters": 42628,
+      "heldout_accuracy": 1.0
+    },
+    {
+      "name": "object_token_single_writer",
+      "parameters": 42628,
+      "heldout_accuracy": 0.67041015625
+    },
+    {
+      "name": "object_token_memory_disabled",
+      "parameters": 42628,
+      "heldout_accuracy": 0.67578125
+    }
+  ],
+  "accepted_object_token_memory": true
+}

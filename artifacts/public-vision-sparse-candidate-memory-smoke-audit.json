@@ -1,0 +1,7 @@
+{
+  "protocol": "public_vision_sparse_candidate_memory_audit_v2: independently recomputes the bounded public-vision storage/readout gate; never architecture or Luanti-control evidence.",
+  "source_artifact": "artifacts\\public-vision-sparse-candidate-memory-smoke-report.json",
+  "accepted": false,
+  "recomputed_accepted": false,
+  "failures": []
+}

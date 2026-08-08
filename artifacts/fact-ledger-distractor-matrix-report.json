@@ -1,0 +1,11 @@
+{
+  "protocol": "fact_ledger_distractor_matrix_v1: source/time/confidence/version ledger faces independent strong revisions, weak newer conflicts, stale strong packets, unrelated facts, and disk restoration; a naive last-write store is a counterfactual baseline.",
+  "episodes": 64,
+  "distractors_per_episode": 32,
+  "ledger_successes": 64,
+  "naive_last_write_successes": 0,
+  "all_restored": true,
+  "all_conflicts_isolated": true,
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\fact-ledger-distractor-matrix-report.json"
+}

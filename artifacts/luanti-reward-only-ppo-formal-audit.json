@@ -1,0 +1,7 @@
+{
+  "protocol": "luanti_reward_only_ppo_audit_v1: validates the frozen 16x4 real-Luanti vision/action/reward-only comparison and recomputes the declared held-out gate.",
+  "source_artifact": "artifacts\\luanti-reward-only-ppo-formal-report.json",
+  "accepted": false,
+  "recomputed_accepted": false,
+  "failures": []
+}

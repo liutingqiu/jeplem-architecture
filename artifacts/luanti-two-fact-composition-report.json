@@ -1,0 +1,282 @@
+{
+  "language_schema_accepted": true,
+  "fact_memory_successes": 8,
+  "no_fact_successes": 0,
+  "episodes": 8,
+  "all_prerequisite_sequences": true,
+  "all_revisions": true,
+  "all_facts_hidden": true,
+  "all_stale_rejected": true,
+  "all_checkpoint_restored": true,
+  "all_fact_provenance_complete": true,
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-two-fact-composition-report.json",
+  "with_facts": [
+    {
+      "seed": 3000000,
+      "completed": true,
+      "charge_verified": true,
+      "key_verified": true,
+      "prerequisite_rewards": [
+        0.15,
+        0.2
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 33
+    },
+    {
+      "seed": 3000031,
+      "completed": true,
+      "charge_verified": true,
+      "key_verified": true,
+      "prerequisite_rewards": [
+        0.15,
+        0.2
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 35
+    },
+    {
+      "seed": 3000062,
+      "completed": true,
+      "charge_verified": true,
+      "key_verified": true,
+      "prerequisite_rewards": [
+        0.15,
+        0.2
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 33
+    },
+    {
+      "seed": 3000093,
+      "completed": true,
+      "charge_verified": true,
+      "key_verified": true,
+      "prerequisite_rewards": [
+        0.15,
+        0.2
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 33
+    },
+    {
+      "seed": 3000124,
+      "completed": true,
+      "charge_verified": true,
+      "key_verified": true,
+      "prerequisite_rewards": [
+        0.15,
+        0.2
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 35
+    },
+    {
+      "seed": 3000155,
+      "completed": true,
+      "charge_verified": true,
+      "key_verified": true,
+      "prerequisite_rewards": [
+        0.15,
+        0.2
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 33
+    },
+    {
+      "seed": 3000186,
+      "completed": true,
+      "charge_verified": true,
+      "key_verified": true,
+      "prerequisite_rewards": [
+        0.15,
+        0.2
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 35
+    },
+    {
+      "seed": 3000217,
+      "completed": true,
+      "charge_verified": true,
+      "key_verified": true,
+      "prerequisite_rewards": [
+        0.15,
+        0.2
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 33
+    }
+  ],
+  "without_facts": [
+    {
+      "seed": 3000000,
+      "completed": false,
+      "charge_verified": false,
+      "key_verified": false,
+      "prerequisite_rewards": [
+        0.15
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 64
+    },
+    {
+      "seed": 3000031,
+      "completed": false,
+      "charge_verified": false,
+      "key_verified": false,
+      "prerequisite_rewards": [
+        0.15
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 64
+    },
+    {
+      "seed": 3000062,
+      "completed": false,
+      "charge_verified": false,
+      "key_verified": false,
+      "prerequisite_rewards": [
+        0.15
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 64
+    },
+    {
+      "seed": 3000093,
+      "completed": false,
+      "charge_verified": false,
+      "key_verified": false,
+      "prerequisite_rewards": [
+        0.15
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 64
+    },
+    {
+      "seed": 3000124,
+      "completed": false,
+      "charge_verified": false,
+      "key_verified": false,
+      "prerequisite_rewards": [
+        0.15
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 64
+    },
+    {
+      "seed": 3000155,
+      "completed": false,
+      "charge_verified": false,
+      "key_verified": false,
+      "prerequisite_rewards": [
+        0.15
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 64
+    },
+    {
+      "seed": 3000186,
+      "completed": false,
+      "charge_verified": false,
+      "key_verified": false,
+      "prerequisite_rewards": [
+        0.15
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 64
+    },
+    {
+      "seed": 3000217,
+      "completed": false,
+      "charge_verified": false,
+      "key_verified": false,
+      "prerequisite_rewards": [
+        0.15
+      ],
+      "control_revisions": 1,
+      "facts_hidden_after_prerequisites": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "fact_provenance_complete": true,
+      "actions": 64
+    }
+  ]
+}

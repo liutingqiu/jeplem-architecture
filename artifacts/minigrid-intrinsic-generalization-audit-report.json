@@ -1,0 +1,246 @@
+{
+  "protocol": "minigrid_intrinsic_generalization_v1: three disjoint held-out seed blocks; PPO with an explicit 0.05 local-observation visit-count bonus during training only; success and acceptance use environment reward only; no teacher, oracle, future observation, seed answer, or distance shaping",
+  "device": "cuda",
+  "updates": 8,
+  "episodes_per_update": 24,
+  "evaluation_episodes": 32,
+  "intrinsic_bonus": 0.05,
+  "splits": [
+    {
+      "start_seed": 1000000,
+      "random": {
+        "successes": 6,
+        "episodes": 32,
+        "mean_return": 0.114111328125,
+        "mean_steps": 47.59375,
+        "action_counts": [
+          200,
+          224,
+          220,
+          210,
+          223,
+          209,
+          237
+        ]
+      },
+      "plwm": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          2048,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "no_memory": {
+        "successes": 3,
+        "episodes": 32,
+        "mean_return": 0.08979492187499999,
+        "mean_steps": 48.75,
+        "action_counts": [
+          456,
+          446,
+          18,
+          0,
+          640,
+          0,
+          0
+        ]
+      },
+      "gru": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          11,
+          0,
+          0,
+          0,
+          2037
+        ]
+      },
+      "transformer": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          1345,
+          703,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "start_seed": 2000000,
+      "random": {
+        "successes": 4,
+        "episodes": 32,
+        "mean_return": 0.084130859375,
+        "mean_steps": 51.75,
+        "action_counts": [
+          213,
+          252,
+          234,
+          229,
+          241,
+          234,
+          253
+        ]
+      },
+      "plwm": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          2048,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "no_memory": {
+        "successes": 2,
+        "episodes": 32,
+        "mean_return": 0.05986328125,
+        "mean_steps": 54.46875,
+        "action_counts": [
+          357,
+          348,
+          14,
+          0,
+          1024,
+          0,
+          0
+        ]
+      },
+      "gru": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          2040
+        ]
+      },
+      "transformer": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          1264,
+          781,
+          3,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "start_seed": 3000000,
+      "random": {
+        "successes": 2,
+        "episodes": 32,
+        "mean_return": 0.036572265625,
+        "mean_steps": 56.03125,
+        "action_counts": [
+          230,
+          267,
+          250,
+          251,
+          261,
+          258,
+          276
+        ]
+      },
+      "plwm": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          2048,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "no_memory": {
+        "successes": 2,
+        "episodes": 32,
+        "mean_return": 0.05986328125,
+        "mean_steps": 50.65625,
+        "action_counts": [
+          327,
+          315,
+          19,
+          0,
+          960,
+          0,
+          0
+        ]
+      },
+      "gru": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          10,
+          0,
+          0,
+          0,
+          2038
+        ]
+      },
+      "transformer": {
+        "successes": 0,
+        "episodes": 32,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          1486,
+          559,
+          3,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\minigrid-intrinsic-generalization-audit-report.json"
+}

@@ -1,0 +1,11 @@
+{
+  "protocol": "public_vision_fixed_identity_side_calibration_v1: bounded supervised visual readout only; forward receives one initial 11x11x7 public visual frame. Fixed-identity target, coordinates, query, seeds, actions, rewards, teachers, planners, and shaped rewards are excluded from input and never transfer to Luanti control.",
+  "device": "cpu",
+  "train_seed": 13900000,
+  "heldout_seed": 14000000,
+  "train_steps": 240,
+  "batch_size": 64,
+  "parameters": 108673,
+  "heldout_accuracy": 1.0,
+  "accepted_fixed_identity_readout": true
+}

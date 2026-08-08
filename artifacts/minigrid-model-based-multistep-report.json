@@ -1,0 +1,47 @@
+{
+  "protocol": "minigrid_model_based_planning_v2: random training-world action transitions train a causal observation/reward model; training may supervise a predeclared self-rolled transition horizon, and held-out control enumerates only the model's own action-conditioned latent rollouts. No teacher action, path oracle, future action-time observation, seed answer, or shaped reward.",
+  "device": "cuda",
+  "parameters": 152224,
+  "corpus_episodes": 512,
+  "corpus_transitions": 23897,
+  "positive_reward_transitions": 287,
+  "updates": 200,
+  "batch_episodes": 32,
+  "training_rollout_horizon": 6,
+  "planning_horizon": 6,
+  "initial_loss": 1.2031322717666626,
+  "final_loss": 0.4839121699333191,
+  "heldout_one_step_observation_mse": 0.015510536190268232,
+  "heldout_six_step_observation_mse": 0.012972252597860487,
+  "heldout_one_step_reward_brier": 0.042893064141878476,
+  "heldout_six_step_reward_brier": 0.16241583808359247,
+  "training_seconds": 260.27986700006295,
+  "random": {
+    "successes": 42,
+    "episodes": 64,
+    "mean_return": 0.3132568359375,
+    "mean_steps": 46.390625,
+    "action_counts": [
+      962,
+      985,
+      1022,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "planner": {
+    "successes": 0,
+    "episodes": 64,
+    "mean_return": 0.0,
+    "mean_steps": 64.0,
+    "action_counts": [
+      2048,
+      2048,
+      0
+    ]
+  },
+  "accepted_model_based_feasibility": false,
+  "artifact": "artifacts\\minigrid-model-based-multistep-report.json"
+}

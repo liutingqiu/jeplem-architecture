@@ -1,0 +1,7 @@
+{
+  "protocol": "luanti_delayed_goal_qlearning_audit_v1: independently validates the fixed delayed-goal public-memory task split and its reactive-versus-retained gate.",
+  "source_artifact": "artifacts\\luanti-delayed-goal-gated-compact-binary-replication-qlearning-report.json",
+  "accepted": true,
+  "recomputed_accepted": true,
+  "failures": []
+}

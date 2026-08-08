@@ -1,0 +1,258 @@
+{
+  "language_schema_accepted": true,
+  "fact_memory_successes": 8,
+  "no_fact_successes": 0,
+  "episodes": 8,
+  "both_charge_modes_seen": true,
+  "all_sequences": true,
+  "all_revisions": true,
+  "all_facts_hidden": true,
+  "all_stale_rejected": true,
+  "all_checkpoint_restored": true,
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-polarity-composition-report.json",
+  "with_facts": [
+    {
+      "seed": 4000000,
+      "completed": true,
+      "charge_mode": "decoy",
+      "positive_rewards": [
+        0.16,
+        0.2,
+        1.0
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 33
+    },
+    {
+      "seed": 4000031,
+      "completed": true,
+      "charge_mode": "decoy",
+      "positive_rewards": [
+        0.16,
+        0.2,
+        1.0
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 31
+    },
+    {
+      "seed": 4000062,
+      "completed": true,
+      "charge_mode": "key",
+      "positive_rewards": [
+        0.15,
+        0.2,
+        1.0
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 35
+    },
+    {
+      "seed": 4000093,
+      "completed": true,
+      "charge_mode": "decoy",
+      "positive_rewards": [
+        0.16,
+        0.2,
+        1.0
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 33
+    },
+    {
+      "seed": 4000124,
+      "completed": true,
+      "charge_mode": "key",
+      "positive_rewards": [
+        0.15,
+        0.2,
+        1.0
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 33
+    },
+    {
+      "seed": 4000155,
+      "completed": true,
+      "charge_mode": "decoy",
+      "positive_rewards": [
+        0.16,
+        0.2,
+        1.0
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 33
+    },
+    {
+      "seed": 4000186,
+      "completed": true,
+      "charge_mode": "key",
+      "positive_rewards": [
+        0.15,
+        0.2,
+        1.0
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 33
+    },
+    {
+      "seed": 4000217,
+      "completed": true,
+      "charge_mode": "key",
+      "positive_rewards": [
+        0.15,
+        0.2,
+        1.0
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 35
+    }
+  ],
+  "without_facts": [
+    {
+      "seed": 4000000,
+      "completed": false,
+      "charge_mode": null,
+      "positive_rewards": [
+        0.16
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 64
+    },
+    {
+      "seed": 4000031,
+      "completed": false,
+      "charge_mode": null,
+      "positive_rewards": [
+        0.16
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 64
+    },
+    {
+      "seed": 4000062,
+      "completed": false,
+      "charge_mode": null,
+      "positive_rewards": [
+        0.15
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 64
+    },
+    {
+      "seed": 4000093,
+      "completed": false,
+      "charge_mode": null,
+      "positive_rewards": [
+        0.16
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 64
+    },
+    {
+      "seed": 4000124,
+      "completed": false,
+      "charge_mode": null,
+      "positive_rewards": [
+        0.15
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 64
+    },
+    {
+      "seed": 4000155,
+      "completed": false,
+      "charge_mode": null,
+      "positive_rewards": [
+        0.16
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 64
+    },
+    {
+      "seed": 4000186,
+      "completed": false,
+      "charge_mode": null,
+      "positive_rewards": [
+        0.15
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 64
+    },
+    {
+      "seed": 4000217,
+      "completed": false,
+      "charge_mode": null,
+      "positive_rewards": [
+        0.15
+      ],
+      "control_revisions": 1,
+      "facts_hidden": true,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 64
+    }
+  ]
+}

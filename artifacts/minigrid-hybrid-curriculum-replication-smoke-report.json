@@ -1,0 +1,322 @@
+{
+  "protocol": "minigrid_hybrid_curriculum_v1: two-stage, reward-only curriculum; tactical causal Transformer plus independently switchable PLWM persistent side state; sampled actions, external environment reward, fixed separated train/held-out seeds, and no teacher action, path oracle, future observation, seed answer, reward shaping, manual planning, or replayed teacher trajectory.",
+  "device": "cuda",
+  "experiment_seed": 51,
+  "train_seed_start": 20000,
+  "bootstrap_updates": 1,
+  "memory_updates": 1,
+  "episodes_per_update": 2,
+  "heldout_seed_range": [
+    2000000,
+    2000001
+  ],
+  "random_evaluation": {
+    "successes": 0,
+    "episodes": 2,
+    "mean_return": 0.0,
+    "mean_steps": 64.0,
+    "action_counts": [
+      17,
+      19,
+      15,
+      24,
+      17,
+      18,
+      18
+    ]
+  },
+  "results": [
+    {
+      "name": "hybrid_plwm_transformer",
+      "parameters": 222769,
+      "active_parameters": 222769,
+      "active_plwm_side": true,
+      "stages": [
+        {
+          "name": "reward_only_navigation_bootstrap",
+          "environment": "MiniGrid-Empty-5x5-v0",
+          "action_mode": "movement_only",
+          "updates": 1,
+          "episodes_per_update": 2,
+          "seed_start": 20000,
+          "train_episodes": 2,
+          "train_successes": 2
+        },
+        {
+          "name": "delayed_memory_transfer",
+          "environment": "MiniGrid-MemoryS7-v0",
+          "action_mode": "all",
+          "updates": 1,
+          "episodes_per_update": 2,
+          "seed_start": 20002,
+          "train_episodes": 2,
+          "train_successes": 0
+        }
+      ],
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          128,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          11,
+          16,
+          45,
+          19,
+          10,
+          11,
+          16
+        ]
+      }
+    },
+    {
+      "name": "hybrid_without_plwm_side",
+      "parameters": 222769,
+      "active_parameters": 81800,
+      "active_plwm_side": false,
+      "stages": [
+        {
+          "name": "reward_only_navigation_bootstrap",
+          "environment": "MiniGrid-Empty-5x5-v0",
+          "action_mode": "movement_only",
+          "updates": 1,
+          "episodes_per_update": 2,
+          "seed_start": 20000,
+          "train_episodes": 2,
+          "train_successes": 1
+        },
+        {
+          "name": "delayed_memory_transfer",
+          "environment": "MiniGrid-MemoryS7-v0",
+          "action_mode": "all",
+          "updates": 1,
+          "episodes_per_update": 2,
+          "seed_start": 20002,
+          "train_episodes": 2,
+          "train_successes": 0
+        }
+      ],
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          2,
+          0,
+          0,
+          62,
+          64,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          28,
+          6,
+          12,
+          41,
+          14,
+          13,
+          14
+        ]
+      }
+    },
+    {
+      "name": "no_memory",
+      "parameters": 10760,
+      "active_parameters": 10760,
+      "active_plwm_side": false,
+      "stages": [
+        {
+          "name": "reward_only_navigation_bootstrap",
+          "environment": "MiniGrid-Empty-5x5-v0",
+          "action_mode": "movement_only",
+          "updates": 1,
+          "episodes_per_update": 2,
+          "seed_start": 20000,
+          "train_episodes": 2,
+          "train_successes": 1
+        },
+        {
+          "name": "delayed_memory_transfer",
+          "environment": "MiniGrid-MemoryS7-v0",
+          "action_mode": "all",
+          "updates": 1,
+          "episodes_per_update": 2,
+          "seed_start": 20002,
+          "train_episodes": 2,
+          "train_successes": 0
+        }
+      ],
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          0,
+          128,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          22,
+          17,
+          13,
+          18,
+          19,
+          16,
+          23
+        ]
+      }
+    },
+    {
+      "name": "gru",
+      "parameters": 43720,
+      "active_parameters": 43720,
+      "active_plwm_side": false,
+      "stages": [
+        {
+          "name": "reward_only_navigation_bootstrap",
+          "environment": "MiniGrid-Empty-5x5-v0",
+          "action_mode": "movement_only",
+          "updates": 1,
+          "episodes_per_update": 2,
+          "seed_start": 20000,
+          "train_episodes": 2,
+          "train_successes": 0
+        },
+        {
+          "name": "delayed_memory_transfer",
+          "environment": "MiniGrid-MemoryS7-v0",
+          "action_mode": "all",
+          "updates": 1,
+          "episodes_per_update": 2,
+          "seed_start": 20002,
+          "train_episodes": 2,
+          "train_successes": 1
+        }
+      ],
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          1,
+          127,
+          0,
+          0,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          13,
+          14,
+          13,
+          29,
+          17,
+          20,
+          22
+        ]
+      }
+    },
+    {
+      "name": "transformer_capacity_control",
+      "parameters": 229160,
+      "active_parameters": 229160,
+      "active_plwm_side": false,
+      "stages": [
+        {
+          "name": "reward_only_navigation_bootstrap",
+          "environment": "MiniGrid-Empty-5x5-v0",
+          "action_mode": "movement_only",
+          "updates": 1,
+          "episodes_per_update": 2,
+          "seed_start": 20000,
+          "train_episodes": 2,
+          "train_successes": 1
+        },
+        {
+          "name": "delayed_memory_transfer",
+          "environment": "MiniGrid-MemoryS7-v0",
+          "action_mode": "all",
+          "updates": 1,
+          "episodes_per_update": 2,
+          "seed_start": 20002,
+          "train_episodes": 2,
+          "train_successes": 0
+        }
+      ],
+      "evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          1,
+          1,
+          63,
+          0,
+          63,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 0,
+        "episodes": 2,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          8,
+          13,
+          18,
+          29,
+          11,
+          33,
+          16
+        ]
+      }
+    }
+  ],
+  "accepted_hybrid_controller": false,
+  "artifact": "artifacts\\minigrid-hybrid-curriculum-replication-smoke-report.json"
+}

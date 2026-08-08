@@ -1,0 +1,133 @@
+{
+  "protocol": "luanti_short_delay_2id_aux_retrieval_v1: auxiliary retrieval-supervised DQN on short_delay_2id; L_total = L_reward + 0.1 * L_aux where L_aux is cross-entropy predicting which of 2 identities (goal/key) was queried at step 2; all 4 models share AuxiliaryRetrievalHead; PLWM uses memory belief, GRU/Transformer use hidden state, no_memory uses query event as dummy.",
+  "course": "short_delay_2id",
+  "device": "cuda",
+  "training_seed_range": [
+    19000000,
+    19000001,
+    19000002,
+    19000003,
+    19000004,
+    19000005,
+    19000006,
+    19000007
+  ],
+  "heldout_seed_range": [
+    19001000,
+    19001001,
+    19001002,
+    19001003
+  ],
+  "action_seed": 9042337,
+  "max_steps": 3,
+  "transformer_context": 2,
+  "model_widths": {
+    "no_memory": 310,
+    "gru": 170,
+    "transformer": 80,
+    "plwm": 64
+  },
+  "parameter_match_tolerance": 0.05,
+  "parameter_match_errors": {},
+  "acceptance_mode": "aux_retrieval",
+  "random_evaluation": {
+    "episodes": 4,
+    "successes": 1,
+    "mean_return": 0.22250000527128577,
+    "action_counts": [
+      0,
+      11,
+      1,
+      0
+    ]
+  },
+  "results": [
+    {
+      "name": "no_memory",
+      "parameters": 116199,
+      "training_episodes": 8,
+      "training_successes": 2,
+      "evaluation": {
+        "episodes": 4,
+        "successes": 0,
+        "mean_return": -0.2774999947287142,
+        "action_counts": [
+          0,
+          11,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "gru",
+      "parameters": 117455,
+      "training_episodes": 8,
+      "training_successes": 4,
+      "evaluation": {
+        "episodes": 4,
+        "successes": 1,
+        "mean_return": 0.22250000527128577,
+        "action_counts": [
+          0,
+          11,
+          1,
+          0
+        ]
+      }
+    },
+    {
+      "name": "transformer_2",
+      "parameters": 117135,
+      "training_episodes": 8,
+      "training_successes": 0,
+      "evaluation": {
+        "episodes": 4,
+        "successes": 0,
+        "mean_return": -0.2774999947287142,
+        "action_counts": [
+          0,
+          11,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "plwm_state_off",
+      "parameters": 116146,
+      "training_episodes": 8,
+      "training_successes": 4,
+      "evaluation": {
+        "episodes": 4,
+        "successes": 1,
+        "mean_return": 0.22250000527128577,
+        "action_counts": [
+          0,
+          11,
+          1,
+          0
+        ]
+      }
+    },
+    {
+      "name": "plwm",
+      "parameters": 116146,
+      "training_episodes": 8,
+      "training_successes": 3,
+      "evaluation": {
+        "episodes": 4,
+        "successes": 1,
+        "mean_return": 0.22250000527128577,
+        "action_counts": [
+          0,
+          11,
+          1,
+          0
+        ]
+      }
+    }
+  ],
+  "accepted_neural_task_diagnostic": false,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-short-delay-2id-report.json"
+}

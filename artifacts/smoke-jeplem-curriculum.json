@@ -1,0 +1,218 @@
+{
+  "protocol": "jeplem_hybrid_curriculum_v1: two-stage reward-only curriculum; tactical causal Transformer plus persistent PLWM side state; JEPLM adds online SPR-style action-conditioned multi-step latent prediction (predict horizon from persistent belief plus intervening actions to the detached real future belief) and a SIGReg-lite variance hinge; no EMA teacher, no separate offline pretraining phase, no teacher action, path oracle, future observation at action time, seed answer, reward shaping, or replayed trajectory; fixed separated train/held-out seeds.",
+  "device": "cuda",
+  "experiment_seed": 41123,
+  "bootstrap_updates": 1,
+  "memory_updates": 1,
+  "episodes_per_update": 6,
+  "heldout_seed_range": [
+    1000000,
+    1000001,
+    1000002,
+    1000003,
+    1000004,
+    1000005,
+    1000006,
+    1000007
+  ],
+  "random_evaluation": {
+    "successes": 0,
+    "episodes": 8,
+    "mean_return": 0.0,
+    "mean_steps": 45.25,
+    "action_counts": [
+      44,
+      57,
+      51,
+      55,
+      50,
+      46,
+      59
+    ]
+  },
+  "results": [
+    {
+      "name": "hybrid_jeplem",
+      "parameters": 232050,
+      "active_parameters": 232050,
+      "jeplem_coefficient": 0.1,
+      "anti_collapse_coefficient": 0.01,
+      "predict_horizon": 2,
+      "stages": [
+        {
+          "name": "reward_only_navigation_bootstrap",
+          "environment": "MiniGrid-Empty-5x5-v0",
+          "action_mode": "movement_only",
+          "updates": 1,
+          "episodes_per_update": 6,
+          "seed_start": 10000,
+          "train_episodes": 6,
+          "train_successes": 2
+        },
+        {
+          "name": "delayed_memory_transfer",
+          "environment": "MiniGrid-MemoryS7-v0",
+          "action_mode": "all",
+          "updates": 1,
+          "episodes_per_update": 6,
+          "seed_start": 10006,
+          "train_episodes": 6,
+          "train_successes": 1
+        }
+      ],
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          191,
+          0,
+          1,
+          0,
+          0,
+          190,
+          130
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 1,
+        "episodes": 8,
+        "mean_return": 0.05996093749999999,
+        "mean_steps": 55.375,
+        "action_counts": [
+          96,
+          39,
+          35,
+          78,
+          44,
+          71,
+          80
+        ]
+      }
+    },
+    {
+      "name": "hybrid_baseline",
+      "parameters": 222834,
+      "active_parameters": 222834,
+      "jeplem_coefficient": 0.0,
+      "anti_collapse_coefficient": 0.0,
+      "predict_horizon": 2,
+      "stages": [
+        {
+          "name": "reward_only_navigation_bootstrap",
+          "environment": "MiniGrid-Empty-5x5-v0",
+          "action_mode": "movement_only",
+          "updates": 1,
+          "episodes_per_update": 6,
+          "seed_start": 10000,
+          "train_episodes": 6,
+          "train_successes": 5
+        },
+        {
+          "name": "delayed_memory_transfer",
+          "environment": "MiniGrid-MemoryS7-v0",
+          "action_mode": "all",
+          "updates": 1,
+          "episodes_per_update": 6,
+          "seed_start": 10006,
+          "train_episodes": 6,
+          "train_successes": 2
+        }
+      ],
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          2,
+          0,
+          322,
+          0,
+          0,
+          0,
+          188
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 2,
+        "episodes": 8,
+        "mean_return": 0.14101562499999998,
+        "mean_steps": 45.0,
+        "action_counts": [
+          55,
+          59,
+          83,
+          49,
+          38,
+          27,
+          49
+        ]
+      }
+    },
+    {
+      "name": "transformer_reference",
+      "parameters": 81800,
+      "active_parameters": 81800,
+      "jeplem_coefficient": 0.0,
+      "anti_collapse_coefficient": 0.0,
+      "predict_horizon": 2,
+      "stages": [
+        {
+          "name": "reward_only_navigation_bootstrap",
+          "environment": "MiniGrid-Empty-5x5-v0",
+          "action_mode": "movement_only",
+          "updates": 1,
+          "episodes_per_update": 6,
+          "seed_start": 10000,
+          "train_episodes": 6,
+          "train_successes": 5
+        },
+        {
+          "name": "delayed_memory_transfer",
+          "environment": "MiniGrid-MemoryS7-v0",
+          "action_mode": "all",
+          "updates": 1,
+          "episodes_per_update": 6,
+          "seed_start": 10006,
+          "train_episodes": 6,
+          "train_successes": 1
+        }
+      ],
+      "evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          0,
+          128,
+          128,
+          256,
+          0
+        ]
+      },
+      "stochastic_evaluation": {
+        "successes": 0,
+        "episodes": 8,
+        "mean_return": 0.0,
+        "mean_steps": 57.5,
+        "action_counts": [
+          32,
+          57,
+          48,
+          68,
+          78,
+          104,
+          73
+        ]
+      }
+    }
+  ],
+  "jeplem_increment_successes": 0,
+  "accepted": false,
+  "artifact": "artifacts\\smoke-jeplem-curriculum.json"
+}

@@ -1,0 +1,7 @@
+{
+  "protocol": "luanti_addressed_memory_diagnostic_audit_v1: independent recomputation of the repaired seven-channel current-writer calibration; never an architecture-advantage audit.",
+  "source_artifact": "artifacts\\luanti-addressed-repaired-current-writer-dqn-smoke-report.json",
+  "accepted": false,
+  "recomputed_accepted": false,
+  "failures": []
+}

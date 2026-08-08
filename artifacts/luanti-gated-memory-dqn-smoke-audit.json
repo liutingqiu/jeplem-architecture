@@ -1,0 +1,7 @@
+{
+  "protocol": "luanti_gated_memory_dqn_audit_v1: independently validates the fixed reward-only DQN task diagnostic; never an architecture acceptance audit.",
+  "source_artifact": "artifacts\\luanti-gated-memory-dqn-smoke-report.json",
+  "accepted": true,
+  "recomputed_accepted": true,
+  "failures": []
+}

@@ -1,0 +1,14 @@
+{
+  "parsed_goal": {
+    "task": "object_delivery",
+    "target": "goal",
+    "require_key": true,
+    "avoid_decoy": true
+  },
+  "actions": 14,
+  "completed": true,
+  "key_collected": true,
+  "decoy_collected": false,
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-language-goal-report.json"
+}

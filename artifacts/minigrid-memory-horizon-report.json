@@ -1,0 +1,1180 @@
+{
+  "protocol": "minigrid_memory_horizon_v1: oracle route is used solely to inspect environment observability; no route, action, grid state, or success label may train a controller",
+  "seed_start": 3000000,
+  "environments": [
+    {
+      "environment": "MiniGrid-MemoryS7-v0",
+      "episodes": [
+        {
+          "seed": 3000000,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000001,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000002,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000003,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000004,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000005,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000006,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000007,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000008,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000009,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000010,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000011,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000012,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000013,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000014,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000015,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000016,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000017,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000018,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000019,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000020,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000021,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000022,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000023,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000024,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000025,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000026,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000027,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000028,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000029,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000030,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000031,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000032,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000033,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000034,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000035,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000036,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000037,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000038,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000039,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000040,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000041,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000042,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000043,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000044,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000045,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000046,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000047,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000048,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000049,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000050,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000051,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000052,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000053,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000054,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000055,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000056,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000057,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000058,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000059,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000060,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000061,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000062,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000063,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        }
+      ],
+      "minimum_source_to_branch_actions": 3,
+      "median_source_to_branch_actions": 5.0
+    },
+    {
+      "environment": "MiniGrid-MemoryS13-v0",
+      "episodes": [
+        {
+          "seed": 3000000,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000001,
+          "source_seen": true,
+          "source_to_branch_actions": 8,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000002,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000003,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000004,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 10
+        },
+        {
+          "seed": 3000005,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000006,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000007,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000008,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000009,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000010,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000011,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000012,
+          "source_seen": true,
+          "source_to_branch_actions": 10,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000013,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000014,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000015,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000016,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000017,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000018,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 10
+        },
+        {
+          "seed": 3000019,
+          "source_seen": true,
+          "source_to_branch_actions": 10,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000020,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000021,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000022,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000023,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000024,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000025,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000026,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000027,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000028,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000029,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 10
+        },
+        {
+          "seed": 3000030,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000031,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000032,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000033,
+          "source_seen": true,
+          "source_to_branch_actions": 8,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000034,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000035,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000036,
+          "source_seen": true,
+          "source_to_branch_actions": 8,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000037,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000038,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000039,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000040,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000041,
+          "source_seen": true,
+          "source_to_branch_actions": 10,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000042,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000043,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 10
+        },
+        {
+          "seed": 3000044,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000045,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000046,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000047,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000048,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000049,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000050,
+          "source_seen": true,
+          "source_to_branch_actions": 10,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000051,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000052,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000053,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000054,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 10
+        },
+        {
+          "seed": 3000055,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000056,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000057,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000058,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000059,
+          "source_seen": true,
+          "source_to_branch_actions": 10,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000060,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000061,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000062,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000063,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 11
+        }
+      ],
+      "minimum_source_to_branch_actions": 7,
+      "median_source_to_branch_actions": 9.0
+    },
+    {
+      "environment": "MiniGrid-MemoryS17Random-v0",
+      "episodes": [
+        {
+          "seed": 3000000,
+          "source_seen": true,
+          "source_to_branch_actions": 13,
+          "route_actions": 16
+        },
+        {
+          "seed": 3000001,
+          "source_seen": true,
+          "source_to_branch_actions": 6,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000002,
+          "source_seen": true,
+          "source_to_branch_actions": 13,
+          "route_actions": 14
+        },
+        {
+          "seed": 3000003,
+          "source_seen": true,
+          "source_to_branch_actions": 8,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000004,
+          "source_seen": true,
+          "source_to_branch_actions": 8,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000005,
+          "source_seen": true,
+          "source_to_branch_actions": 10,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000006,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000007,
+          "source_seen": true,
+          "source_to_branch_actions": 6,
+          "route_actions": 9
+        },
+        {
+          "seed": 3000008,
+          "source_seen": true,
+          "source_to_branch_actions": 6,
+          "route_actions": 8
+        },
+        {
+          "seed": 3000009,
+          "source_seen": true,
+          "source_to_branch_actions": 6,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000010,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 10
+        },
+        {
+          "seed": 3000011,
+          "source_seen": true,
+          "source_to_branch_actions": 8,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000012,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 8
+        },
+        {
+          "seed": 3000013,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000014,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000015,
+          "source_seen": true,
+          "source_to_branch_actions": 10,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000016,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 14
+        },
+        {
+          "seed": 3000017,
+          "source_seen": true,
+          "source_to_branch_actions": 8,
+          "route_actions": 10
+        },
+        {
+          "seed": 3000018,
+          "source_seen": true,
+          "source_to_branch_actions": 12,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000019,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 9
+        },
+        {
+          "seed": 3000020,
+          "source_seen": true,
+          "source_to_branch_actions": 8,
+          "route_actions": 10
+        },
+        {
+          "seed": 3000021,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000022,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 14
+        },
+        {
+          "seed": 3000023,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000024,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000025,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000026,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 10
+        },
+        {
+          "seed": 3000027,
+          "source_seen": true,
+          "source_to_branch_actions": 8,
+          "route_actions": 10
+        },
+        {
+          "seed": 3000028,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 8
+        },
+        {
+          "seed": 3000029,
+          "source_seen": true,
+          "source_to_branch_actions": 8,
+          "route_actions": 15
+        },
+        {
+          "seed": 3000030,
+          "source_seen": true,
+          "source_to_branch_actions": 12,
+          "route_actions": 15
+        },
+        {
+          "seed": 3000031,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 8
+        },
+        {
+          "seed": 3000032,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 15
+        },
+        {
+          "seed": 3000033,
+          "source_seen": true,
+          "source_to_branch_actions": 8,
+          "route_actions": 10
+        },
+        {
+          "seed": 3000034,
+          "source_seen": true,
+          "source_to_branch_actions": 15,
+          "route_actions": 17
+        },
+        {
+          "seed": 3000035,
+          "source_seen": true,
+          "source_to_branch_actions": 10,
+          "route_actions": 11
+        },
+        {
+          "seed": 3000036,
+          "source_seen": true,
+          "source_to_branch_actions": 7,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000037,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000038,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 6
+        },
+        {
+          "seed": 3000039,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000040,
+          "source_seen": true,
+          "source_to_branch_actions": 12,
+          "route_actions": 15
+        },
+        {
+          "seed": 3000041,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000042,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000043,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000044,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 8
+        },
+        {
+          "seed": 3000045,
+          "source_seen": true,
+          "source_to_branch_actions": 12,
+          "route_actions": 14
+        },
+        {
+          "seed": 3000046,
+          "source_seen": true,
+          "source_to_branch_actions": 12,
+          "route_actions": 14
+        },
+        {
+          "seed": 3000047,
+          "source_seen": true,
+          "source_to_branch_actions": 6,
+          "route_actions": 8
+        },
+        {
+          "seed": 3000048,
+          "source_seen": true,
+          "source_to_branch_actions": 14,
+          "route_actions": 16
+        },
+        {
+          "seed": 3000049,
+          "source_seen": true,
+          "source_to_branch_actions": 15,
+          "route_actions": 16
+        },
+        {
+          "seed": 3000050,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000051,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 12
+        },
+        {
+          "seed": 3000052,
+          "source_seen": true,
+          "source_to_branch_actions": 9,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000053,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000054,
+          "source_seen": true,
+          "source_to_branch_actions": 11,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000055,
+          "source_seen": true,
+          "source_to_branch_actions": 12,
+          "route_actions": 13
+        },
+        {
+          "seed": 3000056,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000057,
+          "source_seen": true,
+          "source_to_branch_actions": 3,
+          "route_actions": 5
+        },
+        {
+          "seed": 3000058,
+          "source_seen": true,
+          "source_to_branch_actions": 5,
+          "route_actions": 9
+        },
+        {
+          "seed": 3000059,
+          "source_seen": true,
+          "source_to_branch_actions": 4,
+          "route_actions": 7
+        },
+        {
+          "seed": 3000060,
+          "source_seen": true,
+          "source_to_branch_actions": 6,
+          "route_actions": 8
+        },
+        {
+          "seed": 3000061,
+          "source_seen": true,
+          "source_to_branch_actions": 10,
+          "route_actions": 16
+        },
+        {
+          "seed": 3000062,
+          "source_seen": true,
+          "source_to_branch_actions": 10,
+          "route_actions": 17
+        },
+        {
+          "seed": 3000063,
+          "source_seen": true,
+          "source_to_branch_actions": 10,
+          "route_actions": 13
+        }
+      ],
+      "minimum_source_to_branch_actions": 3,
+      "median_source_to_branch_actions": 8.0
+    }
+  ],
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\minigrid-memory-horizon-report.json"
+}

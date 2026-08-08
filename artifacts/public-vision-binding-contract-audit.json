@@ -1,0 +1,7 @@
+{
+  "protocol": "public_vision_binding_contract_audit_v1: read-only public-pixel label reconstruction for the synthetic delayed-query calibration; never a model input, control policy, or architecture result.",
+  "generator_seed": 13800000,
+  "episodes": 2048,
+  "public_pixel_oracle_accuracy": 1.0,
+  "accepted": true
+}

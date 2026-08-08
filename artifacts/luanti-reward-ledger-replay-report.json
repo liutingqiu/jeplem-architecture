@@ -1,0 +1,81 @@
+{
+  "protocol": "luanti_reward_ledger_replay_v1: read-only replay of existing local Luanti bridge reward records; existing reward envelope source/tick/caused_by fields become bounded ledger provenance, with no game action or hidden-state access.",
+  "source_log": "D:\\PLWM-Luanti\\bridge\\observations.jsonl",
+  "selected_episodes": 8,
+  "episodes": [
+    {
+      "episode_id": "delay-32-fact_memory-2",
+      "prerequisite_values": [
+        0.15,
+        0.2
+      ],
+      "facts_complete": true,
+      "restored_complete": true
+    },
+    {
+      "episode_id": "delay-32-fact_memory-4",
+      "prerequisite_values": [
+        0.15,
+        0.2
+      ],
+      "facts_complete": true,
+      "restored_complete": true
+    },
+    {
+      "episode_id": "delay-32-fact_memory-6",
+      "prerequisite_values": [
+        0.15,
+        0.2
+      ],
+      "facts_complete": true,
+      "restored_complete": true
+    },
+    {
+      "episode_id": "delay-32-fact_memory-7",
+      "prerequisite_values": [
+        0.15,
+        0.2
+      ],
+      "facts_complete": true,
+      "restored_complete": true
+    },
+    {
+      "episode_id": "delay-32-teacher-2",
+      "prerequisite_values": [
+        0.15,
+        0.2
+      ],
+      "facts_complete": true,
+      "restored_complete": true
+    },
+    {
+      "episode_id": "delay-32-teacher-4",
+      "prerequisite_values": [
+        0.15,
+        0.2
+      ],
+      "facts_complete": true,
+      "restored_complete": true
+    },
+    {
+      "episode_id": "delay-32-teacher-6",
+      "prerequisite_values": [
+        0.15,
+        0.2
+      ],
+      "facts_complete": true,
+      "restored_complete": true
+    },
+    {
+      "episode_id": "delay-32-teacher-7",
+      "prerequisite_values": [
+        0.15,
+        0.2
+      ],
+      "facts_complete": true,
+      "restored_complete": true
+    }
+  ],
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-reward-ledger-replay-report.json"
+}

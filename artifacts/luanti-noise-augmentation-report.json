@@ -1,0 +1,40 @@
+{
+  "device": "cuda",
+  "training_samples": 414,
+  "augmentation_rate": 0.16,
+  "training_steps": 700,
+  "comparisons": [
+    {
+      "noise_rate": 0.0,
+      "stale_replay_steps": 0,
+      "episodes": 4,
+      "clean_successes": 4,
+      "augmented_successes": 4
+    },
+    {
+      "noise_rate": 0.04,
+      "stale_replay_steps": 1,
+      "episodes": 4,
+      "clean_successes": 4,
+      "augmented_successes": 4
+    },
+    {
+      "noise_rate": 0.08,
+      "stale_replay_steps": 1,
+      "episodes": 4,
+      "clean_successes": 4,
+      "augmented_successes": 4
+    },
+    {
+      "noise_rate": 0.16,
+      "stale_replay_steps": 2,
+      "episodes": 4,
+      "clean_successes": 1,
+      "augmented_successes": 3
+    }
+  ],
+  "clean_checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-vision-policy.pt",
+  "augmented_checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-vision-noise-mixture-policy.pt",
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-noise-augmentation-report.json"
+}

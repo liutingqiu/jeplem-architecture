@@ -1,0 +1,10 @@
+{
+  "protocol": "luanti_reward_ledger_contract_v1: only existing Luanti reward envelopes with source/tick/request provenance become bounded prerequisite facts; a weak non-reward conflict remains isolated.",
+  "charge_accepted": true,
+  "key_accepted": true,
+  "source_bound": true,
+  "weak_conflict_isolated": true,
+  "restored_complete": true,
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-reward-ledger-contract-report.json"
+}

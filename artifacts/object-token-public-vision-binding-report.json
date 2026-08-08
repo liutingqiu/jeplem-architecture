@@ -1,0 +1,22 @@
+{
+  "protocol": "object_token_public_vision_binding_v1: bounded supervised visual readout only; each forward receives initial and delayed-query 11x11x7 public visual frames. Object masks are derived only from raw public tile pixels and only distinguish object from air/agent. Labels, identity IDs, coordinates, seeds, actions, rewards, teachers, planners, and shaped rewards are excluded from input and never transfer to Luanti control.",
+  "device": "cpu",
+  "train_seed": 14100000,
+  "heldout_seed": 14200000,
+  "train_steps": 240,
+  "batch_size": 64,
+  "parameter_match_error": 0.0,
+  "results": [
+    {
+      "name": "object_token_query_matching",
+      "parameters": 11763,
+      "heldout_accuracy": 1.0
+    },
+    {
+      "name": "query_independent_object_tokens",
+      "parameters": 11763,
+      "heldout_accuracy": 0.68994140625
+    }
+  ],
+  "accepted_object_token_binding": true
+}

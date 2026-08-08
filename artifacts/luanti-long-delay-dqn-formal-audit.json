@@ -1,0 +1,7 @@
+{
+  "protocol": "luanti_long_delay_dqn_audit_v1: independently validates the frozen real-Luanti long-delay reward-only DQN task diagnostic; never an architecture acceptance audit.",
+  "source_artifact": "artifacts\\luanti-long-delay-dqn-formal-report.json",
+  "accepted": true,
+  "recomputed_accepted": true,
+  "failures": []
+}

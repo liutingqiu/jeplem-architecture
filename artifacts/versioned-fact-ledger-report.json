@@ -1,0 +1,11 @@
+{
+  "protocol": "versioned_fact_ledger_v1: strong source/time/confidence evidence may revise durable facts; weak, stale, or cross-source conflicts are isolated with their provenance and never silently overwrite unrelated facts.",
+  "accepted_initial": true,
+  "weak_conflict_isolated": true,
+  "unrelated_retained": true,
+  "strong_revision_applied": true,
+  "stale_conflict_isolated": true,
+  "restored_complete": true,
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\versioned-fact-ledger-report.json"
+}

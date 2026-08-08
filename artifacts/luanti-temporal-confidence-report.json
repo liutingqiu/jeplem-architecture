@@ -1,0 +1,45 @@
+{
+  "device": "cuda",
+  "heldout_seeds": [
+    1510000,
+    1510043,
+    1510086,
+    1510129
+  ],
+  "conditions": [
+    {
+      "model": "clean",
+      "noise_rate": 0.08,
+      "stale_replay_steps": 1,
+      "raw_successes": 4,
+      "temporal_successes": 2,
+      "episodes": 4
+    },
+    {
+      "model": "clean",
+      "noise_rate": 0.16,
+      "stale_replay_steps": 2,
+      "raw_successes": 3,
+      "temporal_successes": 2,
+      "episodes": 4
+    },
+    {
+      "model": "noise-mixture",
+      "noise_rate": 0.08,
+      "stale_replay_steps": 1,
+      "raw_successes": 4,
+      "temporal_successes": 3,
+      "episodes": 4
+    },
+    {
+      "model": "noise-mixture",
+      "noise_rate": 0.16,
+      "stale_replay_steps": 2,
+      "raw_successes": 4,
+      "temporal_successes": 2,
+      "episodes": 4
+    }
+  ],
+  "accepted": false,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-temporal-confidence-report.json"
+}

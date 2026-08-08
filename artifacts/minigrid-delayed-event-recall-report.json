@@ -1,0 +1,32 @@
+{
+  "protocol": "minigrid_delayed_event_recall_v1: reconstruct an eight-event-old, agent-observed sensor record from actual MemoryS13 random-action streams; source grid, routes, rewards as answers, and policy labels are excluded.",
+  "device": "cuda",
+  "sequence_length": 16,
+  "recall_delay": 8,
+  "corpus_episodes": 512,
+  "updates": 300,
+  "results": [
+    {
+      "name": "evidence_store",
+      "parameters": 80416,
+      "heldout_mse": 0.02211768552660942
+    },
+    {
+      "name": "evidence_disabled",
+      "parameters": 80416,
+      "heldout_mse": 0.023183053359389305
+    },
+    {
+      "name": "gru",
+      "parameters": 53535,
+      "heldout_mse": 0.023383159190416336
+    },
+    {
+      "name": "four_event_transformer",
+      "parameters": 56095,
+      "heldout_mse": 0.024430174380540848
+    }
+  ],
+  "accepted_evidence_recall": false,
+  "artifact": "artifacts\\minigrid-delayed-event-recall-report.json"
+}

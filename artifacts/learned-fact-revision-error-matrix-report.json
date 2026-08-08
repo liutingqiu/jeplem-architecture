@@ -1,0 +1,153 @@
+{
+  "protocol": "learned_fact_revision_error_matrix_v1: the unmodified learned fact-addressed store and matched baselines train only on mixed source-bound conflicts, then are evaluated on disjoint weak-only, stale-only, and mixed conflict streams. This is a diagnostic decomposition, not optimization or control.",
+  "device": "cuda",
+  "training_examples": 2048,
+  "updates": 500,
+  "results": [
+    {
+      "name": "learned_fact_store",
+      "parameters": 12532,
+      "conditions": [
+        {
+          "conflict_mode": "weak",
+          "distractors": 32,
+          "accuracy": 0.677734375
+        },
+        {
+          "conflict_mode": "stale",
+          "distractors": 32,
+          "accuracy": 0.666015625
+        },
+        {
+          "conflict_mode": "mixed",
+          "distractors": 32,
+          "accuracy": 0.72265625
+        },
+        {
+          "conflict_mode": "weak",
+          "distractors": 64,
+          "accuracy": 0.701171875
+        },
+        {
+          "conflict_mode": "stale",
+          "distractors": 64,
+          "accuracy": 0.69921875
+        },
+        {
+          "conflict_mode": "mixed",
+          "distractors": 64,
+          "accuracy": 0.74609375
+        }
+      ]
+    },
+    {
+      "name": "learned_store_no_addressing",
+      "parameters": 12532,
+      "conditions": [
+        {
+          "conflict_mode": "weak",
+          "distractors": 32,
+          "accuracy": 0.314453125
+        },
+        {
+          "conflict_mode": "stale",
+          "distractors": 32,
+          "accuracy": 0.291015625
+        },
+        {
+          "conflict_mode": "mixed",
+          "distractors": 32,
+          "accuracy": 0.330078125
+        },
+        {
+          "conflict_mode": "weak",
+          "distractors": 64,
+          "accuracy": 0.30078125
+        },
+        {
+          "conflict_mode": "stale",
+          "distractors": 64,
+          "accuracy": 0.28125
+        },
+        {
+          "conflict_mode": "mixed",
+          "distractors": 64,
+          "accuracy": 0.31640625
+        }
+      ]
+    },
+    {
+      "name": "gru",
+      "parameters": 19636,
+      "conditions": [
+        {
+          "conflict_mode": "weak",
+          "distractors": 32,
+          "accuracy": 0.306640625
+        },
+        {
+          "conflict_mode": "stale",
+          "distractors": 32,
+          "accuracy": 0.283203125
+        },
+        {
+          "conflict_mode": "mixed",
+          "distractors": 32,
+          "accuracy": 0.31640625
+        },
+        {
+          "conflict_mode": "weak",
+          "distractors": 64,
+          "accuracy": 0.333984375
+        },
+        {
+          "conflict_mode": "stale",
+          "distractors": 64,
+          "accuracy": 0.279296875
+        },
+        {
+          "conflict_mode": "mixed",
+          "distractors": 64,
+          "accuracy": 0.333984375
+        }
+      ]
+    },
+    {
+      "name": "four_event_transformer",
+      "parameters": 24484,
+      "conditions": [
+        {
+          "conflict_mode": "weak",
+          "distractors": 32,
+          "accuracy": 0.3125
+        },
+        {
+          "conflict_mode": "stale",
+          "distractors": 32,
+          "accuracy": 0.306640625
+        },
+        {
+          "conflict_mode": "mixed",
+          "distractors": 32,
+          "accuracy": 0.32421875
+        },
+        {
+          "conflict_mode": "weak",
+          "distractors": 64,
+          "accuracy": 0.3125
+        },
+        {
+          "conflict_mode": "stale",
+          "distractors": 64,
+          "accuracy": 0.27734375
+        },
+        {
+          "conflict_mode": "mixed",
+          "distractors": 64,
+          "accuracy": 0.31640625
+        }
+      ]
+    }
+  ],
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\learned-fact-revision-error-matrix-report.json"
+}

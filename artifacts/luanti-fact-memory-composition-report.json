@@ -1,0 +1,175 @@
+{
+  "language_schema_accepted": true,
+  "fact_memory_successes": 8,
+  "no_fact_successes": 0,
+  "episodes": 8,
+  "all_revisions": true,
+  "all_stale_rejected": true,
+  "all_checkpoint_restored": true,
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-fact-memory-composition-report.json",
+  "with_facts": [
+    {
+      "seed": 2800000,
+      "completed": true,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 20
+    },
+    {
+      "seed": 2800031,
+      "completed": true,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 22
+    },
+    {
+      "seed": 2800062,
+      "completed": true,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 20
+    },
+    {
+      "seed": 2800093,
+      "completed": true,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 22
+    },
+    {
+      "seed": 2800124,
+      "completed": true,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 20
+    },
+    {
+      "seed": 2800155,
+      "completed": true,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 22
+    },
+    {
+      "seed": 2800186,
+      "completed": true,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 22
+    },
+    {
+      "seed": 2800217,
+      "completed": true,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": true,
+      "actions": 20
+    }
+  ],
+  "without_facts": [
+    {
+      "seed": 2800000,
+      "completed": false,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 28
+    },
+    {
+      "seed": 2800031,
+      "completed": false,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 28
+    },
+    {
+      "seed": 2800062,
+      "completed": false,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 28
+    },
+    {
+      "seed": 2800093,
+      "completed": false,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 28
+    },
+    {
+      "seed": 2800124,
+      "completed": false,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 28
+    },
+    {
+      "seed": 2800155,
+      "completed": false,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 28
+    },
+    {
+      "seed": 2800186,
+      "completed": false,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 28
+    },
+    {
+      "seed": 2800217,
+      "completed": false,
+      "fact_verified": true,
+      "control_revisions": 1,
+      "stale_visual_rejected": true,
+      "fresh_visual_accepted": true,
+      "checkpoint_restored": false,
+      "actions": 28
+    }
+  ]
+}

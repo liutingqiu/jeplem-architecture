@@ -1,0 +1,11 @@
+{
+  "protocol": "public_vision_binding_calibration_v1: bounded supervised visual readout only; forward receives initial and delayed-query 11x11x7 public visual frames only. Query/answer labels, identity IDs, coordinates, seeds, actions, rewards, teachers, planners, and shaped rewards are excluded from input and never transfer to Luanti control.",
+  "device": "cpu",
+  "train_seed": 13400000,
+  "heldout_seed": 13500000,
+  "train_steps": 240,
+  "batch_size": 64,
+  "parameters": 128401,
+  "heldout_accuracy": 0.6865234375,
+  "accepted_public_visual_binding": false
+}

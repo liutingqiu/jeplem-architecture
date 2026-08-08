@@ -1,0 +1,95 @@
+{
+  "protocol": "minigrid_plwm_predictive_pretraining_v1: PLWM-only self-supervised pretraining on fixed random movement trajectories from seeds [100000, 100000+N), then reward-only PPO on separate training seeds [10000, 10000+720); held-out seeds start at 1000000. No teacher action, path oracle, future observation at action time, seed answer, or reward shaping.",
+  "device": "cuda",
+  "pretraining_episodes": 192,
+  "pretraining_updates": 200,
+  "ppo_updates": 30,
+  "episodes_per_ppo_update": 24,
+  "random": {
+    "successes": 42,
+    "episodes": 64,
+    "mean_return": 0.3132568359375,
+    "mean_steps": 46.390625,
+    "action_counts": [
+      962,
+      985,
+      1022,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "results": [
+    {
+      "name": "plwm_reward_only",
+      "parameters": 120361,
+      "pretraining_loss_start": null,
+      "pretraining_loss_end": null,
+      "heldout_predictive_loss": null,
+      "training_successes": 548,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 64,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          4096,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "plwm_predictive_pretrained",
+      "parameters": 120361,
+      "pretraining_loss_start": 0.09572494775056839,
+      "pretraining_loss_end": 0.011754201725125313,
+      "heldout_predictive_loss": 0.011912738904356956,
+      "training_successes": 596,
+      "evaluation": {
+        "successes": 0,
+        "episodes": 64,
+        "mean_return": 0.0,
+        "mean_steps": 64.0,
+        "action_counts": [
+          0,
+          0,
+          4096,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "transformer_reward_only",
+      "parameters": 81800,
+      "pretraining_loss_start": null,
+      "pretraining_loss_end": null,
+      "heldout_predictive_loss": null,
+      "training_successes": 673,
+      "evaluation": {
+        "successes": 64,
+        "episodes": 64,
+        "mean_return": 0.9296875,
+        "mean_steps": 5.0,
+        "action_counts": [
+          0,
+          64,
+          256,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "artifact": "artifacts\\minigrid-plwm-predictive-pretraining-report.json"
+}
