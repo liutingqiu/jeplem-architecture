@@ -12,3 +12,4 @@ minecraft-mod/gradle-*.zip
 artifacts/*.err.log
 artifacts/*.out.log
 artifacts/*.log
+.reasonix/

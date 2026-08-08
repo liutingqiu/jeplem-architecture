@@ -1,0 +1,39 @@
+{
+  "protocol": "short_delay_2id_diagnostic_v1",
+  "course": "short_delay_2id",
+  "description": "3-step delayed retrieval with intermediate silhouette clue",
+  "created": "2026-08-07",
+  "contract_frozen": true,
+  "seeds": {
+    "training": {"start": 19000000, "count": 256},
+    "heldout": {"start": 19001000, "count": 32}
+  },
+  "task": {
+    "max_steps": 3,
+    "identity_count": 2,
+    "query_step": 2,
+    "has_intermediate_clue": true
+  },
+  "models": {
+    "no_memory": true,
+    "gru": true,
+    "transformer": true,
+    "plwm": true,
+    "plwm_state_off": true
+  },
+  "training": {
+    "episodes": 256,
+    "batch_size": 32,
+    "lr": 0.0003,
+    "weight_decay": 0.00001,
+    "aux_alpha": 0.1
+  },
+  "acceptance": {
+    "plwm_heldout_min": 0.75,
+    "plwm_vs_no_memory_gap_min": 0.15,
+    "plwm_vs_gru_gap_min": 0.10,
+    "plwm_vs_transformer_gap_min": 0.10,
+    "no_memory_heldout_max": 0.60
+  },
+  "rationale": "Diagnostic task to prove PLWM mechanism works on learnable cross-frame retrieval. If PLWM fails here, it's architecture problem. If succeeds, addressed_2id failure is task design issue."
+}
