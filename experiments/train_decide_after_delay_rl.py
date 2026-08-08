@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from plwm.device import resolve_device
-from plwm.torch_model import TorchPLWM
+from plwm.torch_model import TorchCognitiveState, TorchPLWM
 
 try:
     from .audit_minigrid_decide_after_delay_scan import make_corpus
@@ -117,8 +117,8 @@ class PolicyEvidence(nn.Module):
             candidate_values = torch.cat((values[:, 1:], self.value(encoded).unsqueeze(1)), dim=1)
             keys = keys * (1.0 - gate) + candidate_keys * gate
             values = values * (1.0 - gate) + candidate_values * gate
-            active = valid[:, index].view(batch, 1)
-            outputs.append(self.head(torch.cat((state, recalled), dim=-1)) * active + (1.0 - active) * 0.0)
+            active = valid[:, index].view(batch, 1).float()
+            outputs.append(self.head(torch.cat((state, recalled), dim=-1)) * active)
         output = torch.stack(outputs, dim=1)
         return output[..., :-1], output[..., -1]
 
@@ -135,15 +135,15 @@ class PolicyPLWM(nn.Module):
         state = self.core.initial_state(observations.shape[0], observations.device)
         outputs = []
         for index in range(observations.shape[1]):
-            active = valid[:, index]
+            active_mask = valid[:, index].view(-1, 1)
             candidate, _surprise = self.core.step(observations[:, index], state, think=True)
-            active_mask = active.view(-1, 1)
-            state = TorchPLWM.__new__(type(state))
-            state.belief = torch.where(active_mask, candidate.belief, state.belief)
-            state.workspace = torch.where(active_mask, candidate.workspace, state.workspace)
-            state.keys = torch.where(active_mask.unsqueeze(-1), candidate.keys, state.keys)
-            state.values = torch.where(active_mask.unsqueeze(-1), candidate.values, state.values)
-            state.confidences = torch.where(active_mask.unsqueeze(-1), candidate.confidences, state.confidences)
+            state = TorchCognitiveState(
+                torch.where(active_mask, candidate.belief, state.belief),
+                torch.where(active_mask, candidate.workspace, state.workspace),
+                torch.where(active_mask.unsqueeze(-1), candidate.keys, state.keys),
+                torch.where(active_mask.unsqueeze(-1), candidate.values, state.values),
+                torch.where(active_mask.unsqueeze(-1), candidate.confidences, state.confidences),
+            )
             outputs.append(self.core.classify(state))
         output = torch.stack(outputs, dim=1)
         return output[..., :-1], output[..., -1]
@@ -164,6 +164,7 @@ def _collect(
     model: nn.Module, env: DecideEnv, *, count: int, seed_start: int,
     device: torch.device, stochastic: bool = True,
 ) -> tuple[list[list[Tensor]], list[list[int]], list[list[float]]]:
+    was_training = model.training
     model.eval()
     histories, action_lists, reward_lists = [], [], []
     for episode_index in range(count):
@@ -185,6 +186,8 @@ def _collect(
         histories.append(history)
         action_lists.append(actions)
         reward_lists.append(rewards)
+    if was_training:
+        model.train()
     return histories, action_lists, reward_lists
 
 
@@ -210,6 +213,7 @@ def _train_ppo(
     optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-5)
     total_episodes = total_successes = 0
     for update in range(updates):
+        model.train()
         histories, action_lists, reward_lists = _collect(
             model, env, count=episodes_per_update, seed_start=seed_start + update * episodes_per_update, device=device,
         )
@@ -335,10 +339,18 @@ def run(
             original, swapped, both,
         ))
     by_name = {result.name: result for result in results}
-    persistent_best = max(
-        (by_name[name].both_successes for name in ("gru_policy", "evidence_policy", "plwm_policy")),
+    # RL swap semantics: flipping the action forces a memory-following policy
+    # to fail, so both≈0 is the *correct* behaviour for a genuine memory
+    # policy.  The right metrics are held-out accuracy (orig) and the gap
+    # (orig - swapped) as memory evidence.
+    plwm_orig = by_name["plwm_policy"].heldout_successes
+    gru_orig = by_name["gru_policy"].heldout_successes
+    evidence_orig = by_name["evidence_policy"].heldout_successes
+    persistent_best = max(plwm_orig, evidence_orig, gru_orig)
+    accepted = (
+        persistent_best >= int(evaluation_episodes * 0.6)
+        and max(plwm_orig, evidence_orig) >= gru_orig + int(evaluation_episodes * 0.1)
     )
-    accepted = persistent_best >= int(evaluation_episodes * 0.5)
     target = artifact or ROOT / "artifacts" / "decide-after-delay-rl-report.json"
     target.parent.mkdir(exist_ok=True)
     report = Report(
