@@ -1,0 +1,48 @@
+{
+  "protocol": "rmt_baseline_v1: causal transformer with learnable prefix memory tokens (Recurrent Memory Transformer) on the DecideAfterDelay scan corpus; identical train loop, heldout split, and swap counterfactual probe as the scan; answers whether a modern attention-with-memory baseline matches PLWM's long-delay exact recall.",
+  "device": "cuda",
+  "delay": 8,
+  "gap": 3,
+  "identity_count": 2,
+  "training_examples": 1024,
+  "updates": 400,
+  "results": [
+    {
+      "name": "gru",
+      "parameters": 13570,
+      "heldout_accuracy": 0.875,
+      "swapped_accuracy": 0.125,
+      "memory_evidence": 0.75
+    },
+    {
+      "name": "rmt_mem4",
+      "parameters": 84034,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    },
+    {
+      "name": "rmt_mem8",
+      "parameters": 84290,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    },
+    {
+      "name": "rmt_mem16",
+      "parameters": 84802,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    },
+    {
+      "name": "plwm",
+      "parameters": 25449,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\rmt-d8-seed222.json"
+}

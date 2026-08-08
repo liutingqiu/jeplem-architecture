@@ -28,6 +28,7 @@ from train_decide_stream_rl import (
     PolicyEvidence,
     PolicyGRU,
     PolicyPLWM,
+    PolicyRMTStream,
     Result,
     _evaluate,
     _train_ppo,
@@ -72,6 +73,8 @@ def run(
         ("evidence_policy", lambda: PolicyEvidence(input_dim, identity_count)),
         ("plwm_policy", lambda: PolicyPLWM(input_dim, identity_count)),
         ("plwm_slots16_policy", lambda: PolicyPLWM(input_dim, identity_count, memory_slots=16)),
+        ("rmt_mem4_policy", lambda: PolicyRMTStream(input_dim, identity_count, unit_len=env_rule0.unit_len, memory_tokens=4)),
+        ("rmt_mem8_policy", lambda: PolicyRMTStream(input_dim, identity_count, unit_len=env_rule0.unit_len, memory_tokens=8)),
     )
 
     stage1_scores: dict[str, tuple[float, float]] = {}

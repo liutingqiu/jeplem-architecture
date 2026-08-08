@@ -1,0 +1,66 @@
+{
+  "protocol": "minigrid_decide_stream_rule_adaptation: stage 1 learns identity->choice rule 0 on a 4-episode stream; stage 2 flips the rule (choice = complement) and the adaptation curve measures how quickly each controller recovers on reward feedback only; PPO on-policy throughout; no privileged state.",
+  "device": "cuda",
+  "units": 4,
+  "gap": 4,
+  "identity_count": 2,
+  "stage1_updates": 100,
+  "stage2_updates": 100,
+  "eval_every": 20,
+  "stage1_query_accuracy": 0.7936197916666666,
+  "stage1_cross_accuracy": 0.5742753623188406,
+  "adaptation_curve": {
+    "gru_policy": [
+      0.45703125,
+      0.51171875,
+      0.45703125,
+      0.51171875,
+      0.51171875
+    ],
+    "evidence_policy": [
+      0.45703125,
+      0.45703125,
+      0.45703125,
+      0.45703125,
+      0.45703125
+    ],
+    "plwm_policy": [
+      0.24609375,
+      0.3203125,
+      0.32421875,
+      0.46484375,
+      0.62890625
+    ],
+    "plwm_slots16_policy": [
+      0.390625,
+      0.54296875,
+      0.6484375,
+      0.79296875,
+      0.83203125
+    ],
+    "rmt_mem4_policy": [
+      0.54296875,
+      0.54296875,
+      0.49609375,
+      0.796875,
+      0.796875
+    ],
+    "rmt_mem8_policy": [
+      0.45703125,
+      0.45703125,
+      0.51171875,
+      0.51171875,
+      0.796875
+    ]
+  },
+  "final_query_accuracy": {
+    "gru_policy": 0.51171875,
+    "evidence_policy": 0.45703125,
+    "plwm_policy": 0.62890625,
+    "plwm_slots16_policy": 0.83203125,
+    "rmt_mem4_policy": 0.796875,
+    "rmt_mem8_policy": 0.796875
+  },
+  "accepted": false,
+  "artifact": "artifacts\\rule-adapt-rmt-u4g4-seed222.json"
+}

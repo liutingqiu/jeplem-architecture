@@ -215,6 +215,77 @@ class PolicyPLWM(nn.Module):
 from plwm.torch_model import TorchCognitiveState
 
 
+class PolicyRMTStream(nn.Module):
+    """Recurrent Memory Transformer as a streaming policy.
+
+    Learnable memory tokens persist across episodes (units); each unit is one
+    transformer segment of (memory_tokens + unit_len) frames.  Memory updates
+    are detached at segment boundaries (truncated BPTT), mirroring the standard
+    RMT training regime.  This is the contemporary attention-with-memory
+    baseline for the stream / rule-revision tasks.
+    """
+
+    def __init__(self, input_dim: int, num_actions: int, *, unit_len: int,
+                 d_model: int = 64, n_layers: int = 2, n_heads: int = 4,
+                 memory_tokens: int = 4, dropout: float = 0.0) -> None:
+        super().__init__()
+        self.unit_len, self.memory_tokens = unit_len, memory_tokens
+        self.proj = nn.Linear(input_dim, d_model)
+        self.memory = nn.Parameter(torch.randn(memory_tokens, d_model) * 0.02)
+        self.pos = nn.Parameter(torch.randn(1, 256, d_model) * 0.02)
+        layer = nn.TransformerEncoderLayer(
+            d_model, n_heads, dim_feedforward=2 * d_model, dropout=dropout,
+            batch_first=True, activation="relu",
+        )
+        self.encoder = nn.TransformerEncoder(layer, n_layers)
+        self.head = nn.Linear(d_model, num_actions + 1)
+        self._mem: Tensor | None = None
+        self._seg_len = 0
+        self._seg_frames: Tensor | None = None
+
+    def reset(self, batch: int, device: torch.device) -> None:
+        self._mem = self.memory.unsqueeze(0).expand(batch, -1, -1).to(device)
+        self._seg_len = 0
+        self._seg_frames = None
+
+    def _run(self, seg_frames: Tensor, mem: Tensor) -> tuple[Tensor, Tensor]:
+        batch = seg_frames.shape[0]
+        mem_count = mem.shape[1]
+        embedded = torch.cat((mem, self.proj(seg_frames)), dim=1)  # [B, M+L, d]
+        total = mem_count + seg_frames.shape[1]
+        embedded = embedded + self.pos[:, :total]
+        causal = torch.triu(
+            torch.full((total, total), float("-inf"), device=embedded.device), diagonal=1,
+        )
+        out = self.encoder(embedded, mask=causal)
+        return out, out[:, :mem_count].detach()
+
+    def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor]:
+        if self._seg_frames is None:
+            self._seg_frames = observation_step.unsqueeze(1)
+        else:
+            self._seg_frames = torch.cat((self._seg_frames, observation_step.unsqueeze(1)), dim=1)
+        self._seg_len += 1
+        out, new_mem = self._run(self._seg_frames, self._mem)
+        if self._seg_len >= self.unit_len:
+            self._mem = torch.where(valid_step.unsqueeze(-1).unsqueeze(-1), new_mem, self._mem)
+            self._seg_len = 0
+            self._seg_frames = None
+        output = self.head(out[:, -1])
+        return output[..., :-1], output[..., -1]
+
+    def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor]:
+        batch, length, _ = observations.shape
+        self.reset(batch, observations.device)
+        logits_list: list[Tensor] = []
+        values_list: list[Tensor] = []
+        for index in range(length):
+            logits, value = self.step(observations[:, index], valid[:, index])
+            logits_list.append(logits)
+            values_list.append(value)
+        return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
+
+
 def _pad(episodes: list[list[Tensor]], device: torch.device, input_dim: int) -> tuple[Tensor, Tensor]:
     length = max(len(episode) for episode in episodes)
     values = torch.zeros((len(episodes), length, input_dim), device=device)
@@ -404,6 +475,8 @@ def run(
         ("evidence_policy", lambda: PolicyEvidence(input_dim, identity_count)),
         ("plwm_policy", lambda: PolicyPLWM(input_dim, identity_count)),
         ("plwm_slots16_policy", lambda: PolicyPLWM(input_dim, identity_count, memory_slots=16)),
+        ("rmt_mem4_policy", lambda: PolicyRMTStream(input_dim, identity_count, unit_len=env.unit_len, memory_tokens=4)),
+        ("rmt_mem8_policy", lambda: PolicyRMTStream(input_dim, identity_count, unit_len=env.unit_len, memory_tokens=8)),
     )
     results = []
     for name, factory in factories:
