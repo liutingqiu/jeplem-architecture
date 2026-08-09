@@ -64,8 +64,19 @@ return out, out[:, :mem_count].detach()
 1. **detach 不是崩盘主因**：k=1.0 关闭 detach（full BPTT）cross 仍 0.46-0.47（≈随机）；k=2.0 有无 detach 几乎相同（0.75 vs 0.74）。
 2. **窗口可见性才是主因**：上一 episode 帧直接落在段内（k≥2）→ cross 恢复（0.75-0.91）；跨段（k≤1）→ 崩（0.49-0.50）。k=0.5 连 query 也崩（身份帧与查询帧被段边界切开）。
 3. **机制链条（修正版）**：RMT 跨段记忆只能经 memory token **隐式压缩**携带；RL 稀疏奖励下该压缩**不可学**（梯度是否可传均无效）；段内直接可见则无需压缩、attention 直接检索 → 恢复。
-4. **与主旨统一**：RMT 的 memory token 本质是"压缩派"（同 GRU）——"显式槽位写入（PLWM/evidence）> 隐式压缩（GRU/RMT memory token）"在流式跨段场景第三次成立（前两次：监督精确回忆、规则修订）。
-5. 附带：k=0.5 无 detach 因 full BPTT 计算图过大训练过慢未完成（不影响结论，方向由 k=1.0-nodetach 覆盖）。
+4. **补救矩阵（2026-08-10 补）：RMT 跨段不可救**：
+
+| 配置 | query/cross |
+|---|---|
+| RMT base（detach）| 0.807/0.448 |
+| RMT + aux（语义内容预测，prev 目标）| 0.816/0.473 |
+| RMT 无 detach | 0.844/0.552 |
+| RMT + aux + 无 detach | 0.833/0.522 |
+| evidence（对照，无任何辅助）| 0.932/**0.806** |
+
+   aux 明确监督 + 梯度可达（无 detach）均无效——**段边界 memory token 的跨段内容在 RL 下结构性不可学**。对比：GRU 无段边界，aux(prev) 可把 cross 从 0.45 微升到 0.52（部分可教）——**段边界比单隐状态是更硬的限制**。RMT 跨段唯一出路 = 窗口内可见（k≥2，O(L²) 成本）。
+5. **与主旨统一**：RMT 的 memory token 本质是"压缩派"（同 GRU）——"显式槽位写入（PLWM/evidence）> 隐式压缩（GRU/RMT memory token）"在流式跨段场景第三次成立（前两次：监督精确回忆、规则修订）。
+6. 附带：k=0.5 无 detach 因 full BPTT 计算图过大训练过慢未完成（不影响结论，方向由 k=1.0-nodetach 覆盖）。
 
 **这是 attention 记忆家族的结构性代价**：流式无界场景下，要么 memory token 学会隐式压缩（本报告证伪其在 RL 下可学），要么加大段窗口（k≥2，注意成本随窗口增长、且等于放弃跨段记忆机制）。PLWM 的槽位显式写入每帧可写、无压缩负担、O(1)/帧。
 

@@ -373,6 +373,52 @@ class PolicyRMTStream(nn.Module):
         return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
 
 
+class PolicyRMTStreamAux(PolicyRMTStream):
+    """RMT streaming policy with a memory-content prediction head on the
+    current frame representation (out[:, -1]).  Aux targets the PREVIOUS
+    episode's identity (cross-episode content) -- the decisive test whether
+    explicit content supervision can make the RMT memory-token compression
+    learnable (vs the measured 'implicit compression unlearnable under RL')."""
+
+    def __init__(self, input_dim: int, num_actions: int, *, unit_len: int,
+                 d_model: int = 64, n_layers: int = 2, n_heads: int = 4,
+                 memory_tokens: int = 4, dropout: float = 0.0,
+                 segment_units: float = 1.0, detach_mem: bool = True,
+                 aux_coefficient: float = 0.5) -> None:
+        super().__init__(input_dim, num_actions, unit_len=unit_len, d_model=d_model,
+                         n_layers=n_layers, n_heads=n_heads, memory_tokens=memory_tokens,
+                         dropout=dropout, segment_units=segment_units, detach_mem=detach_mem)
+        self.aux_head = nn.Linear(d_model, 2)
+        self.aux_coefficient = aux_coefficient
+
+    def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        if self._seg_frames is None:
+            self._seg_frames = observation_step.unsqueeze(1)
+        else:
+            self._seg_frames = torch.cat((self._seg_frames, observation_step.unsqueeze(1)), dim=1)
+        self._seg_len += 1
+        out, new_mem = self._run(self._seg_frames, self._mem)
+        if self._seg_len >= self._seg_target:
+            self._mem = torch.where(valid_step.unsqueeze(-1).unsqueeze(-1), new_mem, self._mem)
+            self._seg_len = 0
+            self._seg_frames = None
+        output = self.head(out[:, -1])
+        return output[..., :-1], output[..., -1], self.aux_head(out[:, -1])
+
+    def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        batch, length, _ = observations.shape
+        self.reset(batch, observations.device)
+        logits_list: list[Tensor] = []
+        values_list: list[Tensor] = []
+        aux_list: list[Tensor] = []
+        for index in range(length):
+            logits, value, aux = self.step(observations[:, index], valid[:, index])
+            logits_list.append(logits)
+            values_list.append(value)
+            aux_list.append(aux)
+        return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1), torch.stack(aux_list, dim=1)
+
+
 def _pad(episodes: list[list[Tensor]], device: torch.device, input_dim: int) -> tuple[Tensor, Tensor]:
     length = max(len(episode) for episode in episodes)
     values = torch.zeros((len(episodes), length, input_dim), device=device)
@@ -579,7 +625,7 @@ def run(
     switch_at: int | None = None, artifact: Path | None = None,
     rmt_segment_units: float = 1.0, rmt_detach_mem: bool = True,
     rmt_probe: bool = False, aux_memory: bool = False,
-    aux_coefficient: float = 0.5, gru_focus: bool = False,
+    aux_coefficient: float = 0.5, gru_focus: bool = False, rmt_aux_only: bool = False,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -616,9 +662,14 @@ def run(
         factories = factories + (
             ("gru_aux_policy", lambda: PolicyGRUAux(input_dim, identity_count, aux_coefficient=aux_coefficient)),
             ("gru_aux2_policy", lambda: PolicyGRUAux2(input_dim, identity_count, aux_coefficient=aux_coefficient)),
+            ("rmt_aux_mem4_policy", lambda: PolicyRMTStreamAux(
+                input_dim, identity_count, unit_len=env.unit_len, memory_tokens=4,
+                aux_coefficient=aux_coefficient)),
         )
     if gru_focus:
         factories = [f for f in factories if f[0] in ("gru_policy", "gru_aux_policy", "gru_aux2_policy")]
+    if rmt_aux_only:
+        factories = [f for f in factories if f[0] in ("rmt_mem4_policy", "rmt_aux_mem4_policy")]
     results = []
     for name, factory in factories:
         model = factory().to(resolved)
@@ -634,7 +685,7 @@ def run(
             query_acc, cross_acc, before_acc, after_acc,
         ))
     by_name = {result.name: result for result in results}
-    if rmt_probe or gru_focus:
+    if rmt_probe or gru_focus or rmt_aux_only:
         # probe/focus modes lack the full controller set; the gate is
         # meaningless there.
         accepted = False
@@ -671,6 +722,7 @@ if __name__ == "__main__":
     parser.add_argument("--aux-memory", action="store_true")
     parser.add_argument("--aux-coefficient", type=float, default=0.5)
     parser.add_argument("--gru-focus", action="store_true")
+    parser.add_argument("--rmt-aux-only", action="store_true")
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
     outcome = run(
@@ -682,6 +734,6 @@ if __name__ == "__main__":
         rmt_segment_units=args.rmt_segment_units,
         rmt_detach_mem=not args.no_rmt_detach, rmt_probe=args.rmt_probe,
         aux_memory=args.aux_memory, aux_coefficient=args.aux_coefficient,
-        gru_focus=args.gru_focus,
+        gru_focus=args.gru_focus, rmt_aux_only=args.rmt_aux_only,
     )
     print(json.dumps(asdict(outcome), indent=2))
