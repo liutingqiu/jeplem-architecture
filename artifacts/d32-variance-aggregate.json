@@ -1,0 +1,60 @@
+{
+  "protocol": "d32_variance_aggregate_v1",
+  "delay": 32,
+  "note": "independent batch re-runs of the same config; PLWM batches: scan(111/222/333), rmt(222/333/444), rmt-full(222/333/444)",
+  "plwm": {
+    "n": 9,
+    "values": [
+      0.793,
+      0.793,
+      1.0,
+      1.0,
+      0.875,
+      0.793,
+      1.0,
+      0.7344,
+      0.6094
+    ],
+    "min": 0.6094,
+    "median": 0.793,
+    "max": 1.0,
+    "mean": 0.8442,
+    "stdev": 0.1364,
+    "per_batch_mean": {
+      "scan": 0.862,
+      "rmt": 0.8893,
+      "rmt_full": 0.7812
+    }
+  },
+  "gru": {
+    "n": 9,
+    "values": [
+      0.4961,
+      0.4961,
+      0.4961,
+      0.4961,
+      0.4961,
+      0.4961,
+      0.4961,
+      0.4961,
+      0.4961
+    ],
+    "min": 0.4961,
+    "median": 0.4961,
+    "max": 0.4961,
+    "mean": 0.4961,
+    "stdev": 0.0
+  },
+  "evidence_store": {
+    "n": 3,
+    "values": [
+      0.793,
+      0.8711,
+      0.4961
+    ],
+    "min": 0.4961,
+    "median": 0.793,
+    "max": 0.8711,
+    "mean": 0.7201
+  }
+}

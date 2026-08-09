@@ -62,10 +62,12 @@ MemoryS7 reward-only 路线被证实不可诊断（负结果链归档）后，�
 | 延迟 | GRU | evidence_store | evidence_disabled | PLWM |
 |---|---|---|---|---|
 | d=8（3 seed）| 0.802 ± 0.069 | 1.000 | 1.000 | 1.000 |
-| d=16 | 0.871 | 0.734 | 0.793 | 1.000 |
+| d=16（1 seed）| 0.871 | 0.734 | 0.793 | 1.000 |
 | **d=32（3 seed）** | **0.496（随机，全 seed）** | 0.720 | 0.496 | **0.862** |
 
 **GRU 在 33 帧延迟下三 seed 全部精确随机（0.496）**；PLWM 保持 0.862。**架构优势随延迟增长而扩大**（d=8: +0.2 → d=32: +0.37）——满足 MASTER_PLAN 要求的 "advantage growing as delay increases"。
+
+> **⚠️ 补测修正（2026-08-09）**：d=32 的 PLWM 数值在三个独立批次（scan / rmt / rmt-full）中共测得 **9 个 seed**：`0.793, 0.793, 1.0, 1.0, 0.875, 0.793, 1.0, 0.734, 0.609`（中位 **0.793**、均值 0.844±0.136、范围 0.61–1.0；各批均值 0.862/0.889/0.781）。**方向性结论稳（9/9 seed PLWM 均胜 GRU 的 0.496），但 PLWM d=32 的单批精确值方差大、不应作为"0.86"级数字引用**；本表 0.862 为 scan 批 3 seed 均值。GRU d=32 为 9/9 seed 精确随机（0.496，0 方差）。汇总见 `artifacts/d32-variance-aggregate.json`、`experiments/audit_d32_variance_aggregate.py`。
 
 **机制解释**：evidence_store 用 FIFO 8 槽位，33 帧序列中身份帧被中间空帧挤出 → 掉到 0.72；PLWM 用 gated memory（只写 surprise 高的信息帧），空帧不挤占槽位 → 长延迟仍保持高。gate 机制是差异来源。
 
@@ -112,9 +114,11 @@ DecideAfterDelay 改造成**事件流 RL 环境**（DecideEnv）：每步一个�
 4. **surprise 的价值是任务依赖的**：长延迟监督任务（d=32 scan）中 PLWM 的 surprise 门控优于 FIFO（0.862 vs 0.720），但在 RL 策略学习中是负担。
 5. **架构含义**：surprise 应作为门控/置信度/新奇检测的辅助信号（决策侧），而非作为通用训练目标强制混合——预测误差驱动写入保留，但不应进入策略梯度主损失。
 
-## 七、跨 episode 持久（连续流，3 seed，units=3 gap=4）
+## 七、跨 episode 持久（连续流，units=3 gap=4，6 seed 补测）
 
 连续事件流：每 episode [身份帧, gap 空帧, 查询帧]，查询 one-hot 指定当前或上一 episode 的身份（cross=上一 episode）。流不 reset，GRU 隐状态被后续 episode 稀释。
+
+### 7.1 原 3 seed（41123/222/333）
 
 | 模型 | query 均值 | cross 均值 |
 |---|---|---|
@@ -122,11 +126,27 @@ DecideAfterDelay 改造成**事件流 RL 环境**（DecideEnv）：每步一个�
 | evidence_policy | 0.889 | 0.796 |
 | **plwm_policy** | **0.924** | **0.821** |
 
-**结论**：连续流/跨 episode 场景下，GRU 压缩隐状态彻底无法保留早期身份（cross≈随机）；可寻址记忆保留能力（PLWM/evidence cross≈0.8）；**PLWM 在此任务 query 精度第一（0.924）**，且 gated_memory + latent=64 配置下反超 evidence。
+### 7.2 ⚠️ 补测修正（2026-08-09）：6 seed 重出（+444/555/666）
 
-至此证据链完整：**监督（3 任务）→ 难度扫描（延迟/身份轴）→ RL 单 episode → RL 连续流**，四个维度一致——需要精确跨步回忆时，可寻址记忆 > 压缩隐状态；PLWM 在连续流（最贴近真实持久认知系统）场景表现最优。
+| 模型 | n | query 均值 | cross 均值 | 脚本门达标（cross≥0.6 且超 GRU+0.2）|
+|---|---|---|---|---|
+| gru_policy | 6 | 0.558 | 0.498（6/6 ≈随机）| — |
+| evidence_policy | 6 | 0.910 | 0.799 | 5/6 |
+| plwm_policy | 6 | 0.909 | 0.769 | **5/6**（唯一失败 seed222 0.716 vs 门槛 0.722，差 0.006）|
+| plwm_slots16_policy | 3 | 0.882 | 0.826 | 3/3 |
+| rmt_mem4 / mem8（新补对照）| 3 | 0.823 / 0.832 | **0.493 / 0.517（≈随机）** | 0/3 |
+
+**结论修正**：
+1. **原"PLWM query 精度第一（0.924）"在 6 seed 下不成立**：PLWM query 0.909 ≈ evidence 0.910（打平），cross 0.769 甚至略低于 evidence 0.799——3 seed 的"第一"是抽样波动。**稳的结论是"可寻址记忆（PLWM/evidence）≫ GRU"，不是"PLWM 优于 evidence"**。
+2. **新增对照发现：RMT 在跨 episode 连续流上崩盘（0/3，cross≈随机）**——RMT 只在监督精确回忆/规则修订任务与 PLWM 打平，在连续流（最贴近真实持久认知）场景不成立。PLWM slots16 在此场景仍 3/3 达标。
+3. GRU 6/6 seed 全部 ≈随机（cross 0.48–0.52），"压缩隐状态被后续 episode 稀释"的机制结论成立。
+4. 汇总：`artifacts/stream-seed-aggregate.json`、`experiments/audit_stream_seed_aggregate.py`。
+
+至此证据链完整：**监督（3 任务）→ 难度扫描（延迟/身份轴）→ RL 单 episode → RL 连续流**，四个维度一致——需要精确跨步回忆时，**可寻址记忆 > 压缩隐状态（GRU/RMT 流式版）**；PLWM 与 evidence 在连续流上等价，PLWM 的差异化价值是 gated memory 的认知语义与长间隔鲁棒性（§八），而非绝对精度。
 
 ## 八、连续流外推（更长流 / 更大间隔，3 seed）
+
+> 注：下表中 u=3 g=4 基线行为 3 seed 口径（41123/222/333，见 §7.1）；u=5 与 u=3 g=8 为各自 3 seed。外推结论（间隔是 PLWM 正向轴、超长流是容量/干扰边界）未受 6 seed 补测影响。
 
 | 配置 | GRU query/cross | evidence query/cross | **PLWM query/cross** |
 |---|---|---|---|

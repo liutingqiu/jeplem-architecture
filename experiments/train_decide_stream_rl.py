@@ -352,8 +352,9 @@ def _gae(rewards: list[list[float]], values: Tensor, valid: Tensor, *, gamma: fl
 def _train_ppo(
     model: nn.Module, env: DecideStreamEnv, *, updates: int, episodes_per_update: int,
     seed_start: int, device: torch.device, ppo_epochs: int = 4, entropy_coefficient: float = 0.05,
+    weight_decay: float = 1e-5,
 ) -> tuple[int, int]:
-    optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-5)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=weight_decay)
     total_episodes = total_successes = 0
     for update in range(updates):
         model.train()

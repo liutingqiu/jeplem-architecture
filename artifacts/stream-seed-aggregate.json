@@ -1,0 +1,215 @@
+{
+  "protocol": "decide_stream_u3g4_6seed_aggregate_v1",
+  "seeds": [
+    41123,
+    222,
+    333,
+    444,
+    555,
+    666
+  ],
+  "per_seed_script_accepted": {
+    "41123": true,
+    "222": false,
+    "333": true,
+    "444": true,
+    "555": true,
+    "666": true
+  },
+  "criterion": "cross>=0.6 and cross>=gru_cross+0.2 (script gate)",
+  "note": "old 3 seeds: 3-model script; new 3 seeds (444/555/666): 6-model script (adds slots16/RMT)",
+  "per_model": {
+    "gru_policy": {
+      "n": 6,
+      "seeds": [
+        222,
+        333,
+        444,
+        555,
+        666,
+        41123
+      ],
+      "query": [
+        0.6458,
+        0.4792,
+        0.5208,
+        0.5208,
+        0.5208,
+        0.6615
+      ],
+      "query_mean": 0.5582,
+      "cross": [
+        0.5224,
+        0.5224,
+        0.4776,
+        0.4776,
+        0.4776,
+        0.5075
+      ],
+      "cross_mean": 0.4975,
+      "plwm_gate_pass": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "plwm_gate_pass_rate": "0/6"
+    },
+    "evidence_policy": {
+      "n": 6,
+      "seeds": [
+        222,
+        333,
+        444,
+        555,
+        666,
+        41123
+      ],
+      "query": [
+        0.8698,
+        0.8802,
+        0.9583,
+        0.9583,
+        0.875,
+        0.9167
+      ],
+      "query_mean": 0.9097,
+      "cross": [
+        0.7313,
+        0.7761,
+        0.8806,
+        0.8806,
+        0.6418,
+        0.8806
+      ],
+      "cross_mean": 0.7985,
+      "plwm_gate_pass": [
+        true,
+        true,
+        true,
+        true,
+        false,
+        true
+      ],
+      "plwm_gate_pass_rate": "5/6"
+    },
+    "plwm_policy": {
+      "n": 6,
+      "seeds": [
+        222,
+        333,
+        444,
+        555,
+        666,
+        41123
+      ],
+      "query": [
+        0.901,
+        0.9688,
+        0.8698,
+        0.9062,
+        0.9062,
+        0.901
+      ],
+      "query_mean": 0.9089,
+      "cross": [
+        0.7164,
+        0.9104,
+        0.6866,
+        0.7313,
+        0.7313,
+        0.8358
+      ],
+      "cross_mean": 0.7687,
+      "plwm_gate_pass": [
+        false,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "plwm_gate_pass_rate": "5/6"
+    },
+    "plwm_slots16_policy": {
+      "n": 3,
+      "seeds": [
+        444,
+        555,
+        666
+      ],
+      "query": [
+        0.8646,
+        0.901,
+        0.8802
+      ],
+      "query_mean": 0.8819,
+      "cross": [
+        0.8806,
+        0.8806,
+        0.7164
+      ],
+      "cross_mean": 0.8259,
+      "plwm_gate_pass": [
+        true,
+        true,
+        true
+      ],
+      "plwm_gate_pass_rate": "3/3"
+    },
+    "rmt_mem4_policy": {
+      "n": 3,
+      "seeds": [
+        444,
+        555,
+        666
+      ],
+      "query": [
+        0.8177,
+        0.8177,
+        0.8333
+      ],
+      "query_mean": 0.8229,
+      "cross": [
+        0.4776,
+        0.4776,
+        0.5224
+      ],
+      "cross_mean": 0.4925,
+      "plwm_gate_pass": [
+        false,
+        false,
+        false
+      ],
+      "plwm_gate_pass_rate": "0/3"
+    },
+    "rmt_mem8_policy": {
+      "n": 3,
+      "seeds": [
+        444,
+        555,
+        666
+      ],
+      "query": [
+        0.8073,
+        0.8698,
+        0.8177
+      ],
+      "query_mean": 0.8316,
+      "cross": [
+        0.4478,
+        0.6269,
+        0.4776
+      ],
+      "cross_mean": 0.5174,
+      "plwm_gate_pass": [
+        false,
+        false,
+        false
+      ],
+      "plwm_gate_pass_rate": "0/3"
+    }
+  }
+}

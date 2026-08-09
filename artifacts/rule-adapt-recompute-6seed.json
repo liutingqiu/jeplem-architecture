@@ -1,0 +1,142 @@
+{
+  "protocol": "rule_adapt_recompute_v1",
+  "seeds": [
+    222,
+    333,
+    444,
+    555,
+    666,
+    777
+  ],
+  "criteria": {
+    "A_strict": "final>=0.7 and final>=gru+0.2",
+    "B_improve": "final block > first block"
+  },
+  "per_model": {
+    "gru_policy": {
+      "finals": [
+        0.5117,
+        0.5586,
+        0.543,
+        0.457,
+        0.6055,
+        0.457
+      ],
+      "mean_final": 0.5221,
+      "strict_pass": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "strict_pass_rate": "0/6",
+      "improve_pass": [
+        true,
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "improve_pass_rate": "3/6"
+    },
+    "evidence_policy": {
+      "finals": [
+        0.457,
+        0.457,
+        0.8438,
+        0.8086,
+        0.457,
+        0.457
+      ],
+      "mean_final": 0.5801,
+      "strict_pass": [
+        false,
+        false,
+        true,
+        true,
+        false,
+        false
+      ],
+      "strict_pass_rate": "2/6",
+      "improve_pass": [
+        false,
+        false,
+        true,
+        true,
+        false,
+        false
+      ],
+      "improve_pass_rate": "2/6"
+    },
+    "plwm_policy": {
+      "finals": [
+        0.6289,
+        0.8789,
+        0.7344,
+        0.9961,
+        0.543,
+        0.9727
+      ],
+      "mean_final": 0.7923,
+      "strict_pass": [
+        false,
+        true,
+        false,
+        true,
+        false,
+        true
+      ],
+      "strict_pass_rate": "3/6",
+      "improve_pass": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "improve_pass_rate": "6/6"
+    },
+    "plwm_slots16_policy": {
+      "finals": [
+        0.832,
+        0.6836,
+        0.9922,
+        0.875,
+        0.8125,
+        0.8008
+      ],
+      "mean_final": 0.8327,
+      "strict_pass": [
+        true,
+        false,
+        true,
+        true,
+        true,
+        true
+      ],
+      "strict_pass_rate": "5/6",
+      "improve_pass": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "improve_pass_rate": "6/6"
+    }
+  },
+  "script_accepted": [
+    false,
+    true,
+    false,
+    true,
+    false,
+    true
+  ],
+  "script_accepted_rate": "3/6"
+}

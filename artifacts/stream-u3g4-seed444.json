@@ -1,0 +1,62 @@
+{
+  "protocol": "minigrid_decide_stream_rl_v1: continuous stream of episodes, each [identity frame, gap empty frames, query frame]; query one-hot selects current or previous episode's identity; reward only on query steps; PPO on-policy; no teacher, oracle, shaped reward, or privileged state; reports overall query accuracy, cross-episode accuracy, and before/after rule-switch accuracy (switch_at); rule 0: choice == identity, rule 1: choice == complement.",
+  "device": "cuda",
+  "units": 3,
+  "gap": 4,
+  "identity_count": 2,
+  "switch_at": null,
+  "updates": 100,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "gru_policy",
+      "parameters": 13635,
+      "query_accuracy": 0.5208333333333334,
+      "cross_episode_accuracy": 0.47761194029850745,
+      "before_switch_accuracy": 0.5208333333333334,
+      "after_switch_accuracy": 0.0
+    },
+    {
+      "name": "evidence_policy",
+      "parameters": 50372,
+      "query_accuracy": 0.9583333333333334,
+      "cross_episode_accuracy": 0.8805970149253731,
+      "before_switch_accuracy": 0.9583333333333334,
+      "after_switch_accuracy": 0.0
+    },
+    {
+      "name": "plwm_policy",
+      "parameters": 100106,
+      "query_accuracy": 0.8697916666666666,
+      "cross_episode_accuracy": 0.6865671641791045,
+      "before_switch_accuracy": 0.8697916666666666,
+      "after_switch_accuracy": 0.0
+    },
+    {
+      "name": "plwm_slots16_policy",
+      "parameters": 100106,
+      "query_accuracy": 0.8645833333333334,
+      "cross_episode_accuracy": 0.8805970149253731,
+      "before_switch_accuracy": 0.8645833333333334,
+      "after_switch_accuracy": 0.0
+    },
+    {
+      "name": "rmt_mem4_policy",
+      "parameters": 84099,
+      "query_accuracy": 0.8177083333333334,
+      "cross_episode_accuracy": 0.47761194029850745,
+      "before_switch_accuracy": 0.8177083333333334,
+      "after_switch_accuracy": 0.0
+    },
+    {
+      "name": "rmt_mem8_policy",
+      "parameters": 84355,
+      "query_accuracy": 0.8072916666666666,
+      "cross_episode_accuracy": 0.44776119402985076,
+      "before_switch_accuracy": 0.8072916666666666,
+      "after_switch_accuracy": 0.0
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\stream-u3g4-seed444.json"
+}
