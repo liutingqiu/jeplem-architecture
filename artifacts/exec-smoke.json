@@ -1,0 +1,21 @@
+{
+  "protocol": "executive_control_v1: Block-9 minimal experiment. Two alternating tasks use disjoint 2-dim signal subsets amid 8 noise dims; small training data. active_gate learns a task-conditioned feature gate (executive control); passive uses all inputs + task id. Criterion: active_gate test accuracy >= passive + 0.15 in the small-data regime.",
+  "device": "cuda",
+  "per_task_train": 50,
+  "results": [
+    {
+      "name": "active_gate",
+      "parameters": 194,
+      "train_accuracy": 1.0,
+      "test_accuracy": 1.0
+    },
+    {
+      "name": "passive",
+      "parameters": 418,
+      "train_accuracy": 1.0,
+      "test_accuracy": 1.0
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\exec-smoke.json"
+}
