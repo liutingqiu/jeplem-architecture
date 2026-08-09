@@ -252,6 +252,51 @@ class PolicyEvidence(nn.Module):
         return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
 
 
+class PolicyEvidenceAux(PolicyEvidence):
+    """Evidence slot memory + dual-timescale memory-content prediction head
+    (current and previous identity).  JEPLM D1+D2 combination test: does the
+    semantic aux strengthen or disturb the slots' native multi-timescale?"""
+
+    def __init__(self, input_dim: int, num_actions: int, *, width: int = 64, slots: int = 8, aux_coefficient: float = 0.5) -> None:
+        super().__init__(input_dim, num_actions, width=width, slots=slots)
+        self.aux_head = nn.Linear(width * 2, 4)  # [cur(2), prev(2)]
+        self.aux_coefficient = aux_coefficient
+
+    def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        batch = observation_step.shape[0]
+        encoded = self.encoder(observation_step)
+        weights = torch.softmax(
+            torch.einsum("bd,bmd->bm", self.query(encoded), self._keys) / self.encoder[0].out_features**0.5, dim=-1,
+        )
+        recalled = torch.einsum("bm,bmd->bd", weights, self._values)
+        candidate_state = self.state(torch.cat((encoded, recalled), dim=-1), self._state)
+        gate = torch.sigmoid(self.write_gate(encoded)).view(batch, 1, 1)
+        candidate_keys = torch.cat((self._keys[:, 1:], self.key(encoded).unsqueeze(1)), dim=1)
+        candidate_values = torch.cat((self._values[:, 1:], self.value(encoded).unsqueeze(1)), dim=1)
+        active = valid_step.unsqueeze(-1)
+        active_slots = active.unsqueeze(-1)
+        self._state = torch.where(active, candidate_state, self._state)
+        self._keys = torch.where(active_slots, candidate_keys, self._keys)
+        self._values = torch.where(active_slots, candidate_values, self._values)
+        self._final_state = self._state
+        output = self.head(torch.cat((self._state, recalled), dim=-1))
+        return output[..., :-1], output[..., -1], self.aux_head(torch.cat((self._state, recalled), dim=-1))
+
+    def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        batch, length, _ = observations.shape
+        self.reset(batch, observations.device)
+        logits_list: list[Tensor] = []
+        values_list: list[Tensor] = []
+        aux_list: list[Tensor] = []
+        for index in range(length):
+            logits, value, aux = self.step(observations[:, index], valid[:, index])
+            logits_list.append(logits)
+            values_list.append(value)
+            aux_list.append(aux)
+        return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1), torch.stack(aux_list, dim=1)
+        return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
+
+
 class PolicyPLWM(nn.Module):
     def __init__(self, input_dim: int, num_actions: int, *, latent: int = 64, memory_slots: int = 8, thought_steps: int = 1, gated_memory: bool = True) -> None:
         super().__init__()
@@ -626,6 +671,7 @@ def run(
     rmt_segment_units: float = 1.0, rmt_detach_mem: bool = True,
     rmt_probe: bool = False, aux_memory: bool = False,
     aux_coefficient: float = 0.5, gru_focus: bool = False, rmt_aux_only: bool = False,
+    evidence_aux_only: bool = False,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -665,11 +711,15 @@ def run(
             ("rmt_aux_mem4_policy", lambda: PolicyRMTStreamAux(
                 input_dim, identity_count, unit_len=env.unit_len, memory_tokens=4,
                 aux_coefficient=aux_coefficient)),
+            ("evidence_aux_policy", lambda: PolicyEvidenceAux(
+                input_dim, identity_count, aux_coefficient=aux_coefficient)),
         )
     if gru_focus:
         factories = [f for f in factories if f[0] in ("gru_policy", "gru_aux_policy", "gru_aux2_policy")]
     if rmt_aux_only:
         factories = [f for f in factories if f[0] in ("rmt_mem4_policy", "rmt_aux_mem4_policy")]
+    if evidence_aux_only:
+        factories = [f for f in factories if f[0] in ("evidence_policy", "evidence_aux_policy")]
     results = []
     for name, factory in factories:
         model = factory().to(resolved)
@@ -685,7 +735,7 @@ def run(
             query_acc, cross_acc, before_acc, after_acc,
         ))
     by_name = {result.name: result for result in results}
-    if rmt_probe or gru_focus or rmt_aux_only:
+    if rmt_probe or gru_focus or rmt_aux_only or evidence_aux_only:
         # probe/focus modes lack the full controller set; the gate is
         # meaningless there.
         accepted = False
@@ -723,6 +773,7 @@ if __name__ == "__main__":
     parser.add_argument("--aux-coefficient", type=float, default=0.5)
     parser.add_argument("--gru-focus", action="store_true")
     parser.add_argument("--rmt-aux-only", action="store_true")
+    parser.add_argument("--evidence-aux-only", action="store_true")
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
     outcome = run(
@@ -735,5 +786,6 @@ if __name__ == "__main__":
         rmt_detach_mem=not args.no_rmt_detach, rmt_probe=args.rmt_probe,
         aux_memory=args.aux_memory, aux_coefficient=args.aux_coefficient,
         gru_focus=args.gru_focus, rmt_aux_only=args.rmt_aux_only,
+        evidence_aux_only=args.evidence_aux_only,
     )
     print(json.dumps(asdict(outcome), indent=2))
