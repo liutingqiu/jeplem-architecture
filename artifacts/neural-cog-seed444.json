@@ -1,0 +1,18 @@
+{
+  "protocol": "neural_cognitive_system_v1: neural perception (pixel->identity MLP) feeds the autonomous cognitive loop (belief gap -> goal -> learn -> consolidate -> apply). Identities are real RGB frames; the loop must stay correct and intervention-robust under perceptual noise. Criterion: coverage >= 0.9, application >= 0.9, intervention >= 0.8, perception >= 0.95.",
+  "device": "cuda",
+  "domains": 6,
+  "episodes": 40,
+  "results": [
+    {
+      "name": "neural_cognitive",
+      "steps_to_complete": 23.725,
+      "coverage": 1.0,
+      "application_accuracy": 1.0,
+      "intervention_accuracy": 1.0,
+      "perception_accuracy": 1.0
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\neural-cog-seed444.json"
+}
