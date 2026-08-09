@@ -1,0 +1,27 @@
+{
+  "protocol": "minigrid_decide_after_delay_rl_v1: event-stream environment with one reward at the query step (+1 for matching the remembered identity); PPO on-policy, no teacher action, oracle, shaped reward, or privileged state; counterfactual swap probe flips identity->choice at evaluation; both = solved in original and swapped layouts (genuine memory-driven success).",
+  "device": "cuda",
+  "delay": 32,
+  "gap": 3,
+  "identity_count": 2,
+  "updates": 100,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "gru_policy",
+      "parameters": 13635,
+      "heldout_successes": 36,
+      "swapped_successes": 28,
+      "both_successes": 0
+    },
+    {
+      "name": "gru_aux_policy",
+      "parameters": 13765,
+      "heldout_successes": 51,
+      "swapped_successes": 13,
+      "both_successes": 0
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\rl-aux-d32-s333.json"
+}

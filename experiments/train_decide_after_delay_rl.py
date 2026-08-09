@@ -98,6 +98,45 @@ class PolicyGRU(nn.Module):
         return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
 
 
+class PolicyGRUAux(nn.Module):
+    """GRU policy with a memory-content prediction head: at every non-identity
+    frame the aux head predicts the remembered identity one-hot.  Aux loss is
+    added to the PPO loss (weighted) to test whether explicit memory-content
+    prediction helps GRU learn cross-step memory under RL (as it does under
+    supervision, see JEPLM_AUX_REPORT.md)."""
+
+    def __init__(self, input_dim: int, num_actions: int, width: int = 64, aux_coefficient: float = 0.5) -> None:
+        super().__init__()
+        self.cell = nn.GRUCell(input_dim, width)
+        self.head = nn.Linear(width, num_actions + 1)
+        self.aux_head = nn.Linear(width, 2)
+        self.aux_coefficient = aux_coefficient
+        self._hidden: Tensor | None = None
+
+    def reset(self, batch: int, device: torch.device) -> None:
+        self._hidden = torch.zeros(batch, self.cell.hidden_size, device=device)
+
+    def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        candidate = self.cell(observation_step, self._hidden)
+        active = valid_step.unsqueeze(-1)
+        self._hidden = torch.where(active, candidate, self._hidden)
+        output = self.head(self._hidden)
+        return output[..., :-1], output[..., -1], self.aux_head(self._hidden)
+
+    def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        batch, length, _ = observations.shape
+        self.reset(batch, observations.device)
+        logits_list: list[Tensor] = []
+        values_list: list[Tensor] = []
+        aux_list: list[Tensor] = []
+        for index in range(length):
+            logits, value, aux = self.step(observations[:, index], valid[:, index])
+            logits_list.append(logits)
+            values_list.append(value)
+            aux_list.append(aux)
+        return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1), torch.stack(aux_list, dim=1)
+
+
 class PolicyEvidence(nn.Module):
     def __init__(self, input_dim: int, num_actions: int, *, width: int = 64, slots: int = 8) -> None:
         super().__init__()
@@ -203,14 +242,16 @@ def _pad(episodes: list[list[Tensor]], device: torch.device, input_dim: int) -> 
 def _collect(
     model: nn.Module, env: DecideEnv, *, count: int, seed_start: int,
     device: torch.device, stochastic: bool = True,
-) -> tuple[list[list[Tensor]], list[list[int]], list[list[float]]]:
+) -> tuple[list[list[Tensor]], list[list[int]], list[list[float]], list[int]]:
     """Batch-parallel streaming collection: every episode advances together,
-    one batched forward per frame (O(T) total, GPU keeps a full batch busy)."""
+    one batched forward per frame (O(T) total, GPU keeps a full batch busy).
+    Returns (histories, action_lists, reward_lists, labels)."""
     was_training = model.training
     model.eval()
     import copy
     envs = [copy.deepcopy(env) for _ in range(count)]
     observations = [envs[i].reset(seed=seed_start + i)[0] for i in range(count)]
+    labels = [envs[i]._label for i in range(count)]
     model.reset(count, device)
     histories: list[list[Tensor]] = [[] for _ in range(count)]
     action_lists: list[list[int]] = [[] for _ in range(count)]
@@ -221,7 +262,8 @@ def _collect(
         if not bool(active.any()):
             break
         observation_step = torch.stack([torch.tensor(obs) for obs in observations]).to(device)
-        logits, _values = model.step(observation_step, active)
+        outputs = model.step(observation_step, active)
+        logits = outputs[0]
         for index in range(count):
             if done[index]:
                 continue
@@ -236,7 +278,7 @@ def _collect(
                 done[index] = True
     if was_training:
         model.train()
-    return histories, action_lists, reward_lists
+    return histories, action_lists, reward_lists, labels
 
 
 def _gae(rewards: list[list[float]], values: Tensor, valid: Tensor, *, gamma: float = 0.99, lambda_: float = 0.95) -> tuple[Tensor, Tensor]:
@@ -283,7 +325,7 @@ def _train_ppo(
     total_episodes = total_successes = 0
     for update in range(updates):
         model.train()
-        histories, action_lists, reward_lists = _collect(
+        histories, action_lists, reward_lists, labels = _collect(
             model, env, count=episodes_per_update, seed_start=seed_start + update * episodes_per_update, device=device,
         )
         observations, valid = _pad(histories, device, env.input_dim)
@@ -310,7 +352,18 @@ def _train_ppo(
             entropy = distribution.entropy()[valid].mean()
             loss = actor + 0.5 * critic - entropy_coefficient * entropy
             if len(outputs) > 2:
-                loss = loss + getattr(model, "surprise_coefficient", 0.1) * _predictor_loss(outputs[2], observations)
+                if hasattr(model, "aux_coefficient") and hasattr(model, "aux_head"):
+                    # memory-content prediction on empty frames (positions 1..T-2)
+                    targets = torch.eye(2, device=observations.device)[torch.tensor(labels, device=observations.device)]
+                    positions = torch.arange(outputs[2].shape[1], device=observations.device)
+                    frame_mask = (positions > 0) & (positions < outputs[2].shape[1] - 1)
+                    aux_mask = valid & frame_mask.unsqueeze(0)
+                    if bool(aux_mask.any()):
+                        aux_targets = targets.unsqueeze(1).expand(-1, outputs[2].shape[1], -1)[aux_mask]
+                        aux_loss = nn.functional.cross_entropy(outputs[2][aux_mask], aux_targets.argmax(-1))
+                        loss = loss + model.aux_coefficient * aux_loss
+                else:
+                    loss = loss + getattr(model, "surprise_coefficient", 0.1) * _predictor_loss(outputs[2], observations)
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -384,6 +437,7 @@ def run(
     identity_count: int = 2, updates: int = 40, episodes_per_update: int = 24,
     evaluation_episodes: int = 64, experiment_seed: int = 41_123,
     train_seed_start: int = 10_000, heldout_seed_start: int = 1_000_000,
+    aux_memory: bool = False, aux_coefficient: float = 0.5, gru_focus: bool = False,
     artifact: Path | None = None,
 ) -> Report:
     resolved = resolve_device(device)
@@ -400,6 +454,12 @@ def run(
         ("plwm_latent64_policy", lambda: PolicyPLWM(input_dim, identity_count, latent=64)),
         ("plwm_gated_policy", lambda: PolicyPLWM(input_dim, identity_count, gated_memory=True)),
     )
+    if aux_memory:
+        factories = factories + (
+            ("gru_aux_policy", lambda: PolicyGRUAux(input_dim, identity_count, aux_coefficient=aux_coefficient)),
+        )
+    if gru_focus:
+        factories = [f for f in factories if f[0] in ("gru_policy", "gru_aux_policy")]
     results = []
     for name, factory in factories:
         model = factory().to(resolved)
@@ -419,14 +479,19 @@ def run(
     # to fail, so both≈0 is the *correct* behaviour for a genuine memory
     # policy.  The right metrics are held-out accuracy (orig) and the gap
     # (orig - swapped) as memory evidence.
-    plwm_orig = by_name["plwm_policy"].heldout_successes
+    plwm_orig = by_name["plwm_policy"].heldout_successes if "plwm_policy" in by_name else 0
     gru_orig = by_name["gru_policy"].heldout_successes
-    evidence_orig = by_name["evidence_policy"].heldout_successes
+    evidence_orig = by_name["evidence_policy"].heldout_successes if "evidence_policy" in by_name else 0
     persistent_best = max(plwm_orig, evidence_orig, gru_orig)
-    accepted = (
-        persistent_best >= int(evaluation_episodes * 0.6)
-        and max(plwm_orig, evidence_orig) >= gru_orig + int(evaluation_episodes * 0.1)
-    )
+    if gru_focus:
+        # GRU-focused probe: the interesting comparison is gru vs gru_aux;
+        # the standard gate needs the addressable controllers, so skip it.
+        accepted = False
+    else:
+        accepted = (
+            persistent_best >= int(evaluation_episodes * 0.6)
+            and max(plwm_orig, evidence_orig) >= gru_orig + int(evaluation_episodes * 0.1)
+        )
     target = artifact or ROOT / "artifacts" / "decide-after-delay-rl-report.json"
     target.parent.mkdir(exist_ok=True)
     report = Report(
@@ -448,6 +513,9 @@ if __name__ == "__main__":
     parser.add_argument("--episodes-per-update", type=int, default=24)
     parser.add_argument("--evaluation-episodes", type=int, default=64)
     parser.add_argument("--experiment-seed", type=int, default=41_123)
+    parser.add_argument("--aux-memory", action="store_true")
+    parser.add_argument("--aux-coefficient", type=float, default=0.5)
+    parser.add_argument("--gru-focus", action="store_true")
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
     outcome = run(
@@ -455,6 +523,8 @@ if __name__ == "__main__":
         identity_count=args.identity_count, updates=args.updates,
         episodes_per_update=args.episodes_per_update,
         evaluation_episodes=args.evaluation_episodes,
-        experiment_seed=args.experiment_seed, artifact=args.artifact,
+        experiment_seed=args.experiment_seed,
+        aux_memory=args.aux_memory, aux_coefficient=args.aux_coefficient,
+        gru_focus=args.gru_focus, artifact=args.artifact,
     )
     print(json.dumps(asdict(outcome), indent=2))
