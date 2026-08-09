@@ -37,14 +37,15 @@ from plwm.torch_model import TorchPLWM
 class DecideStreamEnv(gym.Env):
     metadata = {"render_modes": []}
 
-    def __init__(self, *, units: int = 3, gap: int = 4, identity_count: int = 2, seed: int = 0, switch_at: int | None = None) -> None:
+    def __init__(self, *, units: int = 3, gap: int = 4, identity_count: int = 2, seed: int = 0, switch_at: int | None = None, query_horizon: int = 2) -> None:
         if units < 2:
             raise ValueError("stream needs at least two episodes for cross-episode queries")
         self.units, self.gap, self.identity_count = units, gap, identity_count
         self.switch_at = switch_at if switch_at is not None else units + 1
         self.unit_len = gap + 1
         self.total_steps = units * self.unit_len
-        self.input_dim = identity_count + 2  # presence + query type (prev_0 / prev_1)
+        self.query_horizon = query_horizon
+        self.input_dim = identity_count + max(2, query_horizon)  # presence + query channels
         self.action_space = gym.spaces.Discrete(identity_count)
         self.observation_space = gym.spaces.Box(0.0, 1.0, (self.input_dim,), dtype=np.float32)
         self._seed = seed
@@ -62,9 +63,9 @@ class DecideStreamEnv(gym.Env):
         rng = random.Random(seed if seed is not None else self._seed)
         self._identities = [rng.randrange(self.identity_count) for _ in range(self.units)]
         self._query_types = [
-            rng.randrange(1) if unit == 0 else rng.randrange(2)
+            rng.randrange(1) if unit == 0 else rng.randrange(self.query_horizon)
             for unit in range(self.units)
-        ]  # 0 = current episode, 1 = previous episode
+        ]  # 0 = current, 1 = previous, 2 = two-back (query_horizon=3)
         self._frame = 0
         return self._observation(0), {}
 
@@ -76,13 +77,12 @@ class DecideStreamEnv(gym.Env):
         elif position == self.gap:
             vector[self.identity_count + self._query_types[unit]] = 1.0
         return vector
-
     def step(self, action: int) -> tuple[np.ndarray, float, bool, bool, dict]:
         frame = self._frame
         unit, position = divmod(frame, self.unit_len)
         reward = 0.0
         if position == self.gap:  # query frame
-            target_unit = unit - self._query_types[unit]
+            target_unit = max(0, unit - self._query_types[unit])
             if int(action) == self.target_action(unit, target_unit):
                 reward = 1.0
         self._frame += 1
@@ -128,12 +128,13 @@ class PolicyGRUAux(nn.Module):
     prediction rescues GRU's cross-episode memory under RL (as it does in the
     single-episode setting, JEPLM_AUX_REPORT.md)."""
 
-    def __init__(self, input_dim: int, num_actions: int, width: int = 64, aux_coefficient: float = 0.5) -> None:
+    def __init__(self, input_dim: int, num_actions: int, width: int = 64, aux_coefficient: float = 0.5, aux_timescales: int = 1) -> None:
         super().__init__()
         self.cell = nn.GRUCell(input_dim, width)
         self.head = nn.Linear(width, num_actions + 1)
-        self.aux_head = nn.Linear(width, 2)
+        self.aux_head = nn.Linear(width, 2 * aux_timescales)
         self.aux_coefficient = aux_coefficient
+        self.aux_timescales = aux_timescales
         self._hidden: Tensor | None = None
 
     def reset(self, batch: int, device: torch.device) -> None:
@@ -201,6 +202,7 @@ class PolicyGRUAux2(nn.Module):
 class PolicyEvidence(nn.Module):
     def __init__(self, input_dim: int, num_actions: int, *, width: int = 64, slots: int = 8) -> None:
         super().__init__()
+        self.slots = slots
         self.num_actions = num_actions
         self.encoder = nn.Sequential(nn.Linear(input_dim, width), nn.Tanh())
         self.query = nn.Linear(width, width, bias=False)
@@ -217,7 +219,7 @@ class PolicyEvidence(nn.Module):
     def reset(self, batch: int, device: torch.device) -> None:
         width = self.encoder[0].out_features
         self._state = torch.zeros(batch, width, device=device)
-        self._keys = torch.zeros(batch, 8, width, device=device)
+        self._keys = torch.zeros(batch, self.slots, width, device=device)
         self._values = torch.zeros_like(self._keys)
 
     def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor]:
@@ -580,7 +582,14 @@ def _train_ppo(
                 aux_mask = valid & frame_mask.unsqueeze(0)
                 if bool(aux_mask.any()):
                     aux_logits = outputs[2]
-                    if aux_logits.shape[-1] == 4:
+                    if aux_logits.shape[-1] >= 6:
+                        cur_loss = nn.functional.cross_entropy(aux_logits[..., :2][aux_mask], cur_targets[aux_mask])
+                        prev_loss = nn.functional.cross_entropy(aux_logits[..., 2:4][aux_mask], prev_targets[aux_mask])
+                        prev2_units = (frame_units - 2).clamp(min=0)
+                        prev2_targets = labels_t[:, prev2_units]
+                        prev2_loss = nn.functional.cross_entropy(aux_logits[..., 4:6][aux_mask], prev2_targets[aux_mask])
+                        aux_loss = cur_loss + prev_loss + prev2_loss
+                    elif aux_logits.shape[-1] == 4:
                         cur_loss = nn.functional.cross_entropy(aux_logits[..., :2][aux_mask], cur_targets[aux_mask])
                         prev_loss = nn.functional.cross_entropy(aux_logits[..., 2:][aux_mask], prev_targets[aux_mask])
                         aux_loss = cur_loss + prev_loss
@@ -619,7 +628,7 @@ def _evaluate(model: nn.Module, env: DecideStreamEnv, *, episodes: int, seed_sta
                 hit = int(action == target)
                 correct += hit
                 total += 1
-                if env._query_types[unit] == 1:
+                if env._query_types[unit] > 0:  # cross-episode (previous / two-back)
                     correct_prev += hit
                     total_prev += 1
                 if unit < env.switch_at:
@@ -671,13 +680,14 @@ def run(
     rmt_segment_units: float = 1.0, rmt_detach_mem: bool = True,
     rmt_probe: bool = False, aux_memory: bool = False,
     aux_coefficient: float = 0.5, gru_focus: bool = False, rmt_aux_only: bool = False,
-    evidence_aux_only: bool = False,
+    evidence_aux_only: bool = False, query_horizon: int = 2, aux_timescales: int = 1,
+    evidence_slots: int = 8,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
     np.random.seed(experiment_seed)
     random.seed(experiment_seed)
-    env = DecideStreamEnv(units=units, gap=gap, identity_count=identity_count, switch_at=switch_at)
+    env = DecideStreamEnv(units=units, gap=gap, identity_count=identity_count, switch_at=switch_at, query_horizon=query_horizon)
     input_dim = env.input_dim
     if rmt_probe:
         # probe mode: only RMT (+GRU as the gate baseline) -- cheap and
@@ -694,7 +704,7 @@ def run(
     else:
         factories = (
             ("gru_policy", lambda: PolicyGRU(input_dim, identity_count)),
-            ("evidence_policy", lambda: PolicyEvidence(input_dim, identity_count)),
+            ("evidence_policy", lambda: PolicyEvidence(input_dim, identity_count, slots=evidence_slots)),
             ("plwm_policy", lambda: PolicyPLWM(input_dim, identity_count)),
             ("plwm_slots16_policy", lambda: PolicyPLWM(input_dim, identity_count, memory_slots=16)),
             ("rmt_mem4_policy", lambda: PolicyRMTStream(
@@ -706,7 +716,8 @@ def run(
         )
     if aux_memory:
         factories = factories + (
-            ("gru_aux_policy", lambda: PolicyGRUAux(input_dim, identity_count, aux_coefficient=aux_coefficient)),
+            ("gru_aux_policy", lambda: PolicyGRUAux(input_dim, identity_count, aux_coefficient=aux_coefficient, aux_timescales=aux_timescales)),
+            ("gru_aux3_policy", lambda: PolicyGRUAux(input_dim, identity_count, aux_coefficient=aux_coefficient, aux_timescales=3)),
             ("gru_aux2_policy", lambda: PolicyGRUAux2(input_dim, identity_count, aux_coefficient=aux_coefficient)),
             ("rmt_aux_mem4_policy", lambda: PolicyRMTStreamAux(
                 input_dim, identity_count, unit_len=env.unit_len, memory_tokens=4,
@@ -766,6 +777,9 @@ if __name__ == "__main__":
     parser.add_argument("--evaluation-episodes", type=int, default=64)
     parser.add_argument("--switch-at", type=int, default=None, help="unit index where the identity->choice rule flips (None = never)")
     parser.add_argument("--experiment-seed", type=int, default=41_123)
+    parser.add_argument("--query-horizon", type=int, default=2)
+    parser.add_argument("--aux-timescales", type=int, default=1)
+    parser.add_argument("--evidence-slots", type=int, default=8)
     parser.add_argument("--rmt-segment-units", type=float, default=1.0)
     parser.add_argument("--no-rmt-detach", action="store_true")
     parser.add_argument("--rmt-probe", action="store_true")
@@ -786,6 +800,7 @@ if __name__ == "__main__":
         rmt_detach_mem=not args.no_rmt_detach, rmt_probe=args.rmt_probe,
         aux_memory=args.aux_memory, aux_coefficient=args.aux_coefficient,
         gru_focus=args.gru_focus, rmt_aux_only=args.rmt_aux_only,
-        evidence_aux_only=args.evidence_aux_only,
+        evidence_aux_only=args.evidence_aux_only, query_horizon=args.query_horizon,
+        aux_timescales=args.aux_timescales, evidence_slots=args.evidence_slots,
     )
     print(json.dumps(asdict(outcome), indent=2))
