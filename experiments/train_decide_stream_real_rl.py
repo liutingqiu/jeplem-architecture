@@ -97,12 +97,13 @@ class DecideStreamRealEnv(gym.Env):
 
     metadata = {"render_modes": []}
 
-    def __init__(self, *, units: int = 3, gap: int = 4, seed: int = 0) -> None:
+    def __init__(self, *, units: int = 3, gap: int = 4, seed: int = 0, use_presence: bool = False) -> None:
         self.units, self.gap, self.seed = units, gap, seed
+        self.use_presence = use_presence
         self.switch_at = units + 1
         self.unit_len = gap + 1
         self.total_steps = units * self.unit_len
-        self.input_dim = INPUT_DIM
+        self.input_dim = (2 if use_presence else SENSORY_DIM) + QUERY_DIM
         self.action_space = gym.spaces.Discrete(2)
         self.observation_space = gym.spaces.Box(0.0, 1.0, (INPUT_DIM,), dtype=np.float32)
         self._sequence: list[Tensor] | None = None
@@ -143,16 +144,20 @@ class DecideStreamRealEnv(gym.Env):
             by_label_starts[label].append(frame_start)
         if len(by_label_starts[0]) == 0 or len(by_label_starts[1]) == 0:
             raise RuntimeError("degenerate stream: only one identity present in this seed's frames")
-        episodes: list[list[int]] = []
-        pick: dict[int, int] = {0: 0, 1: 0}
-        for unit in range(self.units):
-            label = 0 if unit % 2 == 0 else 1
-            source = by_label_starts[label]
-            if pick[label] >= len(source):
-                raise RuntimeError("not enough same-label episodes for interleaving")
-            start = source[pick[label]]
-            pick[label] += 1
-            episodes.append(list(range(start, start + self.gap + 1)))
+        # Natural order: slide a window over the candidates (stream order,
+        # no alternation forcing) and take the first window that contains BOTH
+        # identities.  A single-identity stream would be degenerate (solvable
+        # by a constant output); a deterministic alternation would be a
+        # learnable pattern shortcut.  Window keeps relative stream order.
+        episodes: list[list[int]] | None = None
+        for start in range(len(candidates) - self.units + 1):
+            window = candidates[start:start + self.units]
+            labels_in_window = {label for _frame_start, label in window}
+            if len(labels_in_window) == 2:
+                episodes = [list(range(fs, fs + self.gap + 1)) for fs, _label in window]
+                break
+        if episodes is None:
+            raise RuntimeError("degenerate stream: no window contains both identities")
         sequence: list[Tensor] = []
         labels: list[int] = []
         query_types: list[int] = []
@@ -163,7 +168,10 @@ class DecideStreamRealEnv(gym.Env):
             query_type = 1 if (unit > 0 and random.Random(seed + unit).randrange(2) == 1) else 0
             query_types.append(query_type)
             for position, frame_index in enumerate(episode):
-                obs = frames[frame_index].clone()
+                if self.use_presence:
+                    obs = visible_object_presence(frames[frame_index].unsqueeze(0)).squeeze(0).clone()
+                else:
+                    obs = frames[frame_index].clone()
                 query_onehot = torch.zeros(QUERY_DIM)
                 if position == self.gap:  # query frame (last position)
                     query_onehot[query_type] = 1.0
@@ -250,19 +258,27 @@ def run(
     *, device: str | torch.device | None = None, units: int = 3, gap: int = 4,
     updates: int = 100, episodes_per_update: int = 24, evaluation_episodes: int = 32,
     experiment_seed: int = 41_123, train_seed_start: int = 10_000,
-    heldout_seed_start: int = 1_000_000, artifact: Path | None = None,
+    heldout_seed_start: int = 1_000_000, use_presence: bool = False,
+    rmt_probe: bool = False, artifact: Path | None = None,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
     np.random.seed(experiment_seed)
     random.seed(experiment_seed)
-    env = DecideStreamRealEnv(units=units, gap=gap, seed=experiment_seed)
-    factories = (
-        ("gru_policy", lambda: PolicyGRU(INPUT_DIM, 2)),
-        ("evidence_policy", lambda: PolicyEvidence(INPUT_DIM, 2)),
-        ("plwm_policy", lambda: PolicyPLWM(INPUT_DIM, 2)),
-        ("rmt_mem4_policy", lambda: PolicyRMTStream(INPUT_DIM, 2, unit_len=env.unit_len, memory_tokens=4)),
-    )
+    env = DecideStreamRealEnv(units=units, gap=gap, seed=experiment_seed, use_presence=use_presence)
+    input_dim = env.input_dim
+    if rmt_probe:
+        factories = (
+            ("gru_policy", lambda: PolicyGRU(input_dim, 2)),
+            ("rmt_mem4_policy", lambda: PolicyRMTStream(input_dim, 2, unit_len=env.unit_len, memory_tokens=4)),
+        )
+    else:
+        factories = (
+            ("gru_policy", lambda: PolicyGRU(input_dim, 2)),
+            ("evidence_policy", lambda: PolicyEvidence(input_dim, 2)),
+            ("plwm_policy", lambda: PolicyPLWM(input_dim, 2)),
+            ("rmt_mem4_policy", lambda: PolicyRMTStream(input_dim, 2, unit_len=env.unit_len, memory_tokens=4)),
+        )
     results = []
     for name, factory in factories:
         model = factory().to(resolved)
@@ -297,12 +313,15 @@ if __name__ == "__main__":
     parser.add_argument("--episodes-per-update", type=int, default=24)
     parser.add_argument("--evaluation-episodes", type=int, default=32)
     parser.add_argument("--experiment-seed", type=int, default=41_123)
+    parser.add_argument("--use-presence", action="store_true")
+    parser.add_argument("--rmt-probe", action="store_true")
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
     outcome = run(
         device=args.device, units=args.units, gap=args.gap, updates=args.updates,
         episodes_per_update=args.episodes_per_update,
         evaluation_episodes=args.evaluation_episodes,
-        experiment_seed=args.experiment_seed, artifact=args.artifact,
+        experiment_seed=args.experiment_seed,
+        use_presence=args.use_presence, rmt_probe=args.rmt_probe, artifact=args.artifact,
     )
     print(json.dumps(asdict(outcome), indent=2))

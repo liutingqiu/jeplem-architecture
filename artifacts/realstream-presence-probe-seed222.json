@@ -1,0 +1,27 @@
+{
+  "protocol": "decide_stream_real_rl_v1: continuous stream of REAL MemoryS13 observation episodes [identity frame -> gap empty frames -> query frame (real obs + injected one-hot current/previous)]; reward only on query steps; PPO on-policy; no teacher, oracle, shaped reward, or privileged state; real-observation analogue of DecideStreamEnv.",
+  "device": "cuda",
+  "units": 3,
+  "gap": 4,
+  "updates": 100,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "gru_policy",
+      "parameters": 13635,
+      "query_accuracy": 0.8055555555555556,
+      "cross_episode_accuracy": 0.9696969696969697,
+      "swap_query_accuracy": 0.19444444444444445,
+      "swap_cross_accuracy": 0.030303030303030304
+    },
+    {
+      "name": "rmt_mem4_policy",
+      "parameters": 84099,
+      "query_accuracy": 0.8888888888888888,
+      "cross_episode_accuracy": 1.0,
+      "swap_query_accuracy": 0.1111111111111111,
+      "swap_cross_accuracy": 0.0
+    }
+  ],
+  "artifact": "artifacts\\realstream-presence-probe-seed222.json"
+}
