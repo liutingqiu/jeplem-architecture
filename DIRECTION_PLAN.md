@@ -20,7 +20,7 @@
 | 数学裁决 A/B/C/D | ✅ 证实 | 可分离性、容量、表达式表示等 |
 | addressed_balanced_2id | ❌ 负结果 | 所有模型 50%（随机水平）|
 | short_delay_2id 小批量 | ⚠️ 未通过 | PLWM 3/8 = 37.5% |
-| MiniGrid hybrid curriculum | ✅ 通过 | PLWM 37/64 vs 无记忆 0/64 |
+| ~~MiniGrid hybrid curriculum~~ | ❌ **证伪（2026-08-10）** | 37/64 为平凡策略（left→forward），与 27/64（right→forward）同为平凡策略，swap probe both=0；见 MEMORYS7_REVERIFICATION_REPORT.md |
 
 ### 1.2 核心发现
 
@@ -31,7 +31,7 @@
    - 这是真正的跨帧延迟关联，终端 reward 太稀疏
 
 2. **MiniGrid 证明 PLWM 有架构优势**
-   - hybrid curriculum: PLWM 37/64 vs 无记忆 0/64
+   - ~~hybrid curriculum~~: 已被证伪（平凡策略攻破，2026-08-10）——最有力证据已切换为 DecideAfterDelay 家族
    - 这是目前最有力的证据
 
 3. **JEPA 研究提供了改进方向**
@@ -68,7 +68,7 @@
 **在 MiniGrid 上建立延迟检索的证据**
 
 理由：
-1. **已有成功先例**：hybrid curriculum 37/64
+1. **~~已有成功先例~~**：hybrid curriculum 37/64 已被证伪（平凡策略）——成功先例改为 DecideAfterDelay 记忆任务族（3 seed、swap 探针、多维度一致）
 2. **更稳定**：无需 Luanti 游戏服务器
 3. **更轻量**：CPU 可运行，不依赖 CUDA
 4. **更灵活**：可快速迭代任务设计
@@ -126,7 +126,7 @@
 ### 4.2 基于证据，不是基于猜测
 
 - 已停止的工作有明确数据支持（256 worlds, 1024 worlds, 2id 简化全部失败）
-- 转向 MiniGrid 有成功先例（hybrid curriculum 37/64）
+- 转向 MiniGrid 的动机已改为 DecideAfterDelay 家族证据（37/64 已被证伪为平凡策略）
 - JEPA 研究提供了理论支撑
 
 ### 4.3 成本控制
@@ -137,7 +137,7 @@
 
 ### 4.4 证据导向
 
-- 当前 PLWM 最有力的证据是 MiniGrid hybrid curriculum（37/64 vs 0/64）
+- 当前 PLWM 最有力的证据是 DecideAfterDelay 家族（v3 双身份 GRU 0.802/PLWM 1.0、延迟轴、RL、连续流——全部 swap 探针确认）
 - 在 MiniGrid 上建立延迟检索证据，可以补充这一优势
 - 避免在不可学的任务上浪费资源
 
@@ -155,7 +155,7 @@
 |------|----------|
 | MiniGrid 实验也失败 | 已有多次失败先例，可以重新评估任务设计 |
 | 时间超支 | 分阶段执行，每阶段有明确验收标准 |
-| 证据不足 | 已有 MiniGrid hybrid curriculum 成功先例 |
+| 证据不足 | ~~MiniGrid hybrid curriculum~~ 已证伪；DecideAfterDelay 家族（3+ seed、swap 探针）为当前基础 |
 | JEPA 启发未被验证 | 作为可选阶段，不影响当前方向 |
 
 ---

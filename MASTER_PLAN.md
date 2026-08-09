@@ -768,6 +768,17 @@ complexity. The next control study must first use a predeclared diagnostic
 that separates short Transformer context from genuinely persistent memory,
 then introduce a materially different memory ownership/revision mechanism.
 
+**Final verdict (2026-08-10, MemoryS7 re-verification)**: the held-out
+evaluation itself was later shown to be gamed by a trivial policy --
+`action_counts=[0,64,221,...]` (turn right once, then go straight) hits a
+stable 27/64 because `success_pos` sits on the straight path. The first-run
+37/64 has counts `[64,0,292,...]` (turn LEFT once then straight): same trivial
+policy, different turning direction -- the "37 vs 27/18 advantage" was
+direction-seed luck. All JEPLM v1/v2/intrinsic swap-counterfactual probes
+report `{original: 27, swapped: 0, both: 0}` (no genuine memory). The whole
+MemoryS7 line is void; the evidence base lives in the DecideAfterDelay /
+DecideStream family (see MEMORYS7_REVERIFICATION_REPORT.md).
+
 The first such diagnostic used fixed `MiniGrid-MemoryS13-v0`, because a
 separate read-only environment audit found its source-to-branch causal delay
 to be at least seven actions (median nine), while the candidate short-context

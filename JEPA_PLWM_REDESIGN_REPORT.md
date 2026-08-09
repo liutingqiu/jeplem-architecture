@@ -40,7 +40,7 @@ workspace = GRU(belief, retrieved, workspace)     # latent-only 思考
 |---|---|---|
 | addressed_balanced_2id（6 步延迟，Luanti）| 所有模型 50% | 负结果，已归档（任务设计问题）|
 | short_delay_2id（3 步延迟，Luanti）| PLWM 3/8 = 37.5% | 未通过（验收线 ≥ 0.75）|
-| MiniGrid hybrid curriculum | PLWM 37/64 vs 无记忆 0/64 | ✅ 目前最强证据 |
+| ~~MiniGrid hybrid curriculum~~ | ~~PLWM 37/64 vs 无记忆 0/64~~ | ❌ **证伪（2026-08-10）**：37/64 为平凡策略（left→forward），swap probe both=0；见 MEMORYS7_REVERIFICATION_REPORT.md |
 
 **根因（已在 DIRECTION_PLAN.md 归档）**：延迟关联任务的终端奖励太稀疏，credit assignment 失效；身份(step 0)与查询(step k)永不同帧，中间无视觉线索。任何 controller 都学不会 → 说明**不是记忆容量问题，而是训练信号问题**。
 
@@ -174,7 +174,7 @@ JEPA 的全部价值集中在**训练目标**：它证明"预测语义 latent（
 
 ## 四、定制化实验体系
 
-> 环境选择：**MiniGrid 为主环境**（理由：hybrid curriculum 已有 37/64 成功先例；CPU 可运行；Luanti 服务器稳定性问题已消耗过多调试时间）。L2 阶段扩展到 Crafter（`plwm/crafter_env.py` 已存在）。所有实验遵循 Evidence Standards：契约先行、held-out seed 分离、匹配 baseline、多 seed 运行、失败报告归档。
+> 环境选择：**MiniGrid 为主环境**（~~理由：hybrid curriculum 已有 37/64 成功先例~~——该先例已于 2026-08-10 被证伪为平凡策略，见 MEMORYS7_REVERIFICATION_REPORT.md；当前理由：DecideAfterDelay 家族在 MiniGrid 上已建立 swap 探针方法论与 3+ seed 证据链；CPU 可运行）。L2 阶段扩展到 Crafter（`plwm/crafter_env.py` 已存在）。所有实验遵循 Evidence Standards：契约先行、held-out seed 分离、匹配 baseline、多 seed 运行、失败报告归档。
 
 ### 4.1 任务族：延迟关联（Delayed Association）
 
