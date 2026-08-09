@@ -1,0 +1,25 @@
+{
+  "protocol": "world_model_rollout_v1: Block-12 minimal experiment. Discrete nonlinear dynamics s'=(s*s+3) mod N. complete learns the full transition table (rollout exact forever); linear_approx fits s'~a*s+b (drifts on nonlinear dynamics); partial sees half the states (fails at unseen states). Criterion: complete rollout error <= 0.05 and >= 0.3 lower than both controls -- long-horizon stability requires a genuine (complete) dynamics model.",
+  "device": "None",
+  "states": 20,
+  "rollout": 10,
+  "results": [
+    {
+      "name": "complete",
+      "rollout_error": 0.0,
+      "coverage": 1.0
+    },
+    {
+      "name": "linear_approx",
+      "rollout_error": 1.0,
+      "coverage": 1.0
+    },
+    {
+      "name": "partial",
+      "rollout_error": 0.5000000000000001,
+      "coverage": 0.5
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\wm-seed222.json"
+}
