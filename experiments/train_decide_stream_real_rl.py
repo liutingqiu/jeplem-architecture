@@ -197,6 +197,8 @@ class Result:
     parameters: int
     query_accuracy: float
     cross_episode_accuracy: float
+    swap_query_accuracy: float
+    swap_cross_accuracy: float
 
 
 @dataclass
@@ -209,6 +211,39 @@ class Report:
     episodes_per_update: int
     results: list[Result]
     artifact: str
+
+
+def _evaluate_swap(
+    model: nn.Module, env: DecideStreamRealEnv, *, episodes: int, seed_start: int, device: torch.device,
+) -> tuple[float, float]:
+    """Swap-counterfactual evaluation (RL semantics): force the flipped
+    action.  A genuine memory policy scores high on orig and collapses on swap
+    (evidence = orig - swap); a positional/visual shortcut scores the same on
+    both.  Required by the frozen protocol for all memory claims."""
+    model.eval()
+    correct = correct_prev = total = total_prev = 0
+    for episode_index in range(episodes):
+        observation, _info = env.reset(seed=seed_start + episode_index)
+        model.reset(1, device)
+        for frame in range(env.total_steps):
+            unit, position = divmod(frame, env.unit_len)
+            observation_step = torch.tensor(observation).unsqueeze(0).to(device)
+            valid_step = torch.ones(1, dtype=torch.bool, device=device)
+            outputs = model.step(observation_step, valid_step)
+            if position == env.gap:  # query frame
+                action = 1 - int(outputs[0][0].argmax().item())  # flipped
+                target_unit = unit - env._query_types[unit]
+                target = env.target_action(unit, target_unit)
+                hit = int(action == target)
+                correct += hit
+                total += 1
+                if env._query_types[unit] == 1:
+                    correct_prev += hit
+                    total_prev += 1
+            observation, _reward, terminated, truncated, _info = env.step(0)
+            if terminated or truncated:
+                break
+    return (correct / max(total, 1), correct_prev / max(total_prev, 1))
 
 
 def run(
@@ -238,7 +273,11 @@ def run(
         query_acc, cross_acc, _before, _after = _evaluate(
             model, env, episodes=evaluation_episodes, seed_start=heldout_seed_start, device=resolved,
         )
-        results.append(Result(name, sum(parameter.numel() for parameter in model.parameters()), query_acc, cross_acc))
+        swap_query, swap_cross = _evaluate_swap(
+            model, env, episodes=evaluation_episodes, seed_start=heldout_seed_start, device=resolved,
+        )
+        results.append(Result(name, sum(parameter.numel() for parameter in model.parameters()),
+                              query_acc, cross_acc, swap_query, swap_cross))
     target = artifact or ROOT / "artifacts" / "decide-stream-real-rl-report.json"
     target.parent.mkdir(exist_ok=True)
     report = Report(
