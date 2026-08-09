@@ -227,9 +227,16 @@ class PolicyRMTStream(nn.Module):
 
     def __init__(self, input_dim: int, num_actions: int, *, unit_len: int,
                  d_model: int = 64, n_layers: int = 2, n_heads: int = 4,
-                 memory_tokens: int = 4, dropout: float = 0.0) -> None:
+                 memory_tokens: int = 4, dropout: float = 0.0,
+                 segment_units: float = 1.0, detach_mem: bool = True) -> None:
         super().__init__()
         self.unit_len, self.memory_tokens = unit_len, memory_tokens
+        # probe knobs: segment_units scales the segment boundary (1.0 = one
+        # episode per segment); detach_mem=False keeps the full gradient across
+        # segment boundaries (full-BPTT regime) instead of truncated BPTT.
+        self.segment_units = segment_units
+        self.detach_mem = detach_mem
+        self._seg_target = max(1, int(round(segment_units * unit_len)))
         self.proj = nn.Linear(input_dim, d_model)
         self.memory = nn.Parameter(torch.randn(memory_tokens, d_model) * 0.02)
         self.pos = nn.Parameter(torch.randn(1, 256, d_model) * 0.02)
@@ -258,7 +265,10 @@ class PolicyRMTStream(nn.Module):
             torch.full((total, total), float("-inf"), device=embedded.device), diagonal=1,
         )
         out = self.encoder(embedded, mask=causal)
-        return out, out[:, :mem_count].detach()
+        new_mem = out[:, :mem_count]
+        if self.detach_mem:
+            new_mem = new_mem.detach()
+        return out, new_mem
 
     def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor]:
         if self._seg_frames is None:
@@ -267,7 +277,7 @@ class PolicyRMTStream(nn.Module):
             self._seg_frames = torch.cat((self._seg_frames, observation_step.unsqueeze(1)), dim=1)
         self._seg_len += 1
         out, new_mem = self._run(self._seg_frames, self._mem)
-        if self._seg_len >= self.unit_len:
+        if self._seg_len >= self._seg_target:
             self._mem = torch.where(valid_step.unsqueeze(-1).unsqueeze(-1), new_mem, self._mem)
             self._seg_len = 0
             self._seg_frames = None
@@ -464,6 +474,8 @@ def run(
     evaluation_episodes: int = 64, experiment_seed: int = 41_123,
     train_seed_start: int = 10_000, heldout_seed_start: int = 1_000_000,
     switch_at: int | None = None, artifact: Path | None = None,
+    rmt_segment_units: float = 1.0, rmt_detach_mem: bool = True,
+    rmt_probe: bool = False,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -471,14 +483,31 @@ def run(
     random.seed(experiment_seed)
     env = DecideStreamEnv(units=units, gap=gap, identity_count=identity_count, switch_at=switch_at)
     input_dim = env.input_dim
-    factories = (
-        ("gru_policy", lambda: PolicyGRU(input_dim, identity_count)),
-        ("evidence_policy", lambda: PolicyEvidence(input_dim, identity_count)),
-        ("plwm_policy", lambda: PolicyPLWM(input_dim, identity_count)),
-        ("plwm_slots16_policy", lambda: PolicyPLWM(input_dim, identity_count, memory_slots=16)),
-        ("rmt_mem4_policy", lambda: PolicyRMTStream(input_dim, identity_count, unit_len=env.unit_len, memory_tokens=4)),
-        ("rmt_mem8_policy", lambda: PolicyRMTStream(input_dim, identity_count, unit_len=env.unit_len, memory_tokens=8)),
-    )
+    if rmt_probe:
+        # probe mode: only RMT (+GRU as the gate baseline) -- cheap and
+        # focused on the segment-boundary mechanism.
+        factories = (
+            ("gru_policy", lambda: PolicyGRU(input_dim, identity_count)),
+            ("rmt_mem4_policy", lambda: PolicyRMTStream(
+                input_dim, identity_count, unit_len=env.unit_len, memory_tokens=4,
+                segment_units=rmt_segment_units, detach_mem=rmt_detach_mem)),
+            ("rmt_mem8_policy", lambda: PolicyRMTStream(
+                input_dim, identity_count, unit_len=env.unit_len, memory_tokens=8,
+                segment_units=rmt_segment_units, detach_mem=rmt_detach_mem)),
+        )
+    else:
+        factories = (
+            ("gru_policy", lambda: PolicyGRU(input_dim, identity_count)),
+            ("evidence_policy", lambda: PolicyEvidence(input_dim, identity_count)),
+            ("plwm_policy", lambda: PolicyPLWM(input_dim, identity_count)),
+            ("plwm_slots16_policy", lambda: PolicyPLWM(input_dim, identity_count, memory_slots=16)),
+            ("rmt_mem4_policy", lambda: PolicyRMTStream(
+                input_dim, identity_count, unit_len=env.unit_len, memory_tokens=4,
+                segment_units=rmt_segment_units, detach_mem=rmt_detach_mem)),
+            ("rmt_mem8_policy", lambda: PolicyRMTStream(
+                input_dim, identity_count, unit_len=env.unit_len, memory_tokens=8,
+                segment_units=rmt_segment_units, detach_mem=rmt_detach_mem)),
+        )
     results = []
     for name, factory in factories:
         model = factory().to(resolved)
@@ -494,14 +523,18 @@ def run(
             query_acc, cross_acc, before_acc, after_acc,
         ))
     by_name = {result.name: result for result in results}
-    accepted = (
-        by_name["plwm_policy"].cross_episode_accuracy >= 0.6
-        and by_name["plwm_policy"].cross_episode_accuracy >= by_name["gru_policy"].cross_episode_accuracy + 0.2
-    )
+    if rmt_probe:
+        # probe mode has no plwm controller; the gate is meaningless here.
+        accepted = False
+    else:
+        accepted = (
+            by_name["plwm_policy"].cross_episode_accuracy >= 0.6
+            and by_name["plwm_policy"].cross_episode_accuracy >= by_name["gru_policy"].cross_episode_accuracy + 0.2
+        )
     target = artifact or ROOT / "artifacts" / "decide-stream-rl-report.json"
     target.parent.mkdir(exist_ok=True)
     report = Report(
-        "minigrid_decide_stream_rl_v1: continuous stream of episodes, each [identity frame, gap empty frames, query frame]; query one-hot selects current or previous episode's identity; reward only on query steps; PPO on-policy; no teacher, oracle, shaped reward, or privileged state; reports overall query accuracy, cross-episode accuracy, and before/after rule-switch accuracy (switch_at); rule 0: choice == identity, rule 1: choice == complement.",
+        f"minigrid_decide_stream_rl_v1: continuous stream of episodes, each [identity frame, gap empty frames, query frame]; query one-hot selects current or previous episode's identity; reward only on query steps; PPO on-policy; no teacher, oracle, shaped reward, or privileged state; reports overall query accuracy, cross-episode accuracy, and before/after rule-switch accuracy (switch_at); rule 0: choice == identity, rule 1: choice == complement. rmt_segment_units={rmt_segment_units}, rmt_detach_mem={rmt_detach_mem}, rmt_probe={rmt_probe}",
         str(resolved), units, gap, identity_count, switch_at, updates, episodes_per_update,
         results, accepted, str(target),
     )
@@ -520,6 +553,9 @@ if __name__ == "__main__":
     parser.add_argument("--evaluation-episodes", type=int, default=64)
     parser.add_argument("--switch-at", type=int, default=None, help="unit index where the identity->choice rule flips (None = never)")
     parser.add_argument("--experiment-seed", type=int, default=41_123)
+    parser.add_argument("--rmt-segment-units", type=float, default=1.0)
+    parser.add_argument("--no-rmt-detach", action="store_true")
+    parser.add_argument("--rmt-probe", action="store_true")
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
     outcome = run(
@@ -528,5 +564,7 @@ if __name__ == "__main__":
         episodes_per_update=args.episodes_per_update,
         evaluation_episodes=args.evaluation_episodes,
         experiment_seed=args.experiment_seed, switch_at=args.switch_at, artifact=args.artifact,
+        rmt_segment_units=args.rmt_segment_units,
+        rmt_detach_mem=not args.no_rmt_detach, rmt_probe=args.rmt_probe,
     )
     print(json.dumps(asdict(outcome), indent=2))

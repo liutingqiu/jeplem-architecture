@@ -130,11 +130,17 @@ def run(
     # perception from delayed retention without exposing world internals.
     train_events = visible_object_presence(train_events)
     heldout_events = visible_object_presence(heldout_events)
+    try:
+        from train_rmt_baseline import RMTDecision
+    except ImportError:
+        from experiments.train_rmt_baseline import RMTDecision
     factories = (
         ("evidence_store", lambda: IdentityHead(EvidenceStoreRecall(input_dim=2), feature_dim=2)),
         ("evidence_disabled", lambda: IdentityHead(EvidenceStoreRecall(input_dim=2, use_evidence=False), feature_dim=2)),
         ("gru", lambda: IdentityHead(GRURecall(input_dim=2), feature_dim=2)),
         ("four_event_transformer", lambda: IdentityHead(FourEventTransformerRecall(input_dim=2), feature_dim=2)),
+        ("rmt_mem4", lambda: RMTDecision(input_dim=2, num_classes=2, memory_tokens=4)),
+        ("rmt_mem8", lambda: RMTDecision(input_dim=2, num_classes=2, memory_tokens=8)),
     )
     results = []
     for name, factory in factories:
