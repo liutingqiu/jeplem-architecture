@@ -34,7 +34,20 @@ sys.path.insert(0, str(ROOT))
 
 from plwm.device import resolve_device
 from experiments.audit_minigrid_delayed_object_identity import _corpus as _real_corpus
+from experiments.audit_minigrid_decide_after_delay import PLWMDecision
 from plwm.minigrid_features import visible_object_presence
+
+
+class PLWMNoAux(nn.Module):
+    """PLWM control: explicit-slot memory with no aux head.  Expected to be
+    1.0 on long-delay recall without any aux (slots are already explicit)."""
+
+    def __init__(self, input_dim: int, num_classes: int) -> None:
+        super().__init__()
+        self.core = PLWMDecision(latent=32, memory_slots=8)
+
+    def forward(self, events: Tensor) -> tuple[Tensor, None]:
+        return self.core(events), None
 
 
 class AuxGRUDecision(nn.Module):
@@ -123,10 +136,12 @@ def _train(model: nn.Module, events: Tensor, labels: Tensor, *, updates: int, ba
         batch_events = events[indices].to(device)
         decision_logits, aux_logits = model(batch_events)
         main_loss = nn.functional.cross_entropy(decision_logits, labels[indices].to(device))
-        aux_target = identity[indices].unsqueeze(1).expand(-1, aux_logits.shape[1], -1).to(device)
-        aux_loss = nn.functional.cross_entropy(
-            aux_logits.reshape(-1, 2), aux_target.reshape(-1, 2).argmax(-1))
-        loss = main_loss + model.alpha * aux_loss
+        loss = main_loss
+        if aux_logits is not None:
+            aux_target = identity[indices].unsqueeze(1).expand(-1, aux_logits.shape[1], -1).to(device)
+            aux_loss = nn.functional.cross_entropy(
+                aux_logits.reshape(-1, 2), aux_target.reshape(-1, 2).argmax(-1))
+            loss = loss + model.alpha * aux_loss
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -140,6 +155,8 @@ def _evaluate(model: nn.Module, events: Tensor, labels: Tensor, swapped_labels: 
     decision = decision_logits.argmax(-1).cpu()
     heldout = float((decision == labels).float().mean())
     swapped = float((decision == swapped_labels).float().mean())
+    if aux_logits is None:
+        return heldout, swapped, float("nan")
     aux_target = _identity_onehot(labels).argmax(-1)  # [B]
     aux_pred = aux_logits.argmax(-1).cpu()  # [B, T-1]
     aux_acc = float((aux_pred == aux_target.unsqueeze(1)).all(dim=-1).float().mean())
@@ -187,6 +204,7 @@ def run(
         ("gru_aux", lambda: AuxGRUDecision(input_dim, 2, alpha=alpha)),
         ("evidence_base", lambda: AuxEvidenceDecision(input_dim, 2, alpha=0.0)),
         ("evidence_aux", lambda: AuxEvidenceDecision(input_dim, 2, alpha=alpha)),
+        ("plwm_noaux", lambda: PLWMNoAux(input_dim, 2)),
     )
     swapped_labels = 1 - heldout_labels
     results = []

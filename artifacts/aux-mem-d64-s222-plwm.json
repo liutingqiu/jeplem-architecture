@@ -1,0 +1,52 @@
+{
+  "protocol": "jeplem_aux_memory_content_v1: real/synthetic v2 delayed-identity corpus; base controllers (GRU/evidence) vs +aux head predicting the remembered identity at every post-identity frame (memory-content prediction); alpha=0 means aux loss disabled; heldout decision accuracy + swap-counterfactual evidence; tests whether explicit memory-content prediction helps memory-use under equal budget.",
+  "device": "cuda",
+  "corpus": "synthetic_single",
+  "training_examples": 512,
+  "updates": 300,
+  "alpha": 0.5,
+  "results": [
+    {
+      "name": "gru_base",
+      "parameters": 13316,
+      "heldout_accuracy": 0.5078125,
+      "swapped_accuracy": 0.4921875,
+      "memory_evidence": 0.015625,
+      "aux_accuracy": 0.4921875
+    },
+    {
+      "name": "gru_aux",
+      "parameters": 13316,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0,
+      "aux_accuracy": 1.0
+    },
+    {
+      "name": "evidence_base",
+      "parameters": 50117,
+      "heldout_accuracy": 0.5078125,
+      "swapped_accuracy": 0.4921875,
+      "memory_evidence": 0.015625,
+      "aux_accuracy": 0.5078125
+    },
+    {
+      "name": "evidence_aux",
+      "parameters": 50117,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0,
+      "aux_accuracy": 1.0
+    },
+    {
+      "name": "plwm_noaux",
+      "parameters": 25319,
+      "heldout_accuracy": 0.5078125,
+      "swapped_accuracy": 0.4921875,
+      "memory_evidence": 0.015625,
+      "aux_accuracy": NaN
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\aux-mem-d64-s222-plwm.json"
+}
