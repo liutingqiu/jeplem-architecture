@@ -146,22 +146,41 @@ def _evaluate(model: nn.Module, events: Tensor, labels: Tensor, swapped_labels: 
     return heldout, swapped, aux_acc
 
 
+def _synthetic_single_corpus(*, examples: int, seed_start: int, delay: int) -> tuple[Tensor, Tensor]:
+    """Single-identity delayed recall: [identity one-hot, (delay-1) empty
+    frames], label = identity.  GRU is expected to degrade at long delay
+    (implicit-compression bottleneck) -- the discriminator for the aux probe."""
+    rng = random.Random(91_337 + seed_start)
+    sequences, labels = [], []
+    for _ in range(examples):
+        identity = rng.randrange(2)
+        events = torch.zeros(delay + 1, 2)
+        events[0, identity] = 1.0
+        sequences.append(events)
+        labels.append(identity)
+    return torch.stack(sequences), torch.tensor(labels, dtype=torch.long)
+
+
 def run(
     *, device: str | torch.device | None = None, corpus: str = "real",
     training_examples: int = 512, updates: int = 300, batch_size: int = 32,
-    alpha: float = 0.5, delay: int = 8, artifact: Path | None = None,
+    alpha: float = 0.5, delay: int = 8, experiment_seed: int = 93_337,
+    artifact: Path | None = None,
 ) -> Report:
     resolved = resolve_device(device)
-    torch.manual_seed(93_337)
-    np.random.seed(93_337)
-    random.seed(93_337)
+    torch.manual_seed(experiment_seed)
+    np.random.seed(experiment_seed)
+    random.seed(experiment_seed)
     if corpus == "real":
         train_events, train_labels = _real_corpus(examples=training_examples, seed_start=50_000, sequence_length=delay + 1)
         heldout_events, heldout_labels = _real_corpus(examples=256, seed_start=6_000_000, sequence_length=delay + 1)
         train_events = visible_object_presence(train_events)
         heldout_events = visible_object_presence(heldout_events)
+    elif corpus == "synthetic_single":
+        train_events, train_labels = _synthetic_single_corpus(examples=training_examples, seed_start=50_000, delay=delay)
+        heldout_events, heldout_labels = _synthetic_single_corpus(examples=256, seed_start=6_000_000, delay=delay)
     else:
-        raise ValueError("only the real-stream corpus is supported in this experiment")
+        raise ValueError("corpus must be 'real' or 'synthetic_single'")
     input_dim = train_events.shape[-1]
     factories = (
         ("gru_base", lambda: AuxGRUDecision(input_dim, 2, alpha=0.0)),
@@ -195,15 +214,16 @@ def run(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--device", default=None)
-    parser.add_argument("--corpus", default="real", choices=("real", "synthetic"))
+    parser.add_argument("--corpus", default="real", choices=("real", "synthetic_single"))
     parser.add_argument("--training-examples", type=int, default=512)
     parser.add_argument("--updates", type=int, default=300)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--alpha", type=float, default=0.5)
     parser.add_argument("--delay", type=int, default=8)
+    parser.add_argument("--experiment-seed", type=int, default=93_337)
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
     outcome = run(device=args.device, corpus=args.corpus, training_examples=args.training_examples,
                   updates=args.updates, batch_size=args.batch_size, alpha=args.alpha,
-                  delay=args.delay, artifact=args.artifact)
+                  delay=args.delay, experiment_seed=args.experiment_seed, artifact=args.artifact)
     print(json.dumps(asdict(outcome), indent=2))
