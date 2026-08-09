@@ -42,9 +42,9 @@ class PLWMNoAux(nn.Module):
     """PLWM control: explicit-slot memory with no aux head.  Expected to be
     1.0 on long-delay recall without any aux (slots are already explicit)."""
 
-    def __init__(self, input_dim: int, num_classes: int) -> None:
+    def __init__(self, input_dim: int, num_classes: int, memory_slots: int = 8) -> None:
         super().__init__()
-        self.core = PLWMDecision(latent=32, memory_slots=8)
+        self.core = PLWMDecision(latent=32, memory_slots=memory_slots)
 
     def forward(self, events: Tensor) -> tuple[Tensor, None]:
         return self.core(events), None
@@ -205,6 +205,8 @@ def run(
         ("evidence_base", lambda: AuxEvidenceDecision(input_dim, 2, alpha=0.0)),
         ("evidence_aux", lambda: AuxEvidenceDecision(input_dim, 2, alpha=alpha)),
         ("plwm_noaux", lambda: PLWMNoAux(input_dim, 2)),
+        ("plwm_slots16", lambda: PLWMNoAux(input_dim, 2, memory_slots=16)),
+        ("plwm_slots32", lambda: PLWMNoAux(input_dim, 2, memory_slots=32)),
     )
     swapped_labels = 1 - heldout_labels
     results = []
