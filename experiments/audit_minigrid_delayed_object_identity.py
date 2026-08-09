@@ -117,14 +117,15 @@ def _accuracy(model: nn.Module, events: Tensor, labels: Tensor, device: torch.de
 
 def run(
     *, device: str | torch.device | None = None, training_examples: int = 512,
-    updates: int = 300, batch_size: int = 32, artifact: Path | None = None,
+    updates: int = 300, batch_size: int = 32, delay: int = 8,
+    artifact: Path | None = None,
 ) -> Report:
     if training_examples < 2 or updates < 1 or batch_size < 1:
         raise ValueError("training_examples, updates, and batch_size must be positive")
     resolved = resolve_device(device)
     torch.manual_seed(93_337); np.random.seed(93_337); random.seed(93_337)
-    train_events, train_labels = _corpus(examples=training_examples, seed_start=50_000)
-    heldout_events, heldout_labels = _corpus(examples=128, seed_start=6_000_000)
+    train_events, train_labels = _corpus(examples=training_examples, seed_start=50_000, sequence_length=delay + 1)
+    heldout_events, heldout_labels = _corpus(examples=128, seed_start=6_000_000, sequence_length=delay + 1)
     # The memory module receives only the position-invariant presence feature
     # computed from each current sensor image.  This separates object
     # perception from delayed retention without exposing world internals.
@@ -153,7 +154,7 @@ def run(
     target.parent.mkdir(exist_ok=True)
     report = Report(
         "minigrid_delayed_object_identity_v2: classify Key versus Ball seen in an initial agent sensor frame after eight later agent-observed frames contain neither object; inputs are position-invariant Key/Ball presence features derived from each sensor image, while labels come exclusively from the initial image with no grid, route, policy, reward-answer, or hidden-state access.",
-        str(resolved), 8, training_examples, updates, results, accepted, str(target),
+        str(resolved), delay, training_examples, updates, results, accepted, str(target),
     )
     target.write_text(json.dumps(asdict(report), indent=2), encoding="utf-8")
     return report
@@ -165,9 +166,10 @@ if __name__ == "__main__":
     parser.add_argument("--training-examples", type=int, default=512)
     parser.add_argument("--updates", type=int, default=300)
     parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument("--delay", type=int, default=8)
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
-    outcome = run(device=args.device, training_examples=args.training_examples, updates=args.updates, batch_size=args.batch_size, artifact=args.artifact)
+    outcome = run(device=args.device, training_examples=args.training_examples, updates=args.updates, batch_size=args.batch_size, delay=args.delay, artifact=args.artifact)
     print(json.dumps(asdict(outcome), indent=2))
     if not outcome.accepted_object_identity_recall:
         raise SystemExit("persistent evidence store did not meet delayed-object identity gate")
