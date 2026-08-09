@@ -192,12 +192,13 @@ class PolicyEvidence(nn.Module):
 
 
 class PolicyPLWM(nn.Module):
-    def __init__(self, input_dim: int, num_actions: int, *, latent: int = 32, memory_slots: int = 8, thought_steps: int = 1, gated_memory: bool = False) -> None:
+    def __init__(self, input_dim: int, num_actions: int, *, latent: int = 32, memory_slots: int = 8, thought_steps: int = 1, gated_memory: bool = False, ttcd_gate: bool = False) -> None:
         super().__init__()
         self.core = TorchPLWM(
             input_dim=input_dim, latent_dim=latent, memory_slots=memory_slots,
             thought_steps=thought_steps, output_dim=num_actions + 1,
             gated_memory=gated_memory,
+            ttcd_gate=ttcd_gate,
         )
 
     def reset(self, batch: int, device: torch.device) -> None:
@@ -453,6 +454,7 @@ def run(
         ("plwm_policy", lambda: PolicyPLWM(input_dim, identity_count)),
         ("plwm_latent64_policy", lambda: PolicyPLWM(input_dim, identity_count, latent=64)),
         ("plwm_gated_policy", lambda: PolicyPLWM(input_dim, identity_count, gated_memory=True)),
+        ("plwm_ttcd_policy", lambda: PolicyPLWM(input_dim, identity_count, gated_memory=True, ttcd_gate=True)),
     )
     if aux_memory:
         factories = factories + (

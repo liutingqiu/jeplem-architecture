@@ -184,7 +184,7 @@ class TorchPLWM(nn.Module):
             # TTCD (Princeton 2608.01672): long-vs-short window prediction
             # difference as the 'what is worth remembering' signal, stabler than
             # the raw single-step prediction error.
-            if self._short_ema is None:
+            if self._short_ema is None or self._short_ema.shape != encoded.shape:
                 self._short_ema = encoded.detach().clone()
                 self._long_ema = encoded.detach().clone()
             else:
