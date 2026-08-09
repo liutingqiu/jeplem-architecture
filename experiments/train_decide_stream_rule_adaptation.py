@@ -42,6 +42,7 @@ class AdaptationReport:
     units: int
     gap: int
     identity_count: int
+    revision: str
     stage1_updates: int
     stage2_updates: int
     eval_every: int
@@ -55,11 +56,14 @@ class AdaptationReport:
 
 def run(
     *, device: str | torch.device | None = None, units: int = 4, gap: int = 4,
-    identity_count: int = 2, stage1_updates: int = 100, stage2_updates: int = 100,
-    eval_every: int = 20, episodes_per_update: int = 24, evaluation_episodes: int = 64,
-    experiment_seed: int = 41_123, train_seed_start: int = 10_000,
-    heldout_seed_start: int = 1_000_000, artifact: Path | None = None,
+    identity_count: int = 2, revision: str = "continue", stage1_updates: int = 100,
+    stage2_updates: int = 100, eval_every: int = 20, episodes_per_update: int = 24,
+    evaluation_episodes: int = 64, experiment_seed: int = 41_123,
+    train_seed_start: int = 10_000, heldout_seed_start: int = 1_000_000,
+    artifact: Path | None = None,
 ) -> AdaptationReport:
+    if revision not in ("continue", "decay", "reset"):
+        raise ValueError("revision must be one of continue/decay/reset")
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
     np.random.seed(experiment_seed)
@@ -89,13 +93,24 @@ def run(
         )
         q0, c0, _before, _after = _evaluate(model, env_rule0, episodes=evaluation_episodes, seed_start=heldout_seed_start, device=resolved)
         stage1_scores[name] = (q0, c0)
-        # Stage 2: rule 1, measure adaptation curve.
+        # Stage 2: rule 1.  revision mode controls the weight-domain surgery:
+        #   continue = plain on-policy retraining (baseline)
+        #   decay    = strong weight decay toward zero (Value Decay style explicit forgetting)
+        #   reset    = reinitialize the network from scratch (change-point reset style)
+        if revision == "reset":
+            model = factory().to(resolved)
+            stage2_weight_decay = 1e-5
+        elif revision == "decay":
+            stage2_weight_decay = 0.05
+        else:
+            stage2_weight_decay = 1e-5
         curve: list[float] = []
         for _block in range(stage2_updates // eval_every):
             _train_ppo(
                 model, env_rule1, updates=eval_every,
                 episodes_per_update=episodes_per_update,
-                seed_start=train_seed_start + stage1_updates + _block * eval_every, device=resolved,
+                seed_start=train_seed_start + stage1_updates + _block * eval_every,
+                device=resolved, weight_decay=stage2_weight_decay,
             )
             q1, _c1, _b1, _a1 = _evaluate(model, env_rule1, episodes=evaluation_episodes, seed_start=heldout_seed_start, device=resolved)
             curve.append(q1)
@@ -110,8 +125,8 @@ def run(
     target = artifact or ROOT / "artifacts" / "decide-stream-rule-adaptation-report.json"
     target.parent.mkdir(exist_ok=True)
     report = AdaptationReport(
-        "minigrid_decide_stream_rule_adaptation: stage 1 learns identity->choice rule 0 on a 4-episode stream; stage 2 flips the rule (choice = complement) and the adaptation curve measures how quickly each controller recovers on reward feedback only; PPO on-policy throughout; no privileged state.",
-        str(resolved), units, gap, identity_count, stage1_updates, stage2_updates, eval_every,
+        "minigrid_decide_stream_rule_adaptation: stage 1 learns identity->choice rule 0 on a 4-episode stream; stage 2 flips the rule (choice = complement) and the adaptation curve measures how quickly each controller recovers on reward feedback only; revision mode controls the weight-domain surgery (continue=plain retraining, decay=strong weight decay, reset=reinit from scratch); PPO on-policy throughout; no privileged state.",
+        str(resolved), units, gap, identity_count, revision, stage1_updates, stage2_updates, eval_every,
         sum(v[0] for v in stage1_scores.values()) / len(stage1_scores),
         sum(v[1] for v in stage1_scores.values()) / len(stage1_scores),
         curves, finals, accepted, str(target),
@@ -128,6 +143,7 @@ if __name__ == "__main__":
     parser.add_argument("--identity-count", type=int, default=2)
     parser.add_argument("--stage1-updates", type=int, default=100)
     parser.add_argument("--stage2-updates", type=int, default=100)
+    parser.add_argument("--revision", type=str, default="continue", choices=["continue", "decay", "reset"])
     parser.add_argument("--eval-every", type=int, default=20)
     parser.add_argument("--episodes-per-update", type=int, default=24)
     parser.add_argument("--evaluation-episodes", type=int, default=64)
@@ -136,7 +152,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     outcome = run(
         device=args.device, units=args.units, gap=args.gap,
-        identity_count=args.identity_count, stage1_updates=args.stage1_updates,
+        identity_count=args.identity_count, revision=args.revision,
+        stage1_updates=args.stage1_updates,
         stage2_updates=args.stage2_updates, eval_every=args.eval_every,
         episodes_per_update=args.episodes_per_update,
         evaluation_episodes=args.evaluation_episodes,
