@@ -54,14 +54,15 @@ class AuxEvidenceDecision(nn.Module):
     def __init__(self, input_dim: int, num_classes: int, *, width: int = 64, slots: int = 8, alpha: float = 0.5) -> None:
         super().__init__()
         self.width = width
+        self.slots = slots
         self.encoder = nn.Sequential(nn.Linear(input_dim, width), nn.Tanh())
         self.query = nn.Linear(width, width, bias=False)
         self.key = nn.Linear(width, width, bias=False)
         self.value = nn.Linear(width, width)
         self.write_gate = nn.Linear(width, 1)
         self.state = nn.GRUCell(width * 2, width)
-        self.head = nn.Linear(width * 2, num_classes)
-        self.aux = nn.Linear(width * 2, 2)
+        self.head = nn.Linear(width, num_classes)
+        self.aux = nn.Linear(width, 2)
         self.alpha = alpha
 
     def forward(self, events: Tensor) -> tuple[Tensor, Tensor]:
@@ -139,8 +140,8 @@ def _evaluate(model: nn.Module, events: Tensor, labels: Tensor, swapped_labels: 
     decision = decision_logits.argmax(-1).cpu()
     heldout = float((decision == labels).float().mean())
     swapped = float((decision == swapped_labels).float().mean())
-    aux_target = _identity_onehot(labels)
-    aux_pred = aux_logits.argmax(-1).cpu()
+    aux_target = _identity_onehot(labels).argmax(-1)  # [B]
+    aux_pred = aux_logits.argmax(-1).cpu()  # [B, T-1]
     aux_acc = float((aux_pred == aux_target.unsqueeze(1)).all(dim=-1).float().mean())
     return heldout, swapped, aux_acc
 
