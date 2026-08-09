@@ -1,0 +1,25 @@
+{
+  "protocol": "value_anchoring_v1: Block-10 minimal experiment. Options have different internal outcome probabilities (P(good)); value_anchor learns per-option value from experience (auditable: read back each option's estimate) and prefers the best; uniform and fixed controls. Criterion: value_anchor ordering accuracy >= 0.9 and ends on the best option more than uniform/fixed by >= 0.2 -- preferences form from internal signals, not injected rewards.",
+  "device": "None",
+  "options": 4,
+  "trials": 100,
+  "results": [
+    {
+      "name": "value_anchor",
+      "ordering_accuracy": 0.9145833333333332,
+      "best_option_ratio": 0.786875
+    },
+    {
+      "name": "uniform",
+      "ordering_accuracy": 0.0,
+      "best_option_ratio": 0.24562499999999998
+    },
+    {
+      "name": "fixed",
+      "ordering_accuracy": 0.0,
+      "best_option_ratio": 0.0
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\value-seed333.json"
+}

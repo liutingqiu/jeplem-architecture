@@ -1,0 +1,20 @@
+{
+  "protocol": "social_cognition_v1: Block-11 minimal experiment. Observer predicts a partner agent's actions from observations; partner policy changes every 2 blocks. tom_model learns per-state action distributions (theory of mind); marginal predicts the global most-common action. Criterion: tom_model accuracy >= marginal + 0.2, and re-adapts after policy switches (final block >= 0.7).",
+  "device": "None",
+  "states": 4,
+  "observations_per_block": 120,
+  "results": [
+    {
+      "name": "tom_model",
+      "accuracy": 0.6875,
+      "final_block_accuracy": 0.7166666666666667
+    },
+    {
+      "name": "marginal",
+      "accuracy": 0.35624999999999996,
+      "final_block_accuracy": 0.26666666666666666
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\social-seed222.json"
+}
