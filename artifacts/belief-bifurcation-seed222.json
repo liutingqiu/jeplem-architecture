@@ -1,0 +1,25 @@
+{
+  "protocol": "belief_bifurcation_v2: Block-1 minimal experiment with OOD generalization. GRU trained only on fixed weak/strong patterns; evaluation adds unseen plans (medium/weak-x3/strong-x1/alternating). Structural threshold-accumulation should bifurcate on any stream; a statistical fitter fails OOD. Criterion: belief_cell ood_bifurcation >= 0.8 and > GRU + 0.2.",
+  "device": "cuda",
+  "scenarios_per_split": 300,
+  "results": [
+    {
+      "name": "belief_cell",
+      "id_hold": 1.0,
+      "id_flip": 1.0,
+      "ood_hold": 1.0,
+      "ood_flip": 1.0,
+      "ood_bifurcation": 1.0
+    },
+    {
+      "name": "gru",
+      "id_hold": 1.0,
+      "id_flip": 1.0,
+      "ood_hold": 0.4669260700389105,
+      "ood_flip": 1.0,
+      "ood_bifurcation": 0.4669260700389105
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\belief-bifurcation-seed222.json"
+}
