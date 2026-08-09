@@ -1,0 +1,31 @@
+{
+  "protocol": "autonomous_learning_system_v1: integration of verified foundation blocks into one closed loop (belief + drive/goal + consolidation + intervention robustness). No external task: the system explores by confidence gap, learns, freezes consolidated rules, and applies them; intervention rebalances the identity distribution to check the rules are causal, not spurious. Controls: no_drive (random goals), no_consolidate (shared belief). Criterion: full coverage 1.0, application >= 0.9, intervention >= 0.85, no slower than no_drive, beats no_consolidate coverage by 0.2.",
+  "device": "None",
+  "domains": 6,
+  "episodes": 30,
+  "results": [
+    {
+      "name": "full",
+      "steps_to_complete": 23.466666666666665,
+      "coverage": 1.0,
+      "application_accuracy": 1.0,
+      "intervention_accuracy": 1.0
+    },
+    {
+      "name": "no_drive",
+      "steps_to_complete": 23.633333333333333,
+      "coverage": 1.0,
+      "application_accuracy": 1.0,
+      "intervention_accuracy": 1.0
+    },
+    {
+      "name": "no_consolidate",
+      "steps_to_complete": 219.56666666666666,
+      "coverage": 0.6666666666666666,
+      "application_accuracy": 0.3333333333333334,
+      "intervention_accuracy": 0.3333333333333334
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\integration-smoke.json"
+}
