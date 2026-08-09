@@ -1,0 +1,24 @@
+{
+  "protocol": "self_model_v1: Block-8 minimal experiment. Mixed-difficulty 2D classification; an explicit self-model head is trained to predict the answer head's correctness on each input (metacognition), vs softmax-probability self-report and fixed overconfidence. Criterion: self_model ECE <= 0.15 and >= 0.05 lower than both controls -- an explicit self-model gives reliable 'do I know this?' estimates.",
+  "device": "cuda",
+  "train_examples": 800,
+  "results": [
+    {
+      "name": "self_model",
+      "accuracy": 0.7224999666213989,
+      "ece": 0.21099726317657364
+    },
+    {
+      "name": "softmax",
+      "accuracy": 0.7224999666213989,
+      "ece": 0.2197748527482704
+    },
+    {
+      "name": "overconfident",
+      "accuracy": 0.7224999666213989,
+      "ece": 0.3953703703703705
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\selfmodel-seed444.json"
+}

@@ -1,0 +1,20 @@
+{
+  "protocol": "counterfactual_imagination_v1: Block-7 minimal experiment. Deterministic transition s'=(s+a+1) mod N; the agent experiences one path; counterfactual queries ask about the unseen action at experienced states. world_model generalizes the transition rule (median-shift), memory_only recalls only seen pairs. Criterion: world_model counterfactual accuracy >= 0.9 and >= memory_only + 0.3.",
+  "device": "None",
+  "states": 12,
+  "episodes": 200,
+  "results": [
+    {
+      "name": "world_model",
+      "counterfactual_accuracy": 0.99,
+      "factual_accuracy": 1.0
+    },
+    {
+      "name": "memory_only",
+      "counterfactual_accuracy": 0.0,
+      "factual_accuracy": 1.0
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\cf-seed222.json"
+}
