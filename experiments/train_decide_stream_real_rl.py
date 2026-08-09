@@ -36,7 +36,7 @@ from plwm.device import resolve_device
 from plwm.minigrid_features import visible_object_presence
 from experiments.train_minigrid_memory_actor_critic import encode_observation
 from experiments.train_decide_stream_rl import (
-    PolicyGRU, PolicyEvidence, PolicyPLWM, PolicyRMTStream,
+    PolicyGRU, PolicyEvidence, PolicyPLWM, PolicyRMTStream, PolicyGRUAux,
     _collect, _train_ppo, _evaluate,
 )
 
@@ -112,6 +112,12 @@ class DecideStreamRealEnv(gym.Env):
 
     def target_action(self, unit: int, target_unit: int) -> int:
         return self._labels[target_unit]
+
+    @property
+    def _identities(self) -> list[int]:
+        """Alias used by the shared streaming _collect/_train_ppo (which read
+        env._identities for the aux target)."""
+        return self._labels
 
     def _build_stream(self, seed: int) -> tuple[list[Tensor], list[int], list[int]]:
         # Collect frames from several walk seeds until we have enough clean
@@ -259,7 +265,8 @@ def run(
     updates: int = 100, episodes_per_update: int = 24, evaluation_episodes: int = 32,
     experiment_seed: int = 41_123, train_seed_start: int = 10_000,
     heldout_seed_start: int = 1_000_000, use_presence: bool = False,
-    rmt_probe: bool = False, artifact: Path | None = None,
+    rmt_probe: bool = False, aux_memory: bool = False, aux_coefficient: float = 0.5,
+    artifact: Path | None = None,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -278,6 +285,10 @@ def run(
             ("evidence_policy", lambda: PolicyEvidence(input_dim, 2)),
             ("plwm_policy", lambda: PolicyPLWM(input_dim, 2)),
             ("rmt_mem4_policy", lambda: PolicyRMTStream(input_dim, 2, unit_len=env.unit_len, memory_tokens=4)),
+        )
+    if aux_memory:
+        factories = factories + (
+            ("gru_aux_policy", lambda: PolicyGRUAux(input_dim, 2, aux_coefficient=aux_coefficient)),
         )
     results = []
     for name, factory in factories:
@@ -315,6 +326,8 @@ if __name__ == "__main__":
     parser.add_argument("--experiment-seed", type=int, default=41_123)
     parser.add_argument("--use-presence", action="store_true")
     parser.add_argument("--rmt-probe", action="store_true")
+    parser.add_argument("--aux-memory", action="store_true")
+    parser.add_argument("--aux-coefficient", type=float, default=0.5)
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
     outcome = run(
@@ -322,6 +335,7 @@ if __name__ == "__main__":
         episodes_per_update=args.episodes_per_update,
         evaluation_episodes=args.evaluation_episodes,
         experiment_seed=args.experiment_seed,
-        use_presence=args.use_presence, rmt_probe=args.rmt_probe, artifact=args.artifact,
+        use_presence=args.use_presence, rmt_probe=args.rmt_probe,
+        aux_memory=args.aux_memory, aux_coefficient=args.aux_coefficient, artifact=args.artifact,
     )
     print(json.dumps(asdict(outcome), indent=2))
