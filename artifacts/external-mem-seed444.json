@@ -1,0 +1,24 @@
+{
+  "protocol": "rule_revision_external_memory_v1: stage 1 learns rule 0; stage 2 flips to rule 1. Arm 1 freezes the network and revises via an explicit identity->action rule table (external memory, 0 gradient steps); Arm 2 revises by continued PPO retraining (weight domain). Tests the 'frozen params + external rule memory' niche: external revision should be immediately correct while retraining needs ~100 updates.",
+  "device": "cuda",
+  "units": 4,
+  "gap": 4,
+  "stage1_updates": 100,
+  "rule1_table_accuracy": {
+    "gru_policy": 1.0,
+    "plwm_policy": 1.0,
+    "plwm_slots16_policy": 1.0
+  },
+  "rule1_table_random": {
+    "gru_policy": 0.54296875,
+    "plwm_policy": 0.10546875,
+    "plwm_slots16_policy": 0.1484375
+  },
+  "rule1_retrain_final": {
+    "gru_policy": 0.45703125,
+    "plwm_policy": 0.890625,
+    "plwm_slots16_policy": 0.86328125
+  },
+  "accepted": true,
+  "artifact": "artifacts\\external-mem-seed444.json"
+}
