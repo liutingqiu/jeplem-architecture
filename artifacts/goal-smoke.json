@@ -1,0 +1,28 @@
+{
+  "protocol": "autonomous_goal_generation_v2: Block-4 minimal experiment. No external task: goals emerge from the belief system's confidence gaps. Half the domains have prior knowledge (low gap), half are unknown (high gap). Criterion: gap_goals completes all domains (coverage >= 0.95), its first goal is an unknown high-gap domain in >= 80% of episodes, and beats random's first-goal quality by >= 0.2 -- goals come from internal gaps, not the task.",
+  "device": "None",
+  "domains": 6,
+  "episodes": 50,
+  "results": [
+    {
+      "name": "gap_goals",
+      "steps_to_complete": 16.9,
+      "coverage": 1.0,
+      "first_goal_unknown": 1.0
+    },
+    {
+      "name": "random",
+      "steps_to_complete": 17.08,
+      "coverage": 1.0,
+      "first_goal_unknown": 0.56
+    },
+    {
+      "name": "order",
+      "steps_to_complete": 16.84,
+      "coverage": 1.0,
+      "first_goal_unknown": 0.5
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\goal-smoke.json"
+}
