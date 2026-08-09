@@ -1,0 +1,25 @@
+{
+  "protocol": "pixel_stream_rule_adaptation_v1: continuous stream of raw 7x7x3 RGB episodes (identity center cell, border query) with rule flip; stage 1 learns rule 0, stage 2 flips to rule 1 and measures adaptation on reward feedback only; PPO on-policy; no privileged state; ecological-validity port of the rule-revision protocol.",
+  "device": "cuda",
+  "units": 4,
+  "gap": 4,
+  "revision": "continue",
+  "stage1_updates": 8,
+  "stage2_updates": 8,
+  "adaptation_curve": {
+    "gru_policy": [
+      0.5
+    ],
+    "evidence_policy": [
+      0.5
+    ],
+    "plwm_policy": [
+      0.5
+    ],
+    "plwm_slots16_policy": [
+      0.5
+    ]
+  },
+  "accepted": false,
+  "artifact": "artifacts\\pixel-stream-smoke.json"
+}
