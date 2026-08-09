@@ -1,0 +1,21 @@
+{
+  "protocol": "compositional_generalization_v1: Block-6 minimal experiment. Two attribute axes with independent rules; training on single-attribute objects only; testing on all unseen color x shape combinations. modular (independent heads) should compose; monolithic MLP sees combinations out of distribution. Criterion: modular combination accuracy >= 0.9 and >= monolithic + 0.2.",
+  "device": "cuda",
+  "train_examples": 400,
+  "results": [
+    {
+      "name": "modular",
+      "parameters": 84,
+      "train_accuracy": 1.0,
+      "combination_accuracy": 1.0
+    },
+    {
+      "name": "monolithic_mlp",
+      "parameters": 148,
+      "train_accuracy": 1.0,
+      "combination_accuracy": 1.0
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\compositional-smoke.json"
+}
