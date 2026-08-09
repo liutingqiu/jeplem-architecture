@@ -16,7 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SEEDS = [41123, 222, 333, 444, 555, 666]
-FILE = {41123: "stream-seed41123.json", 222: "stream-seed222.json", 333: "stream-seed333.json",
+FILE = {41123: "stream-full6-u3g4-seed41123.json", 222: "stream-full6-u3g4-seed222.json", 333: "stream-full6-u3g4-seed333.json",
         444: "stream-u3g4-seed444.json", 555: "stream-u3g4-seed555.json", 666: "stream-u3g4-seed666.json"}
 
 
@@ -56,7 +56,7 @@ def main() -> None:
                "seeds": SEEDS,
                "per_seed_script_accepted": per_seed,
                "criterion": "cross>=0.6 and cross>=gru_cross+0.2 (script gate)",
-               "note": "old 3 seeds: 3-model script; new 3 seeds (444/555/666): 6-model script (adds slots16/RMT)",
+               "note": "all 6 seeds on the 6-model script (gru/evidence/plwm/plwm_slots16/rmt_mem4/rmt_mem8); 41123/222/333 rerun as stream-full6-* for seed-matched RMT comparison",
                "per_model": per_model}
     out = ROOT / "artifacts" / "stream-seed-aggregate.json"
     out.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")

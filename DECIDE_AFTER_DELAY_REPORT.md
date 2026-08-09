@@ -126,20 +126,20 @@ DecideAfterDelay 改造成**事件流 RL 环境**（DecideEnv）：每步一个�
 | evidence_policy | 0.889 | 0.796 |
 | **plwm_policy** | **0.924** | **0.821** |
 
-### 7.2 ⚠️ 补测修正（2026-08-09）：6 seed 重出（+444/555/666）
+### 7.2 ⚠️ 补测修正（2026-08-09）：6 seed 同脚本同 seed 重出（41123/222/333 重跑为 6 模型版 + 444/555/666）
 
 | 模型 | n | query 均值 | cross 均值 | 脚本门达标（cross≥0.6 且超 GRU+0.2）|
 |---|---|---|---|---|
-| gru_policy | 6 | 0.558 | 0.498（6/6 ≈随机）| — |
-| evidence_policy | 6 | 0.910 | 0.799 | 5/6 |
-| plwm_policy | 6 | 0.909 | 0.769 | **5/6**（唯一失败 seed222 0.716 vs 门槛 0.722，差 0.006）|
-| plwm_slots16_policy | 3 | 0.882 | 0.826 | 3/3 |
-| rmt_mem4 / mem8（新补对照）| 3 | 0.823 / 0.832 | **0.493 / 0.517（≈随机）** | 0/3 |
+| gru_policy | 6 | 0.521 | 0.478（6/6 ≈随机）| — |
+| evidence_policy | 6 | 0.932 | 0.806 | 4/6 |
+| plwm_policy | 6 | 0.909 | 0.751 | **6/6** |
+| plwm_slots16_policy | 6 | 0.892 | 0.779 | 6/6 |
+| rmt_mem4 / rmt_mem8 | 6 | 0.823 / 0.823 | **0.492 / 0.492（≈随机）** | **0/6** |
 
 **结论修正**：
-1. **原"PLWM query 精度第一（0.924）"在 6 seed 下不成立**：PLWM query 0.909 ≈ evidence 0.910（打平），cross 0.769 甚至略低于 evidence 0.799——3 seed 的"第一"是抽样波动。**稳的结论是"可寻址记忆（PLWM/evidence）≫ GRU"，不是"PLWM 优于 evidence"**。
-2. **新增对照发现：RMT 在跨 episode 连续流上崩盘（0/3，cross≈随机）**——RMT 只在监督精确回忆/规则修订任务与 PLWM 打平，在连续流（最贴近真实持久认知）场景不成立。PLWM slots16 在此场景仍 3/3 达标。
-3. GRU 6/6 seed 全部 ≈随机（cross 0.48–0.52），"压缩隐状态被后续 episode 稀释"的机制结论成立。
+1. **原"PLWM query 精度第一（0.924）"在 6 seed 下不成立**：PLWM query 0.909 ≈ evidence 0.932（打平），cross 0.751 低于 evidence 0.806——3 seed 的"第一"是抽样波动。**稳的结论是"可寻址记忆（PLWM/evidence/slots16）≫ GRU"，不是"PLWM 优于 evidence"**。
+2. **RMT 在跨 episode 连续流上结构性崩盘（gate 0/6，cross≈随机）**——RMT 的 query（段内）0.82 正常但 cross（跨段）全丢：段边界 detach（truncated BPTT）使跨段记忆不可学。RMT 只在监督精确回忆/规则修订（有界序列）与 PLWM 打平；**流式无界场景是 PLWM 相对 attention 记忆家族的实证差异化**（详见 `RMT_STREAMING_COLLAPSE_REPORT.md`）。
+3. GRU 6/6 seed 全部 ≈随机（cross 0.478），"压缩隐状态被后续 episode 稀释"的机制结论成立。
 4. 汇总：`artifacts/stream-seed-aggregate.json`、`experiments/audit_stream_seed_aggregate.py`。
 
 至此证据链完整：**监督（3 任务）→ 难度扫描（延迟/身份轴）→ RL 单 episode → RL 连续流**，四个维度一致——需要精确跨步回忆时，**可寻址记忆 > 压缩隐状态（GRU/RMT 流式版）**；PLWM 与 evidence 在连续流上等价，PLWM 的差异化价值是 gated memory 的认知语义与长间隔鲁棒性（§八），而非绝对精度。

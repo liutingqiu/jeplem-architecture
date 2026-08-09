@@ -50,13 +50,13 @@
 
 见 `artifacts/d32-variance-aggregate.json`。PLWM d=32 9 seed = 中位 0.793、均值 0.844±0.136、范围 0.609–1.000；GRU 9/9 = 0.496（0 方差）。**方向性结论（可寻址>压缩）稳，单批精确值不可作精确优势引用**。
 
-### 2.3 stream 补测 seed 444/555/666（6 seed 重出）
+### 2.3 stream 补测 seed 444/555/666 + 41123/222/333 重跑（6 seed 同脚本全家桶）
 
-见 `artifacts/stream-seed-aggregate.json`。要点：
-- **PLWM 脚本门达标 5/6**（原 3 seed 为 2/3；唯一失败 seed222 差 0.006）；slots16 3/3。
-- **原"PLWM query 第一（0.924）"被证伪**：6 seed 下 PLWM query 0.909 ≈ evidence 0.910（打平），cross 0.769 < evidence 0.799。3 seed 的"第一"是抽样波动。
-- **新增对照发现：RMT 连续流 0/3 崩盘**（cross≈0.5 随机）——RMT 只在监督精确回忆/规则修订与 PLWM 打平，跨 episode 连续流场景不成立（此前 RMT 对照缺该场景，本次 6 模型脚本补齐）。
-- GRU 6/6 ≈随机（cross 0.48–0.52），机制结论稳。
+见 `artifacts/stream-seed-aggregate.json`、`RMT_STREAMING_COLLAPSE_REPORT.md`。要点：
+- **PLWM 脚本门达标 6/6**（同脚本同 seed 重出；注意 41123/222/333 用 6 模型脚本重跑后 GRU cross 降为 0.478，门槛随之降低，PLWM 自身 cross 0.72 未变——达标率对基线波动敏感，PLWM cross 实际范围 0.687–0.910）。
+- **原"PLWM query 第一（0.924）"被证伪**：6 seed 下 PLWM query 0.909 ≈ evidence 0.932（打平），cross 0.751 < evidence 0.806。3 seed 的"第一"是抽样波动。
+- **新增对照发现（已系统化验证）**：RMT mem4/mem8 连续流 **gate 0/6 崩盘**（query 0.823 高、cross 0.492 ≈随机）——段边界 detach（truncated BPTT）导致跨 episode 记忆结构性丢失；RMT 只在有界序列任务（监督精确回忆/规则修订）与 PLWM 打平。PLWM 的"流式持久"从宣称升级为实证差异化。
+- GRU 6/6 ≈随机（cross 0.478），机制结论稳。
 
 ### 2.4 self_model 判据澄清
 
