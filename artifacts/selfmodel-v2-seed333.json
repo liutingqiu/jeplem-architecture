@@ -1,0 +1,21 @@
+{
+  "protocol": "self_model_v2: Block-8 upgrade. 32-dim inputs, OOD = blurred (high-noise) features. self_head trained on ID+OOD correctness (learns the competence boundary); softmax has no such training and stays overconfident on OOD. Criterion: self_head OOD ECE <= 0.4 and >= 0.05 lower than softmax (moderate but consistent gain).",
+  "device": "cuda",
+  "features": 32,
+  "results": [
+    {
+      "name": "self_model",
+      "id_accuracy": 1.0,
+      "ood_accuracy": 0.5149999856948853,
+      "ood_ece": 0.2879712115973234
+    },
+    {
+      "name": "softmax",
+      "id_accuracy": 1.0,
+      "ood_accuracy": 0.5149999856948853,
+      "ood_ece": 0.3853974986076355
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\selfmodel-v2-seed333.json"
+}

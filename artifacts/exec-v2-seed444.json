@@ -1,0 +1,22 @@
+{
+  "protocol": "executive_control_v2: Block-9 upgrade. 64 features, budget k=16 per sample; active_gate learns task-conditioned top-k selection (executive control as resource allocation); random_subset wastes the budget; full_oracle sees everything (upper bound). Criterion: active >= random + 0.15 and within 0.1 of full.",
+  "device": "cuda",
+  "features": 64,
+  "budget": 16,
+  "results": [
+    {
+      "name": "active_gate",
+      "test_accuracy": 0.9412499666213989
+    },
+    {
+      "name": "random_subset",
+      "test_accuracy": 0.6624999642372131
+    },
+    {
+      "name": "full_oracle",
+      "test_accuracy": 0.9174999594688416
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\exec-v2-seed444.json"
+}
