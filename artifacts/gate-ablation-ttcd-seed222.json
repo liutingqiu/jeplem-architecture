@@ -1,0 +1,41 @@
+{
+  "protocol": "gate_ablation_v1: content-addressable slots with swappable write-gate source; input=gate from current observation (external-anchored), state=gate from own recurrent state (self-referential), none=unconditional FIFO; delay=32 where empty gap frames must not evict identity frames; verifies whether a self-referential write gate collapses (Liu 2026 external-control framework) while an externally anchored gate works.",
+  "device": "cuda",
+  "delay": 32,
+  "gap": 3,
+  "identity_count": 2,
+  "training_examples": 1024,
+  "updates": 400,
+  "results": [
+    {
+      "name": "gate_input",
+      "parameters": 50437,
+      "heldout_accuracy": 0.79296875,
+      "swapped_accuracy": 0.20703125,
+      "memory_evidence": 0.5859375
+    },
+    {
+      "name": "gate_state",
+      "parameters": 50437,
+      "heldout_accuracy": 0.87109375,
+      "swapped_accuracy": 0.12890625,
+      "memory_evidence": 0.7421875
+    },
+    {
+      "name": "gate_ttcd",
+      "parameters": 50437,
+      "heldout_accuracy": 0.87109375,
+      "swapped_accuracy": 0.12890625,
+      "memory_evidence": 0.7421875
+    },
+    {
+      "name": "gate_none",
+      "parameters": 50437,
+      "heldout_accuracy": 0.49609375,
+      "swapped_accuracy": 0.50390625,
+      "memory_evidence": -0.0078125
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\gate-ablation-ttcd-seed222.json"
+}

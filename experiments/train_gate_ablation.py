@@ -37,20 +37,32 @@ from audit_minigrid_decide_after_delay_scan import Result, _accuracy, _train, ma
 
 
 class GateAblationEvidence(nn.Module):
-    """Evidence-style slots with a swappable write-gate source."""
+    """Evidence-style slots with a swappable write-gate source.
+
+    gate_mode:
+      input  : gate from current observation (external-anchored, standard)
+      state  : gate from own recurrent state (self-referential)
+      ttcd   : gate from long-vs-short window prediction difference
+               (TTCD, Princeton 2608.01672: long-short window discrepancy as
+               the 'what is worth remembering' signal)
+      none   : unconditional FIFO write
+    """
 
     def __init__(self, input_dim: int, num_classes: int, *, width: int = 64,
-                 slots: int = 8, gate_mode: str = "input") -> None:
+                 slots: int = 8, gate_mode: str = "input",
+                 short_window: int = 4) -> None:
         super().__init__()
-        if gate_mode not in ("input", "state", "none"):
-            raise ValueError("gate_mode must be input/state/none")
+        if gate_mode not in ("input", "state", "ttcd", "none"):
+            raise ValueError("gate_mode must be input/state/ttcd/none")
         self.width, self.slots, self.gate_mode = width, slots, gate_mode
+        self.short_window = short_window
         self.encoder = nn.Sequential(nn.Linear(input_dim, width), nn.Tanh())
         self.query = nn.Linear(width, width, bias=False)
         self.key = nn.Linear(width, width, bias=False)
         self.value = nn.Linear(width, width)
         self.write_gate = nn.Linear(width, 1)
         self.self_gate = nn.Linear(width, 1)
+        self.ttcd_gate = nn.Linear(width * 2, 1)
         self.state = nn.GRUCell(width * 2, width)
         self.head = nn.Linear(width * 2, num_classes)
 
@@ -59,6 +71,7 @@ class GateAblationEvidence(nn.Module):
         state = torch.zeros(batch, self.width, device=events.device)
         keys = torch.zeros(batch, self.slots, self.width, device=events.device)
         values = torch.zeros_like(keys)
+        recent: list[Tensor] = []  # short-window state history for TTCD
         for index in range(events.shape[1]):
             encoded = self.encoder(events[:, index])
             weights = torch.softmax(
@@ -70,6 +83,12 @@ class GateAblationEvidence(nn.Module):
                 gate = torch.sigmoid(self.write_gate(encoded)).view(batch, 1, 1)
             elif self.gate_mode == "state":
                 gate = torch.sigmoid(self.self_gate(state)).view(batch, 1, 1)
+            elif self.gate_mode == "ttcd":
+                recent.append(state)
+                if len(recent) > self.short_window:
+                    recent.pop(0)
+                short = torch.stack(recent, dim=1).mean(dim=1)  # [B, W] short-window mean
+                gate = torch.sigmoid(self.ttcd_gate(torch.cat((short, state), dim=-1))).view(batch, 1, 1)
             else:  # none: unconditional FIFO
                 gate = torch.ones(batch, 1, 1, device=events.device)
             candidate_keys = torch.cat((keys[:, 1:], self.key(encoded).unsqueeze(1)), dim=1)
@@ -119,6 +138,7 @@ def run(
     factories = (
         ("gate_input", lambda: GateAblationEvidence(input_dim, identity_count, gate_mode="input")),
         ("gate_state", lambda: GateAblationEvidence(input_dim, identity_count, gate_mode="state")),
+        ("gate_ttcd", lambda: GateAblationEvidence(input_dim, identity_count, gate_mode="ttcd")),
         ("gate_none", lambda: GateAblationEvidence(input_dim, identity_count, gate_mode="none")),
     )
     results = []
