@@ -1,0 +1,34 @@
+{
+  "protocol": "plwm_ttcd_v1: PLWM gated memory write-gate signal ablation at delay=32; surprise = single-step latent prediction error (standard), ttcd = long-vs-short EMA window prediction difference (Princeton 2608.01672); same corpus, train loop, and swap probe as the scan.",
+  "device": "cuda",
+  "delay": 32,
+  "gap": 3,
+  "identity_count": 2,
+  "training_examples": 1024,
+  "updates": 400,
+  "results": [
+    {
+      "name": "plwm_ungated",
+      "parameters": 25449,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    },
+    {
+      "name": "plwm_surprise",
+      "parameters": 25449,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    },
+    {
+      "name": "plwm_ttcd",
+      "parameters": 25449,
+      "heldout_accuracy": 1.0,
+      "swapped_accuracy": 0.0,
+      "memory_evidence": 1.0
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\plwm-ttcd-d32-seed444.json"
+}

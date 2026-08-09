@@ -70,6 +70,9 @@ class TorchPLWM(nn.Module):
         output_dim: int = 1,
         use_memory: bool = True,
         gated_memory: bool = False,
+        ttcd_gate: bool = False,
+        short_ema_decay: float = 0.5,
+        long_ema_decay: float = 0.95,
         beta: float = 1.0,  # A-P1a: β controls softmax sharpness; err ≤ (M-1)·exp(-βδ/√d)
         # default 1.0 matches original /sqrt(d) scaling; increase for sharper retrieval
     ) -> None:
@@ -79,6 +82,11 @@ class TorchPLWM(nn.Module):
         self.thought_steps = thought_steps
         self.use_memory = use_memory
         self.gated_memory = gated_memory
+        self.ttcd_gate = ttcd_gate
+        self.short_ema_decay = short_ema_decay
+        self.long_ema_decay = long_ema_decay
+        self._short_ema: Tensor | None = None
+        self._long_ema: Tensor | None = None
         self.temperature = beta  # A-P1a: β inverse-temperature; higher = sharper retrieval
 
         self.encoder = nn.Sequential(nn.Linear(input_dim, latent_dim), nn.Tanh())
@@ -110,6 +118,11 @@ class TorchPLWM(nn.Module):
         W = torch.randn(d, d)
         Q, _ = torch.linalg.qr(W)
         self.key_head.weight.data = Q
+
+    def _reset_ttcd(self, batch: int, device: torch.device | str) -> None:
+        if self.ttcd_gate:
+            self._short_ema = None
+            self._long_ema = None
 
     def initial_state(self, batch_size: int, device: torch.device | str) -> TorchCognitiveState:
         zeros = torch.zeros(batch_size, self.latent_dim, device=device)
@@ -167,6 +180,19 @@ class TorchPLWM(nn.Module):
         encoded = self.encoder(observation)
         prediction = self.predictor(state.belief)
         surprise = (prediction - observation).square().mean(dim=-1, keepdim=True)
+        if self.ttcd_gate:
+            # TTCD (Princeton 2608.01672): long-vs-short window prediction
+            # difference as the 'what is worth remembering' signal, stabler than
+            # the raw single-step prediction error.
+            if self._short_ema is None:
+                self._short_ema = encoded.detach().clone()
+                self._long_ema = encoded.detach().clone()
+            else:
+                self._short_ema = self.short_ema_decay * self._short_ema + (1.0 - self.short_ema_decay) * encoded.detach()
+                self._long_ema = self.long_ema_decay * self._long_ema + (1.0 - self.long_ema_decay) * encoded.detach()
+            gate_signal = (self._short_ema - self._long_ema).square().mean(dim=-1, keepdim=True).detach()
+        else:
+            gate_signal = surprise
 
         query = self.query_head(encoded)
         retrieved = self._read_memory(query, state)
@@ -212,7 +238,7 @@ class TorchPLWM(nn.Module):
                 # A differentiable per-candidate gate preserves existing facts
                 # when a public candidate is absent or not salient.
                 learned_gate = torch.sigmoid(
-                    self.memory_write_gate(torch.cat((write_source[:, index], surprise), dim=-1))
+                    self.memory_write_gate(torch.cat((write_source[:, index], gate_signal), dim=-1))
                 ).unsqueeze(1)
                 write_gate = learned_gate * salience.unsqueeze(1) * active_writes[:, index : index + 1].unsqueeze(-1)
             else:
@@ -245,6 +271,7 @@ class TorchPLWM(nn.Module):
     def forward(self, observations: Tensor, *, think_on_last: bool = True) -> tuple[Tensor, Tensor, TorchCognitiveState]:
         """Run an event sequence shaped ``[batch, time, input_dim]``."""
         state = self.initial_state(observations.shape[0], observations.device)
+        self._reset_ttcd(observations.shape[0], observations.device)
         surprises = []
         for index in range(observations.shape[1]):
             state, surprise = self.step(
