@@ -35,6 +35,7 @@ sys.path.insert(0, str(ROOT))
 from plwm.device import resolve_device
 from plwm.minigrid_features import visible_object_presence
 from plwm.jeplem_memory import JEPLMMemory
+from plwm.jeplem_agent import JEPLMAgent
 from experiments.train_perception_layer import PerceptionNet, SENSORY_DIM
 from experiments.train_minigrid_memory_actor_critic import encode_observation
 from experiments.train_decide_stream_rl import (
@@ -375,9 +376,12 @@ def run(
         factories = factories + (
             ("gru_aux_policy", lambda: PolicyGRUAux(input_dim, 2, aux_coefficient=aux_coefficient)),
             ("jeplem_policy", lambda: PolicyJEPLM(input_dim, 2, aux_coefficient=aux_coefficient, use_perception=use_perception)),
+            ("jeplem_agent_policy", lambda: JEPLMAgent(
+                input_dim, 2, use_perception=use_perception,
+                perception_state_dict=str(ROOT / "artifacts" / "perception-layer.pt"))),
         )
     if jeplem_only:
-        factories = [f for f in factories if f[0] == "jeplem_policy"]
+        factories = [f for f in factories if f[0] in ("jeplem_policy", "jeplem_agent_policy")]
     results = []
     for name, factory in factories:
         model = factory().to(resolved)
