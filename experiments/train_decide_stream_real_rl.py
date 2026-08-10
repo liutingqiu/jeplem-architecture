@@ -34,6 +34,7 @@ sys.path.insert(0, str(ROOT))
 
 from plwm.device import resolve_device
 from plwm.minigrid_features import visible_object_presence
+from plwm.jeplem_memory import JEPLMMemory
 from experiments.train_minigrid_memory_actor_critic import encode_observation
 from experiments.train_decide_stream_rl import (
     PolicyGRU, PolicyEvidence, PolicyPLWM, PolicyRMTStream, PolicyGRUAux,
@@ -260,13 +261,51 @@ def _evaluate_swap(
     return (correct / max(total, 1), correct_prev / max(total_prev, 1))
 
 
+
+class PolicyJEPLM(nn.Module):
+    """JEPLM memory component as a stream policy (same wrapper as the
+    synthetic-stream script): content-addressed slots + learned-gate write +
+    dual-timescale semantic aux.  Eco-validity check on real timing + presence."""
+
+    def __init__(self, input_dim: int, num_actions: int, *, latent: int = 64,
+                 slots: int = 8, aux_timescales: int = 2, aux_coefficient: float = 0.5) -> None:
+        super().__init__()
+        self.memory = JEPLMMemory(input_dim, latent=latent, slots=slots,
+                                  identity_count=num_actions, aux_timescales=aux_timescales)
+        self.head = nn.Linear(self.memory.head_in, num_actions + 1)
+        self.aux_coefficient = aux_coefficient
+
+    def reset(self, batch: int, device: torch.device) -> None:
+        self.memory.reset(batch, device)
+
+    def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        features, aux = self.memory.step(observation_step, valid_step)
+        output = self.head(features)
+        return output[..., :-1], output[..., -1], aux
+
+    def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        batch, length, _ = observations.shape
+        self.reset(batch, observations.device)
+        logits_list: list[Tensor] = []
+        values_list: list[Tensor] = []
+        aux_list: list[Tensor] = []
+        for index in range(length):
+            logits, value, aux = self.step(observations[:, index], valid[:, index])
+            logits_list.append(logits)
+            values_list.append(value)
+            if aux is not None:
+                aux_list.append(aux)
+        out = torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
+        return out + (torch.stack(aux_list, dim=1) if aux_list else None,)
+
+
 def run(
     *, device: str | torch.device | None = None, units: int = 3, gap: int = 4,
     updates: int = 100, episodes_per_update: int = 24, evaluation_episodes: int = 32,
     experiment_seed: int = 41_123, train_seed_start: int = 10_000,
     heldout_seed_start: int = 1_000_000, use_presence: bool = False,
     rmt_probe: bool = False, aux_memory: bool = False, aux_coefficient: float = 0.5,
-    artifact: Path | None = None,
+    jeplem_only: bool = False, artifact: Path | None = None,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -289,7 +328,10 @@ def run(
     if aux_memory:
         factories = factories + (
             ("gru_aux_policy", lambda: PolicyGRUAux(input_dim, 2, aux_coefficient=aux_coefficient)),
+            ("jeplem_policy", lambda: PolicyJEPLM(input_dim, 2, aux_coefficient=aux_coefficient)),
         )
+    if jeplem_only:
+        factories = [f for f in factories if f[0] == "jeplem_policy"]
     results = []
     for name, factory in factories:
         model = factory().to(resolved)
@@ -325,6 +367,7 @@ if __name__ == "__main__":
     parser.add_argument("--evaluation-episodes", type=int, default=32)
     parser.add_argument("--experiment-seed", type=int, default=41_123)
     parser.add_argument("--use-presence", action="store_true")
+    parser.add_argument("--jeplem-only", action="store_true")
     parser.add_argument("--rmt-probe", action="store_true")
     parser.add_argument("--aux-memory", action="store_true")
     parser.add_argument("--aux-coefficient", type=float, default=0.5)
@@ -336,6 +379,6 @@ if __name__ == "__main__":
         evaluation_episodes=args.evaluation_episodes,
         experiment_seed=args.experiment_seed,
         use_presence=args.use_presence, rmt_probe=args.rmt_probe,
-        aux_memory=args.aux_memory, aux_coefficient=args.aux_coefficient, artifact=args.artifact,
+        jeplem_only=args.jeplem_only, aux_memory=args.aux_memory, aux_coefficient=args.aux_coefficient, artifact=args.artifact,
     )
     print(json.dumps(asdict(outcome), indent=2))
