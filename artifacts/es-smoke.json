@@ -1,0 +1,47 @@
+{
+  "protocol": "evidence_seek_v1: composite task for the integration layer -- K identities, noisy clue frames (p=reliability), query frames ask 'what is identity X' (X uniform in observation); agent answers X's value (+1 correct, ends) or requests a clue for a self-chosen identity (-0.01, next unit shows it); timeout at units units. PPO on-policy, no teacher/oracle. Controls: mlp_no_memory (memoryless, capped at reliability), gru_policy (compressed state), jeplem_policy (explicit slots). Probes: answer accuracy/rate, episode reward, request-vs-oracle-max-gap match.",
+  "device": "cuda",
+  "units": 6,
+  "gap": 2,
+  "identity_count": 2,
+  "reliability": 0.65,
+  "updates": 5,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "mlp_no_memory",
+      "parameters": 5125,
+      "answer_accuracy": 0.40625,
+      "answer_rate": 1.0,
+      "episode_reward": 0.3982812499999999,
+      "mean_steps": 7.1875,
+      "gap_match_rate": 0.37254901960784315,
+      "request_gap_mean": 0.33885038520211963,
+      "max_gap_mean": 0.4093092282784673
+    },
+    {
+      "name": "gru_policy",
+      "parameters": 14725,
+      "answer_accuracy": 0.5573770491803278,
+      "answer_rate": 0.953125,
+      "episode_reward": 0.5204687499999997,
+      "mean_steps": 8.125,
+      "gap_match_rate": 0.391304347826087,
+      "request_gap_mean": 0.34219796863659857,
+      "max_gap_mean": 0.4141204627044276
+    },
+    {
+      "name": "jeplem_policy",
+      "parameters": 50950,
+      "answer_accuracy": 0.453125,
+      "answer_rate": 1.0,
+      "episode_reward": 0.4449999999999999,
+      "mean_steps": 7.25,
+      "gap_match_rate": 0.3269230769230769,
+      "request_gap_mean": 0.311520649917977,
+      "max_gap_mean": 0.4160496279708156
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\es-smoke.json"
+}

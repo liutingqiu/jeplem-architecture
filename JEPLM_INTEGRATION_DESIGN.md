@@ -86,6 +86,43 @@ step(obs, valid, goal=None)     # goal [B, goal_dim]；query_vec = W_q(encoded) 
 2. **复合任务**（CURRENT_STATE 推荐）：多规则/多目标任务，让 gap_goals/信念/世界模型同时被需要——任务构造投入大，需谨慎防退化捷径。
 3. **与 evidence_aux 对齐**：本次 off 基线 0.962/0.891 已接近 evidence_aux（0.965/0.900），差距基本被 seed 效应覆盖，优先级降低。
 
+## 八、复合任务设计：EvidenceSeek（主动证据收集，2026-08-11）
+
+**任务**：K=2 身份（Key/Ball），每 unit = [线索帧, gap 空帧, 查询帧]。线索帧显示某个身份的带噪线索（p=0.65 真通道）；查询帧 agent 四类动作：答身份 0 / 答身份 1（+1 并结束）/ 求线索 0 / 求线索 1（下一 unit 该身份线索）。总 units=6 超时无奖励。
+
+**需求驱动论证**（每个模块为何真实被需要）：
+| 模块 | 任务需求 | 退化捷径（被机制惩罚） |
+|---|---|---|
+| 显式槽位记忆 | 跨帧累积带噪线索（无记忆正确率 0.65 封顶） | 读输入抄单帧 → 噪声不可靠 |
+| 信念（CategoricalBelief） | 每身份后验置信度 → 缺口 = 1 - confidence | — |
+| 自主目标（gap_goals） | 请求缺口最大身份的线索（max-gap，原样迁移 toy 逻辑） | 随机请求浪费在已确定身份 |
+| 置信度阈值决策 | 何时停止收集、回答 | 永远请求 → 超时无奖励；只答一个 → 被问另一必错 |
+
+**设计决策**：
+- 信念用 `plwm/belief.py` 的 `CategoricalBelief`（连续贝叶斯、可微），gap 特征拼入策略 head 输入（决策侧接线，同 conf_feature 模式）；不用 BeliefCell（二值翻转与连续缺口不匹配）
+- 请求动作的"目标选择" = gap_goals 的 choose_goal 逻辑，评估时用探针验证"请求目标 == max-gap 身份"的匹配率
+- 对照：JEPLM+gap 请求 / JEPLM+随机请求 / JEPLM+固定顺序请求 / GRU 无记忆基线；3 seed + 探针
+- 预期：gap 驱动请求 > 随机/固定（效率，同样单位数内正确率更高）；JEPLM > GRU（记忆价值）
+
+**实现清单**：①环境类 EvidenceSeekEnv（参考 DecideStreamEnv）②训练脚本 train_evidence_seek_rl.py（PPO 循环参考 train_decide_stream_rl.py）③对照策略 + 评估探针。**先验证无捷径基线**（GRU 应 ≤0.65 正确率上限验证任务确实需要记忆），再跑模块对照。
+
+## 九、复合任务 EvidenceSeek 诊断（v1-v4，学习失败 + 架构发现，2026-08-11）
+
+**结果**：RL 100 updates 三模型均停 0.5（随机）；监督探针（含 25600 样本 batch 训练）JEPLMMemory aux 头 loss 恒 0.693（均匀分布）——**任务学习失败，诊断为架构级**。
+
+**v1-v4 修正链**（每版修一个独立缺陷，全部排除后问题仍在）：
+1. v1：线索帧每次 `_observation` 调用重新随机采样（观测不稳定）→ 预生成修复
+2. v1：求动作的线索与随机线索可靠性相同（**边际价值 ≈ 0**，RL 学"直接答"合理）→ v4 改"线索只由请求产生"（不请求 = 无信息，答只能猜）
+3. 记忆 mask bug：`model.step(obs, active)` 把"流存活"当"记忆写入 mask"，空帧/查询帧冲掉线索槽 → 改只在线索帧写；GRU head 缺当前观测（查询帧 X 通道丢失）→ 修复
+4. **终极发现（架构级）**：v4 信息完整 + 归属通道 + goal 调制下，监督 25600 样本仍 loss 恒定——JEPLMMemory 的 **attention 内容寻址未学到**
+
+**架构发现（本诊断最重要的产出）**：
+- DecideStream 的 0.94 **从未真正考验内容寻址**——aux 预测"最近身份"可由 `state`（GRU 融合）兜底，recalled 混不混合不影响
+- EvidenceSeek 首次逼出"**从多槽按 X 精确寻址**"的真需求（身份混叠必须靠 query 聚焦正确槽），而隐式 attention 对齐（encoder 学 query↔key 映射）监督下不收敛
+- **"内容寻址"支柱的实证基础弱于预期**：显式槽位记忆的"寻址"能力需要独立验证/设计（候选：显式 key 解耦、槽 key 与内容分离、寻址预训练），列为集成层后续专题
+
+**诚实记录**：任务学习失败不归因于任务构造（v4 信息完整、env 逐帧验证正确、oracle 上界 ~0.61），归因于 RL 延迟 credit（求→答链）+ 记忆寻址不收敛的双重困难。**EvidenceSeek 任务暂停**，`experiments/train_evidence_seek_rl.py` 保留为诊断资产（含完整探针），后续若做"显式寻址"研究可复用。
+
 ## 四、决策记录（已排除方向及理由）
 
 | 方向 | 排除理由 | 证据 |
