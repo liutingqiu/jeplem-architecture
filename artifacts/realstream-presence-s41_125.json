@@ -1,0 +1,43 @@
+{
+  "protocol": "decide_stream_real_rl_v1: continuous stream of REAL MemoryS13 observation episodes [identity frame -> gap empty frames -> query frame (real obs + injected one-hot current/previous)]; reward only on query steps; PPO on-policy; no teacher, oracle, shaped reward, or privileged state; real-observation analogue of DecideStreamEnv.",
+  "device": "cuda",
+  "units": 3,
+  "gap": 4,
+  "updates": 100,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "gru_policy",
+      "parameters": 13635,
+      "query_accuracy": 0.5729166666666666,
+      "cross_episode_accuracy": 0.5853658536585366,
+      "swap_query_accuracy": 0.4270833333333333,
+      "swap_cross_accuracy": 0.4146341463414634
+    },
+    {
+      "name": "evidence_policy",
+      "parameters": 50372,
+      "query_accuracy": 0.90625,
+      "cross_episode_accuracy": 0.7804878048780488,
+      "swap_query_accuracy": 0.09375,
+      "swap_cross_accuracy": 0.21951219512195122
+    },
+    {
+      "name": "plwm_policy",
+      "parameters": 100106,
+      "query_accuracy": 0.9270833333333334,
+      "cross_episode_accuracy": 0.926829268292683,
+      "swap_query_accuracy": 0.07291666666666667,
+      "swap_cross_accuracy": 0.07317073170731707
+    },
+    {
+      "name": "rmt_mem4_policy",
+      "parameters": 84099,
+      "query_accuracy": 0.8125,
+      "cross_episode_accuracy": 0.5609756097560976,
+      "swap_query_accuracy": 0.1875,
+      "swap_cross_accuracy": 0.43902439024390244
+    }
+  ],
+  "artifact": "artifacts\\realstream-presence-s41_125.json"
+}
