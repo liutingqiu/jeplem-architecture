@@ -64,3 +64,27 @@
 
 ## 五、来源
 4 路子代理调研结果（2026-08-09），arXiv 编号均已验证；详见各子代理报告。
+
+## 六、追加调研：Kimi K3 + CCH（2026-08-11）
+
+### Kimi K3（arXiv 2607.24653, 月之暗面 2026-07-27, 权重开源）
+- 2.8T 总参数 MoE，104B 激活/token，1M context，原生视觉；缩放效率较 K2 +2.5×
+- **KDA（Kimi Delta Attention）**：delta-rule 递归 + 通道级 forget gate
+  `S_t = (I − β_t k_t k_tᵀ)·Diag(α_t)·S_{t−1} + β_t k_t v_tᵀ`
+  每步：通道衰减旧态（α）→ 在 key 方向定向擦除（delta-rule）→ 外积写入（β 写强度）→ 线性读取
+  = 学习式"遗忘旋钮 + 定向擦写"；记忆载体 = 固定矩阵 S（**仍是压缩态**）
+- 混合注意：每 block **3×KDA（压缩）+ 1×Gated MLA（无损检索）**，末尾强制全局 attention
+  → **工业级独立验证"压缩+无损检索混合"**（与我们 RMT/GRU 对比结论同构）
+- AttnRes（跨层 pseudo-query 检索，preprint 59）；Stable LatentMoE（896 专家激活 16）
+- 后训练：多域 RL × 多推理强度，multi-teacher 蒸馏合并；性能领先其他开源，落后 Claude Fable 5/GPT-5.6 Sol
+- 对项目：① delta-rule 擦写 = 未测的第三类写入门控 → 实验队列；② 压缩态不可审计/无体外修订 → 差异化不变
+
+### CCH 能力收敛假说（arXiv 2607.14144）
+- 主张：固定 per-token 推理预算下，能力收敛到 **access-complete 混合** = compressive O(1) 状态通道 + scalable verbatim-index 通道
+- 三道资源墙：Shannon wall（o(N^b) 状态）、horizon wall（固定窗口）、circuit wall（定深 attention-only, 条件 TC0≠NC1）
+- 预注册实验：64 标量状态 + 一层 global attention → 精确检索误差 0.994 → 0.000（剪刀差实测）
+- 对项目：槽位（verbatim-index）+ 隐状态（compressive）= access-complete 方向的理论背书；难度边界实验可基于三道墙设计
+
+### 行动项
+1. JEPLMMemory 加 delta-rule 擦写门控变体对照（中优先级，1-2 天）
+2. CCH 三道墙作为任务难度边界设计依据（写论文/设计实验时引用）
