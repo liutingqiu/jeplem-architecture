@@ -2,75 +2,71 @@
 
 > 用途：让新会话用几分钟读完"项目现在在哪、下一步做什么"，避免重读历史大文件。
 > 更新规则：每个阶段闭环后更新本节头部；历史细节写进 NIGHT_RUN/各 REPORT，不搬进本文件。
-> 最后更新：2026-08-11（阶段 37 闭环：区块 8 升级 ✅，白皮书 11/12）
+> 最后更新：2026-08-11（阶段 37 收官：图纸验证层完成 11/12，主题切换为系统集成层）
 
 ---
 
 ## 一、项目北极星（一行）
 
-验证"显式槽位记忆 + 语义感知层"的 JEPLM 认知架构，用白皮书（COGNITIVE_SYSTEM_WHITEPAPER.md）12 个认知区块的最小可证伪实验逐块攻克；当前在记忆/感知层（区块 3/12 相关）。
+验证"显式槽位记忆 + 语义感知层"的 JEPLM 认知架构：白皮书 12 个认知区块的最小可证伪实验已逐块验证（**11/12 ✅**），下一阶段把已验证的机制 + JEPLM 三承重柱**组装为完整自主认知系统**（系统集成层）。
 
-## 二、当前主线（2026-08 以来）
+## 二、当前主线（图纸验证层已收官，进入系统集成层）
 
-JEPLM 记忆架构的组件验证链（按依赖顺序已完成）：
+**A. 图纸验证层（2026-08 至 08-11，已完成）**：
+1. **JEPLM 三承重柱验证完**：JEPA 感知层（冻结 CNN 0.961，联合训练证伪）| 显式槽位记忆（内容寻址 > 压缩）| 语义 aux（单身份/单时标决定性）
+2. **两根候选柱淘汰（负结果驱动）**：JEPA latent 预测（阶段 28-32 五轮中性 + 记忆冲突）、surprise 清槽修订（阶段 35 RL 有害）——均降级，默认关闭
+3. **白皮书 11/12 区块 ✅**：1-5、7-12 验证通过；区块 6（组合泛化）toy 不可判，可判条件已标注（需 ARC-AGI-2 类外部基准）
+4. **遗留项全清零**：RMT 流式崩盘、真实流回归、aux 三态矩阵、混淆观测 POMDP、查询提示、RMT+aux、双身份干扰 aux
 
-1. **记忆层**：内容寻址槽位 > 压缩隐状态（DecideAfterDelay 家族，3-6 seed）
-2. **感知层**：CNN 感知（0.961）→ 记忆传导量化；冻结是正确设计（联合训练证伪 0.427）
-3. **辅助目标三态矩阵（阶段 28-30 闭环）**：
-   | 辅助类型 | RL 效果 |
-   |---|---|
-   | 重建式（像素/输入空间）| 有害（evidence -0.10）|
-   | 语义内容预测（记忆内容 aux）| 帮助（evidence 0→+0.56）|
-   | latent next-state 预测（JEPA 式，作训练目标）| 中性（0.941/0.831 与无预测完全一致）|
-   | JEPA 预测误差 → 决策侧置信度特征 | 中性（同上，分诊：信息与 one-hot 观测冗余）|
-4. **混淆观测 POMDP 攻击（阶段 31 闭环）**：把身份帧改为 4 帧带噪线索（单帧 65% 可确定、贝叶斯上限 0.846）——JEPA predict/conf 仍全中性（3 seed 噪声内）；双层分诊：state/features 信号源下翻转线索 conf 均无区分（0.458≈0.455、0.497≈0.497），预测误差（帧间变化量）与任务所需信息（线索-身份静态一致性）类型错配；u3g4 回归确认阶段 28 结论不受实现修正影响
-5. **查询提示混淆（阶段 32 闭环，JEPA 支柱审计终局）**：查询帧携带身份提示（30% 翻转），最优=信记忆抗提示——JEPA predict/conf 仍中性（3 seed 均值），且带 predictor 配置跨段记忆崩（s555/666 cross 0.493=随机）——预测监督与记忆保持冲突；探针：查询帧 features 被随机选择器噪声主导，conf 测不到 hint-记忆一致性
-6. **架构组装**：JEPLMAgent v1（冻结 CNN + JEPLMMemory + 策略头）在合成/真实流可用
-7. **surprise 修订 RL 集成（阶段 35 闭环，负结果）**：规则翻转（switch_at=2）下清槽修订有害（after 0.292 vs 基线 0.396）——记忆存身份（翻转不变信息）清掉纯损失；翻转适应靠权重学习；one_shot==always（触发一次后模型自适）；监督版 one-shot 1.0 不迁移到 RL（无 teacher）
-8. **架构承重件最终确定**：JEPA 感知层（冻结 CNN 0.961）+ PLWM 显式槽位记忆 + 语义 aux（单身份/单时标）。JEPA latent 预测（阶段 28-32）与 surprise 清槽修订（阶段 35）均降级——RL 下无实证支持。
+**B. 系统集成层（当前阶段，未开始）**：把已验证机制组装为完整系统。
 
-## 三、最新闭环结论（阶段 37，2026-08-11）
+## 三、关键结论（供集成层设计引用）
 
-- **区块 8 自我模型升级 ✅（3/3 seed）**：v2 能力边界版（32 维 + OOD）——self_head 训 ID+OOD 正确性学会边界，OOD ECE 0.235-0.288 vs softmax 0.385-0.402（低 0.10-0.16）；v1 无增量因 toy 表示不比 answer logits 有判别力；增量需能力边界经验（与区块 1/3 一致）；
-- **白皮书 11/12 ✅**：仅剩区块 6（组合泛化）——toy 不可判（组合=叠加 trivial），可判条件已标注：需 ARC-AGI-2 类抽象视觉基准（外部资源）；
-- **图纸最后一成完成**：区块 5（本会话）+ 区块 8 攻克，白皮书 12 区块从 10/12 → 11/12；架构承重件三柱验证完（阶段 35）。
+- **架构承重件**（JEPLM 最终配置）：感知（冻结 CNN）→ 语义 → 显式槽位记忆 + 语义 aux → 策略。合成流 0.941/0.831、真实流 0.774/0.577 端到端已验证。
+- **JEPA latent 预测 / surprise 清槽修订：RL 下无实证支持，默认关闭**（审计证据：NIGHT_RUN 阶段 28-35）。
+- **分层训练是特征非缺陷**：感知自监督/监督预训练 + 冻结、记忆 RL 优化（联合训练证伪 0.427）；预测监督与记忆保持冲突（阶段 32）。
+- **辅助目标三态**：重建式有害（-0.10）| 语义内容预测帮助（0→+0.56）| latent next-state 中性。
+- **区块机制已验证清单**：1 信念（BeliefCell 分叉）/2 驱力（置信度缺口）/3 持续学习（consolidation 账本）/4 自主目标（gap_goals）/5 因果（CI 测试）/7 反事实（转移泛化）/8 自我模型（能力边界 ECE）/9 执行控制（预算注意力）/10 价值锚定/11 社会认知/12 世界模型（显式转移）。
 
-## 四、下一步候选（按推荐序）
+## 四、下一步：系统集成层（推荐规划路径）
 
-1. **系统集成层（白皮书愿景的剩余主体）**：把已验证的 11 个区块机制 + JEPLM 三承重柱组装为完整自主认知系统（信念→驱力→目标→执行控制与记忆/感知骨架协同）——图纸验证完成后的自然下一步，工程量大。
-2. **区块 6 组合泛化（需外部 ARC 基准）**：可判条件已标注——训练子集规则 + 未见组合成功率 >2x 记忆回放且 >0.5；需 ARC 数据集/环境（外部资源，超出 toy 纪律）。
-3. **真实流端到端补测（需 minigrid）**：JEPLMAgent 最终配置真实流完整验证——阶段 21/25 已部分验证，补强需 Linux/服务器（Windows 无 minigrid）。
+**目标**：把 11 个已验证区块机制 + JEPLM 三承重柱组装为完整自主认知系统，用 ARC-AGI-2 类外部基准作为最终验收（区块 6 可判条件已标注）。
+
+**已有集成资产**（plwm/ 下待勘察）：
+- **骨架已组装**：`plwm/jeplem_agent.py`（JEPLMAgent：感知+记忆+策略）、`jeplem_memory.py`、`jeplem_predictor.py`（降级保留）
+- **区块机制模块**（toy 级独立验证，未与骨架集成）：`belief.py`（区块 1/2）、`commitments.py`/`fact_ledger.py`/`continual.py`（区块 3）、`adaptive.py`/`multiscale.py`/`regime.py`（多尺度/自适应）、`latent_planner.py`（规划）、`world_model.py`（区块 7/12）、`events.py`/`runtime.py`（运行时）
+- **建议规划步骤**：①勘察上述模块的接口与 toy 验证状态 → ②设计模块间接口（信念如何驱动记忆写入/修订、目标如何选择查询、执行控制如何分配注意力、驱力如何触发探索）→ ③选一个"多模块协同"的复合任务验证集成（非单 toy）→ ④ARC 摸底/验收
+- **大方向变更才汇报**：集成层是否改变架构承重件（如信念组件接入记忆门控）属架构决策，按授权自主拍板；ARC 外部基准采购需用户定夺
 
 ## 五、关键文件索引（新会话按需读，不读历史档案）
 
 | 文件 | 角色 | 何时读 |
 |---|---|---|
 | **本文件** | 交接指针 | 必读 |
-| COGNITIVE_SYSTEM_WHITEPAPER.md (15KB) | 北极星/12 区块 | 定方向时 |
+| COGNITIVE_SYSTEM_WHITEPAPER.md (15KB) | 北极星/12 区块（11 ✅ + 区块 6 可判条件） | 定方向时 |
+| JEPLM_IMPLEMENTATION.md | 蓝图（含 JEPA 审计章节、待集成项） | 集成设计时 |
+| JEPLM_MEMORY_DESIGN.md / JEPLM_AUX_REPORT.md | 记忆设计决策/aux 矩阵 | 改记忆代码时 |
 | NIGHT_RUN_20260809.md (32KB) | 阶段 1-37 实验日志 | 查具体证据时（有目录可跳） |
-| JEPLM_AUX_REPORT.md | 辅助目标三态完整矩阵 | 做 aux/JEPA 相关时 |
-| JEPLM_MEMORY_DESIGN.md / JEPLM_IMPLEMENTATION.md | 记忆组件设计/集成 | 改记忆代码时 |
-| JEPLM_WRITE_MODE_REPORT.md | write-mode 消融（FIFO>gate>delta） | 动写入门控时 |
-| MEMORYS7_REVERIFICATION_REPORT.md | 历史结论证伪记录 | 引用 MemoryS7 结论前必读 |
 | **不要读**：MASTER_PLAN.md (107KB，Luanti/MiniGrid 历史档案)、PLWM_BLUEPRINT_V1/PLAIN、RESEARCH_SURVEY_202608 | 已完结历史 | 除非查旧结论 |
 
 ## 六、实验入口（常用命令）
 
 ```bash
-# 合成流连续 RL（主战场）：--jeplem-only 只看 JEPLM，--jeplem-predict/--jeplem-conf-feature 测 JEPA
+# 合成流连续 RL（主战场）：--jeplem-only 只看 JEPLM
 python experiments/train_decide_stream_rl.py --jeplem-only --aux-memory --updates 100 --experiment-seed 444 --artifact artifacts/xxx.json
 
-# 混淆观测 POMDP（阶段 31）：--confounded --clue-frames 4 --clue-reliability 0.65，--probe-conf 跑 conf 分诊
-python experiments/train_decide_stream_rl.py --jeplem-only --aux-memory --confounded --clue-frames 4 --clue-reliability 0.65 --jeplem-predict --jeplem-conf-feature --probe-conf --updates 100 --experiment-seed 444 --artifact artifacts/xxx.json
-
-# 查询提示混淆（阶段 32，JEPA 审计终局）：--query-hint --query-hint-reliability 0.7
+# 混淆观测 POMDP（阶段 31）/ 查询提示（阶段 32）模式
+python experiments/train_decide_stream_rl.py --jeplem-only --aux-memory --confounded --clue-frames 4 --clue-reliability 0.65 --updates 100 --experiment-seed 444 --artifact artifacts/xxx.json
 python experiments/train_decide_stream_rl.py --jeplem-only --aux-memory --query-hint --query-hint-reliability 0.7 --updates 100 --experiment-seed 444 --artifact artifacts/xxx.json
 
-# 感知层
-python experiments/train_perception_layer.py
+# 区块实验（图纸验证层资产，集成时复用）
+python experiments/train_perception_layer.py   # 感知层
+python experiments/train_causal_structure_learning.py --scenario collider  # 区块 5
+python experiments/train_self_model_v2.py      # 区块 8
+python experiments/train_belief_bifurcation.py # 区块 1
 
 # 测试
 python -m unittest discover -s tests -v
 ```
 
-> 纪律：3 seed（444/555/666 或 222/333/41123）、swap 探针、诚实负结果归档。
+> 纪律：3 seed（444/555/666 或 222/333/41123）、swap 探针、诚实负结果归档；集成层改动仍须带可证伪对照。
