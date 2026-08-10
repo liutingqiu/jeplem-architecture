@@ -33,6 +33,7 @@ sys.path.insert(0, str(ROOT))
 from plwm.device import resolve_device
 from plwm.torch_model import TorchPLWM
 from plwm.jeplem_memory import JEPLMMemory
+from plwm.jeplem_agent import JEPLMAgent
 
 
 class DecideStreamEnv(gym.Env):
@@ -721,6 +722,7 @@ def run(
     aux_coefficient: float = 0.5, gru_focus: bool = False, rmt_aux_only: bool = False,
     evidence_aux_only: bool = False, query_horizon: int = 2, aux_timescales: int = 1,
     evidence_slots: int = 8, jeplem_only: bool = False, jeplem_slots: int = 8,
+    jeplem_aux_timescales: int = 2,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -765,6 +767,9 @@ def run(
                 input_dim, identity_count, aux_coefficient=aux_coefficient)),
             ("jeplem_policy", lambda: PolicyJEPLM(
                 input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient)),
+            ("jeplem_agent_policy", lambda: JEPLMAgent(
+                input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient,
+                aux_timescales=jeplem_aux_timescales)),
         )
     if gru_focus:
         factories = [f for f in factories if f[0] in ("gru_policy", "gru_aux_policy", "gru_aux2_policy")]
@@ -773,7 +778,7 @@ def run(
     if evidence_aux_only:
         factories = [f for f in factories if f[0] in ("evidence_policy", "evidence_aux_policy")]
     if jeplem_only:
-        factories = [f for f in factories if f[0] == "jeplem_policy"]
+        factories = [f for f in factories if f[0] in ("jeplem_policy", "jeplem_agent_policy")]
     results = []
     for name, factory in factories:
         model = factory().to(resolved)
@@ -825,6 +830,7 @@ if __name__ == "__main__":
     parser.add_argument("--evidence-slots", type=int, default=8)
     parser.add_argument("--jeplem-only", action="store_true")
     parser.add_argument("--jeplem-slots", type=int, default=8)
+    parser.add_argument("--jeplem-aux-timescales", type=int, default=2)
     parser.add_argument("--rmt-segment-units", type=float, default=1.0)
     parser.add_argument("--no-rmt-detach", action="store_true")
     parser.add_argument("--rmt-probe", action="store_true")
@@ -848,5 +854,6 @@ if __name__ == "__main__":
         evidence_aux_only=args.evidence_aux_only, query_horizon=args.query_horizon,
         aux_timescales=args.aux_timescales, evidence_slots=args.evidence_slots,
         jeplem_only=args.jeplem_only, jeplem_slots=args.jeplem_slots,
+        jeplem_aux_timescales=args.jeplem_aux_timescales,
     )
     print(json.dumps(asdict(outcome), indent=2))
