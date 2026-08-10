@@ -1,0 +1,35 @@
+{
+  "protocol": "decide_stream_real_rl_v1: continuous stream of REAL MemoryS13 observation episodes [identity frame -> gap empty frames -> query frame (real obs + injected one-hot current/previous)]; reward only on query steps; PPO on-policy; no teacher, oracle, shaped reward, or privileged state; real-observation analogue of DecideStreamEnv.",
+  "device": "cuda",
+  "units": 3,
+  "gap": 4,
+  "updates": 100,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "gru_policy",
+      "parameters": 43779,
+      "query_accuracy": 0.6527777777777778,
+      "cross_episode_accuracy": 0.48484848484848486
+    },
+    {
+      "name": "evidence_policy",
+      "parameters": 60420,
+      "query_accuracy": 0.6527777777777778,
+      "cross_episode_accuracy": 0.48484848484848486
+    },
+    {
+      "name": "plwm_policy",
+      "parameters": 120359,
+      "query_accuracy": 0.7916666666666666,
+      "cross_episode_accuracy": 1.0
+    },
+    {
+      "name": "rmt_mem4_policy",
+      "parameters": 94147,
+      "query_accuracy": 1.0,
+      "cross_episode_accuracy": 1.0
+    }
+  ],
+  "artifact": "artifacts\\realstream-rl-u100-seed333.json"
+}
