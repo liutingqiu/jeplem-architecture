@@ -208,6 +208,70 @@ class GRUPolicy(nn.Module):
         return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
 
 
+class ExplicitKeyMemory(nn.Module):
+    """Explicit-slot memory with STRUCTURALLY-ALIGNED addressing (diagnosis
+    control for the content-addressing finding, 2026-08-11).
+
+    JEPLMMemory's implicit attention alignment (one shared encoder learns
+    both the query mapping from the asked-identity channels and the key
+    mapping from the clue-attribution channels) did not converge under
+    supervision in EvidenceSeek (loss constant 0.693).  This variant removes
+    the alignment burden: slot i belongs to identity i, key = projection of
+    the attribution one-hot, query = projection of the asked X one-hot,
+    value = projection of the clue VALUE one-hot.  If this learns, the
+    bottleneck is the implicit alignment, not the task or the attention.
+    """
+
+    def __init__(self, input_dim: int, num_actions: int, *, latent: int = 64,
+                 identity_count: int = 2, value_classes: int = 2) -> None:
+        super().__init__()
+        self.identity_count = identity_count
+        self.value_classes = value_classes
+        self.key_proj = nn.Linear(identity_count, latent)
+        self.value_proj = nn.Linear(value_classes, latent)
+        self.query_proj = nn.Linear(identity_count, latent)
+        self.head = nn.Linear(latent, num_actions + 1)
+        self._keys: Tensor | None = None
+        self._values: Tensor | None = None
+
+    def reset(self, batch: int, device: torch.device) -> None:
+        self._keys = self.key_proj(
+            torch.eye(self.identity_count, device=device).unsqueeze(0).expand(batch, -1, -1)
+        )  # [B, K, latent]
+        self._values = torch.zeros(batch, self.identity_count, self.key_proj.out_features, device=device)
+
+    def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor]:
+        batch = observation_step.shape[0]
+        k = self.identity_count
+        value = observation_step[:, : self.value_classes]
+        attribution = observation_step[:, k : 2 * k]
+        asked = observation_step[:, 2 * k + 1 + 4 : 2 * k + 1 + 4 + k]
+        # write: on clue frames, accumulate the projected value into slot i
+        written_value = self.value_proj(value)  # [B, latent]
+        write_mask = valid_step.unsqueeze(-1).unsqueeze(-1)  # [B,1,1]
+        self._values = self._values + write_mask * written_value.unsqueeze(1) * attribution.unsqueeze(-1)
+        # read: query from asked X, attention over identity slots
+        query_vec = self.query_proj(asked)
+        weights = torch.softmax(
+            torch.einsum("bd,bmd->bm", query_vec, self._keys) / self.key_proj.out_features**0.5,
+            dim=-1,
+        )
+        recalled = torch.einsum("bm,bmd->bd", weights, self._values)
+        output = self.head(recalled)
+        return output[..., :-1], output[..., -1]
+
+    def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor]:
+        batch, length, _ = observations.shape
+        self.reset(batch, observations.device)
+        logits_list: list[Tensor] = []
+        values_list: list[Tensor] = []
+        for index in range(length):
+            logits, value = self.step(observations[:, index], valid[:, index])
+            logits_list.append(logits)
+            values_list.append(value)
+        return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
+
+
 class JEPLMEvidenceSeek(nn.Module):
     """Explicit slot memory: JEPLMMemory stores clue frames (valid only on
     clue frames); policy head reads features and answers/requests.
@@ -257,9 +321,15 @@ def _clue_valid(env: EvidenceSeekEnv, frame: int) -> bool:
 
 
 def _collect(model: nn.Module, env: EvidenceSeekEnv, *, count: int, seed_start: int,
-             device: torch.device) -> tuple[list[list[Tensor]], list[list[int]], list[list[float]], list[list[int]]]:
+             device: torch.device, exploring: bool = False, explore_ratio: float = 0.5) -> tuple[list[list[Tensor]], list[list[int]], list[list[float]], list[list[int]]]:
     """Batch-parallel episode collection.  Each stream resets per episode
-    (episodes are independent tasks; no cross-episode memory requirement)."""
+    (episodes are independent tasks; no cross-episode memory requirement).
+
+    ``exploring``: early-training forced exploration -- with probability
+    ``explore_ratio`` the query-frame action is replaced by a random REQUEST.
+    Without this, the high-variance +-1 answer rewards collapse the policy
+    onto "always answer at the first query" and the request action is never
+    sampled again (exploration collapse, observed 2026-08-11)."""
     import copy
     was_training = model.training
     model.eval()
@@ -287,6 +357,9 @@ def _collect(model: nn.Module, env: EvidenceSeekEnv, *, count: int, seed_start: 
                 continue
             distribution = Categorical(logits=logits[index])
             action = int(distribution.sample().item())
+            if exploring and random.random() < explore_ratio:
+                # forced exploration of the request actions (anti collapse)
+                action = random.choice((ACTION_REQUEST_0, ACTION_REQUEST_1))
             observation, reward, terminated, truncated, _info = envs[index].step(action)
             histories[index].append(observation_step[index])
             action_lists[index].append(action)
@@ -327,12 +400,15 @@ def _gae(rewards: list[list[float]], values: Tensor, valid: Tensor, *, gamma: fl
 
 def _train_ppo(model: nn.Module, env: EvidenceSeekEnv, *, updates: int, episodes_per_update: int,
                seed_start: int, device: torch.device, ppo_epochs: int = 4,
-               entropy_coefficient: float = 0.1, weight_decay: float = 1e-5) -> None:
+               entropy_coefficient: float = 0.1, weight_decay: float = 1e-5,
+               explore_updates: int = 30, explore_ratio: float = 0.5) -> None:
     optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=weight_decay)
     for update in range(updates):
         model.train()
+        exploring = update < explore_updates
         histories, action_lists, reward_lists, _ = _collect(
             model, env, count=episodes_per_update, seed_start=seed_start + update * episodes_per_update, device=device,
+            exploring=exploring, explore_ratio=explore_ratio,
         )
         observations, valid = _pad(histories, device, env.input_dim)
         action_tensor = torch.full(valid.shape, -1, dtype=torch.long, device=device)
@@ -487,6 +563,7 @@ def run(*, device: str | torch.device | None = None, units: int = 6, gap: int = 
         ("mlp_no_memory", lambda: MLPNoMemory(input_dim, N_ACTIONS)),
         ("gru_policy", lambda: GRUPolicy(input_dim, N_ACTIONS)),
         ("jeplem_policy", lambda: JEPLMEvidenceSeek(input_dim, N_ACTIONS, slots=slots, goal_dim=identity_count)),
+        ("explicit_key_policy", lambda: ExplicitKeyMemory(input_dim, N_ACTIONS, identity_count=identity_count)),
     )
     if jeplem_only:
         factories = [f for f in factories if f[0] == "jeplem_policy"]
