@@ -376,8 +376,10 @@ class PolicyJEPLM(nn.Module):
     def __init__(self, input_dim: int, num_actions: int, *, latent: int = 64,
                  slots: int = 16, aux_timescales: int = 2, aux_coefficient: float = 0.5,
                  write_mode: str = "fifo", predict: bool = False,
-                 pred_coefficient: float = 0.1, conf_feature: bool = False) -> None:
+                 pred_coefficient: float = 0.1, conf_feature: bool = False,
+                 revision_mode: str = "none") -> None:
         super().__init__()
+        self.revision_mode = revision_mode  # 'none' | 'one_shot' | 'always'
         self.memory = JEPLMMemory(input_dim, latent=latent, slots=slots,
                                   identity_count=num_actions, aux_timescales=aux_timescales,
                                   write_mode=write_mode)
@@ -408,6 +410,10 @@ class PolicyJEPLM(nn.Module):
         self.memory.reset(batch, device)
         self._pred_loss = None
         self._prev_features = None
+        # surprise-driven revision state (phase 35): one-shot clears the
+        # memory once when the identity-aux CE (surprise) spikes repeatedly
+        self._revision_one_shot_done = False
+        self._surprise_streak = 0
 
     def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor, Tensor]:
         features, aux = self.memory.step(observation_step, valid_step)
@@ -630,7 +636,7 @@ def _pad(episodes: list[list[Tensor]], device: torch.device, input_dim: int) -> 
 @torch.no_grad()
 def _collect(
     model: nn.Module, env: DecideStreamEnv, *, count: int, seed_start: int,
-    device: torch.device, stochastic: bool = True,
+    device: torch.device, stochastic: bool = True, fail_threshold: int = 2,
 ) -> tuple[list[list[Tensor]], list[list[int]], list[list[float]]]:
     """Batch-parallel streaming collection (O(T), full batch per frame)."""
     was_training = model.training
@@ -644,6 +650,13 @@ def _collect(
     reward_lists: list[list[float]] = [[] for _ in range(count)]
     labels = [envs[i]._identities[:] for i in range(count)]
     done = [False] * count
+    # surprise-driven memory revision (phase 35): rule flip is NOT visible in
+    # identity-aux CE (aux predicts identities, which do not change) and
+    # collect is a no-grad forward (no gradient-churn signal), so the RL
+    # natural surprise signal is CONSECUTIVE QUERY FRAME FAILURES (reward 0
+    # on the majority of the parallel batch -- all streams share switch_at).
+    revision_mode = getattr(model, "revision_mode", "none")
+    _failed_queries = 0
     for _step in range(env.total_steps):
         active = torch.tensor([not d for d in done], dtype=torch.bool, device=device)
         if not bool(active.any()):
@@ -663,6 +676,20 @@ def _collect(
             observations[index] = observation
             if terminated or truncated:
                 done[index] = True
+        if revision_mode != "none" and hasattr(model, "memory"):
+            _unit, _pos = divmod(_step, env.unit_len)
+            if _pos == env.gap:  # this frame was a query frame
+                active_n = sum(1 for i in range(count) if not done[i])
+                successes = sum(1 for i in range(count) if not done[i] and reward_lists[i] and reward_lists[i][-1] > 0)
+                if active_n > 0 and successes < active_n * 0.5:
+                    _failed_queries += 1
+                else:
+                    _failed_queries = 0
+                if _failed_queries >= fail_threshold:
+                    model.memory.reset(count, device)  # all streams flip at once (shared switch_at)
+                    _failed_queries = 0
+                    if revision_mode == "one_shot":
+                        revision_mode = "none"  # one-shot: clear exactly once, then rebuild
     if was_training:
         model.train()
     return histories, action_lists, reward_lists, labels
@@ -685,7 +712,7 @@ def _gae(rewards: list[list[float]], values: Tensor, valid: Tensor, *, gamma: fl
 def _train_ppo(
     model: nn.Module, env: DecideStreamEnv, *, updates: int, episodes_per_update: int,
     seed_start: int, device: torch.device, ppo_epochs: int = 4, entropy_coefficient: float = 0.05,
-    weight_decay: float = 1e-5,
+    weight_decay: float = 1e-5, fail_threshold: int = 2,
 ) -> tuple[int, int]:
     optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=weight_decay)
     total_episodes = total_successes = 0
@@ -693,6 +720,7 @@ def _train_ppo(
         model.train()
         histories, action_lists, reward_lists, labels = _collect(
             model, env, count=episodes_per_update, seed_start=seed_start + update * episodes_per_update, device=device,
+            fail_threshold=fail_threshold,
         )
         observations, valid = _pad(histories, device, env.input_dim)
         action_tensor = torch.full(valid.shape, -1, dtype=torch.long, device=device)
@@ -899,6 +927,7 @@ def run(
     jeplem_conf_feature: bool = False, confounded: bool = False,
     clue_frames: int = 1, clue_reliability: float = 0.65, probe_conf: bool = False,
     query_hint: bool = False, query_hint_reliability: float = 0.7,
+    revision_mode: str = "none", fail_threshold: int = 2,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -944,7 +973,7 @@ def run(
             ("jeplem_policy", lambda: PolicyJEPLM(
                 input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient,
                 write_mode=jeplem_write_mode, predict=jeplem_predict, pred_coefficient=0.1,
-                conf_feature=jeplem_conf_feature)),
+                conf_feature=jeplem_conf_feature, revision_mode=revision_mode)),
             ("jeplem_agent_policy", lambda: JEPLMAgent(
                 input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient,
                 aux_timescales=jeplem_aux_timescales, write_mode=jeplem_write_mode)),
@@ -963,7 +992,7 @@ def run(
         model = factory().to(resolved)
         _train_ppo(
             model, env, updates=updates, episodes_per_update=episodes_per_update,
-            seed_start=train_seed_start, device=resolved,
+            seed_start=train_seed_start, device=resolved, fail_threshold=fail_threshold,
         )
         query_acc, cross_acc, before_acc, after_acc = _evaluate(
             model, env, episodes=evaluation_episodes, seed_start=heldout_seed_start, device=resolved,
@@ -1026,6 +1055,8 @@ if __name__ == "__main__":
     parser.add_argument("--probe-conf", action="store_true", help="phase-31: record JEPA conf by clue-flip status (diagnosis probe)")
     parser.add_argument("--query-hint", action="store_true", help="phase-32: query frame carries an identity hint (70%% reliable) - tests whether JEPA conf helps resist the hint shortcut")
     parser.add_argument("--query-hint-reliability", type=float, default=0.7, help="probability the query-frame identity hint is the true identity")
+    parser.add_argument("--revision-mode", type=str, default="none", choices=["none", "one_shot", "always"], help="phase-35: surprise-driven memory revision on rule flip (consecutive query failures)")
+    parser.add_argument("--fail-threshold", type=int, default=2, help="consecutive majority-failed query frames before revision clears memory")
     parser.add_argument("--rmt-segment-units", type=float, default=1.0)
     parser.add_argument("--no-rmt-detach", action="store_true")
     parser.add_argument("--rmt-probe", action="store_true")
@@ -1056,5 +1087,6 @@ if __name__ == "__main__":
         confounded=args.confounded, clue_frames=args.clue_frames,
         clue_reliability=args.clue_reliability, probe_conf=args.probe_conf,
         query_hint=args.query_hint, query_hint_reliability=args.query_hint_reliability,
+        revision_mode=args.revision_mode, fail_threshold=args.fail_threshold,
     )
     print(json.dumps(asdict(outcome), indent=2))
