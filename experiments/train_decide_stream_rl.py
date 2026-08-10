@@ -321,7 +321,7 @@ class PolicyJEPLM(nn.Module):
         self.predict = predict
         self.pred_coefficient = pred_coefficient
         if predict:
-            self.predictor = JEPLMPredictor(self.memory.head_in)
+            self.predictor = JEPLMPredictor(self.memory.latent)
         else:
             self.predictor = None
         self._pred_loss: Tensor | None = None
@@ -745,7 +745,7 @@ def run(
     aux_coefficient: float = 0.5, gru_focus: bool = False, rmt_aux_only: bool = False,
     evidence_aux_only: bool = False, query_horizon: int = 2, aux_timescales: int = 1,
     evidence_slots: int = 8, jeplem_only: bool = False, jeplem_slots: int = 8,
-    jeplem_aux_timescales: int = 2, jeplem_write_mode: str = "fifo",
+    jeplem_aux_timescales: int = 2, jeplem_write_mode: str = "fifo", jeplem_predict: bool = False,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -790,7 +790,7 @@ def run(
                 input_dim, identity_count, aux_coefficient=aux_coefficient)),
             ("jeplem_policy", lambda: PolicyJEPLM(
                 input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient,
-                write_mode=jeplem_write_mode)),
+                write_mode=jeplem_write_mode, predict=jeplem_predict, pred_coefficient=0.1)),
             ("jeplem_agent_policy", lambda: JEPLMAgent(
                 input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient,
                 aux_timescales=jeplem_aux_timescales, write_mode=jeplem_write_mode)),
@@ -855,6 +855,7 @@ if __name__ == "__main__":
     parser.add_argument("--jeplem-only", action="store_true")
     parser.add_argument("--jeplem-slots", type=int, default=8)
     parser.add_argument("--jeplem-aux-timescales", type=int, default=2)
+    parser.add_argument("--jeplem-predict", action="store_true")
     parser.add_argument("--jeplem-write-mode", type=str, default="fifo", choices=["fifo", "gate", "delta_rule"])
     parser.add_argument("--rmt-segment-units", type=float, default=1.0)
     parser.add_argument("--no-rmt-detach", action="store_true")
@@ -881,5 +882,6 @@ if __name__ == "__main__":
         jeplem_only=args.jeplem_only, jeplem_slots=args.jeplem_slots,
         jeplem_aux_timescales=args.jeplem_aux_timescales,
         jeplem_write_mode=args.jeplem_write_mode,
+        jeplem_predict=args.jeplem_predict,
     )
     print(json.dumps(asdict(outcome), indent=2))
