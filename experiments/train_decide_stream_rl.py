@@ -40,7 +40,7 @@ from plwm.jeplem_predictor import JEPLMPredictor
 class DecideStreamEnv(gym.Env):
     metadata = {"render_modes": []}
 
-    def __init__(self, *, units: int = 3, gap: int = 4, identity_count: int = 2, seed: int = 0, switch_at: int | None = None, query_horizon: int = 2, confounded: bool = False, clue_frames: int = 1, clue_reliability: float = 0.65) -> None:
+    def __init__(self, *, units: int = 3, gap: int = 4, identity_count: int = 2, seed: int = 0, switch_at: int | None = None, query_horizon: int = 2, confounded: bool = False, clue_frames: int = 1, clue_reliability: float = 0.65, query_hint: bool = False, query_hint_reliability: float = 0.7) -> None:
         if units < 2:
             raise ValueError("stream needs at least two episodes for cross-episode queries")
         self.units, self.gap, self.identity_count = units, gap, identity_count
@@ -63,6 +63,19 @@ class DecideStreamEnv(gym.Env):
         self.total_steps = units * self.unit_len
         self.query_horizon = query_horizon
         self._clue_flips: list[list[bool]] | None = None
+        # query_hint mode (phase 32): the query frame additionally carries an
+        # identity hint -- the identity one-hot with probability
+        # ``query_hint_reliability`` and the OPPOSITE identity with probability
+        # (1 - reliability).  A single hint observation cannot be told apart
+        # from a clean one, so the policy must trust its memory over the hint
+        # (memory is 100% reliable, hint is 70%).  This is the mirror of phase
+        # 31: JEPA conf (prediction error vs the remembered identity) now
+        # measures the hint-vs-memory consistency that phase-31 clue-conf
+        # could not (query-frame delta against memory IS learnable by the
+        # predictor, whereas clue-to-clue deltas are not).
+        self.query_hint = query_hint
+        self.query_hint_reliability = query_hint_reliability
+        self._query_hint_flips: list[bool] | None = None
         # Note: in confounded mode with clue_frames == gap there are NO empty
         # frames, so the memory-content aux head silently sees no aux frames
         # (frame_mask is empty).  Phase-31 used this configuration; the three
@@ -100,6 +113,11 @@ class DecideStreamEnv(gym.Env):
                 [clue_rng.random() >= self.clue_reliability for _ in range(self.clue_frames)]
                 for _ in range(self.units)
             ]
+        if self.query_hint:
+            hint_rng = random.Random(f"hint-{seed if seed is not None else self._seed}")
+            self._query_hint_flips = [
+                hint_rng.random() >= self.query_hint_reliability for _ in range(self.units)
+            ]
         self._frame = 0
         return self._observation(0), {}
 
@@ -119,6 +137,12 @@ class DecideStreamEnv(gym.Env):
                 shown = identity if not self._clue_flips[unit][position] else (1 - identity)
                 vector[shown] = 1.0
         elif position == self.gap:
+            # query frame: selector channel (which identity to answer) +,
+            # in query_hint mode, an identity hint channel (possibly flipped)
+            if self.query_hint:
+                identity = self._identities[unit]
+                hint = identity if not self._query_hint_flips[unit] else (1 - identity)
+                vector[hint] = 1.0
             vector[self.identity_count + self._query_types[unit]] = 1.0
         return vector
     def step(self, action: int) -> tuple[np.ndarray, float, bool, bool, dict]:
@@ -754,6 +778,8 @@ def _probe_conf_evidence(model: nn.Module, env: DecideStreamEnv, *, episodes: in
     conf_flipped: list[float] = []
     conf_clean: list[float] = []
     conf_query: list[float] = []
+    conf_hint_flipped: list[float] = []  # phase-32: query-frame conf when the identity hint is flipped
+    conf_hint_clean: list[float] = []    # phase-32: query-frame conf when the hint is the true identity
     for episode_index in range(episodes):
         observation, _info = env.reset(seed=seed_start + episode_index)
         model.reset(1, device)
@@ -763,13 +789,18 @@ def _probe_conf_evidence(model: nn.Module, env: DecideStreamEnv, *, episodes: in
             valid_step = torch.ones(1, dtype=torch.bool, device=device)
             model.step(observation_step, valid_step)
             conf = float(model._last_conf[0, 0].item())
-            if position < env.clue_frames:
+            if position < env.clue_frames and env._clue_flips is not None:
                 if env._clue_flips[unit][position]:
                     conf_flipped.append(conf)
                 else:
                     conf_clean.append(conf)
             elif position == env.gap:
                 conf_query.append(conf)
+                if env.query_hint:
+                    if env._query_hint_flips[unit]:
+                        conf_hint_flipped.append(conf)
+                    else:
+                        conf_hint_clean.append(conf)
             observation, _reward, terminated, truncated, _info = env.step(0)
             if terminated or truncated:
                 break
@@ -781,6 +812,10 @@ def _probe_conf_evidence(model: nn.Module, env: DecideStreamEnv, *, episodes: in
         "conf_clean_n": len(conf_clean),
         "conf_query_mean": mean(conf_query),
         "conf_query_n": len(conf_query),
+        "conf_hint_flipped_mean": mean(conf_hint_flipped),
+        "conf_hint_clean_mean": mean(conf_hint_clean),
+        "conf_hint_flipped_n": len(conf_hint_flipped),
+        "conf_hint_clean_n": len(conf_hint_clean),
     }
 
 
@@ -863,12 +898,13 @@ def run(
     jeplem_aux_timescales: int = 2, jeplem_write_mode: str = "fifo", jeplem_predict: bool = False,
     jeplem_conf_feature: bool = False, confounded: bool = False,
     clue_frames: int = 1, clue_reliability: float = 0.65, probe_conf: bool = False,
+    query_hint: bool = False, query_hint_reliability: float = 0.7,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
     np.random.seed(experiment_seed)
     random.seed(experiment_seed)
-    env = DecideStreamEnv(units=units, gap=gap, identity_count=identity_count, switch_at=switch_at, query_horizon=query_horizon, confounded=confounded, clue_frames=clue_frames, clue_reliability=clue_reliability)
+    env = DecideStreamEnv(units=units, gap=gap, identity_count=identity_count, switch_at=switch_at, query_horizon=query_horizon, confounded=confounded, clue_frames=clue_frames, clue_reliability=clue_reliability, query_hint=query_hint, query_hint_reliability=query_hint_reliability)
     input_dim = env.input_dim
     if rmt_probe:
         # probe mode: only RMT (+GRU as the gate baseline) -- cheap and
@@ -988,6 +1024,8 @@ if __name__ == "__main__":
     parser.add_argument("--clue-frames", type=int, default=4, help="clue frames per unit in confounded mode")
     parser.add_argument("--clue-reliability", type=float, default=0.65, help="per-clue probability of showing the true identity channel")
     parser.add_argument("--probe-conf", action="store_true", help="phase-31: record JEPA conf by clue-flip status (diagnosis probe)")
+    parser.add_argument("--query-hint", action="store_true", help="phase-32: query frame carries an identity hint (70%% reliable) - tests whether JEPA conf helps resist the hint shortcut")
+    parser.add_argument("--query-hint-reliability", type=float, default=0.7, help="probability the query-frame identity hint is the true identity")
     parser.add_argument("--rmt-segment-units", type=float, default=1.0)
     parser.add_argument("--no-rmt-detach", action="store_true")
     parser.add_argument("--rmt-probe", action="store_true")
@@ -1017,5 +1055,6 @@ if __name__ == "__main__":
         jeplem_conf_feature=args.jeplem_conf_feature,
         confounded=args.confounded, clue_frames=args.clue_frames,
         clue_reliability=args.clue_reliability, probe_conf=args.probe_conf,
+        query_hint=args.query_hint, query_hint_reliability=args.query_hint_reliability,
     )
     print(json.dumps(asdict(outcome), indent=2))

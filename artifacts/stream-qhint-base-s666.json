@@ -1,0 +1,31 @@
+{
+  "protocol": "minigrid_decide_stream_rl_v1: continuous stream of episodes, each [identity frame, gap empty frames, query frame]; query one-hot selects current or previous episode's identity; reward only on query steps; PPO on-policy; no teacher, oracle, shaped reward, or privileged state; reports overall query accuracy, cross-episode accuracy, and before/after rule-switch accuracy (switch_at); rule 0: choice == identity, rule 1: choice == complement. rmt_segment_units=1.0, rmt_detach_mem=True, rmt_probe=False",
+  "device": "cuda",
+  "units": 3,
+  "gap": 4,
+  "identity_count": 2,
+  "switch_at": null,
+  "updates": 100,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "jeplem_policy",
+      "parameters": 50888,
+      "query_accuracy": 0.9010416666666666,
+      "cross_episode_accuracy": 0.7164179104477612,
+      "before_switch_accuracy": 0.9010416666666666,
+      "after_switch_accuracy": 0.0
+    },
+    {
+      "name": "jeplem_agent_policy",
+      "parameters": 50888,
+      "query_accuracy": 0.9479166666666666,
+      "cross_episode_accuracy": 0.8507462686567164,
+      "before_switch_accuracy": 0.9479166666666666,
+      "after_switch_accuracy": 0.0
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\stream-qhint-base-s666.json",
+  "conf_probe": null
+}
