@@ -56,11 +56,18 @@ class DecideStreamEnv(gym.Env):
         # single observation -- the JEPA value niche identified in phase 30.
         self.confounded = confounded
         self.clue_frames = max(1, clue_frames if confounded else 1)
+        if confounded and self.clue_frames > gap:
+            raise ValueError(f"clue_frames ({self.clue_frames}) must be <= gap ({gap}) so clue block does not collide with the query frame")
         self.clue_reliability = clue_reliability
         self.unit_len = gap + 1  # query frame sits at position == gap
         self.total_steps = units * self.unit_len
         self.query_horizon = query_horizon
         self._clue_flips: list[list[bool]] | None = None
+        # Note: in confounded mode with clue_frames == gap there are NO empty
+        # frames, so the memory-content aux head silently sees no aux frames
+        # (frame_mask is empty).  Phase-31 used this configuration; the three
+        # compared policies all had aux equally disabled, so the comparison
+        # stays controlled, but the phase-31 numbers are aux-free baselines.
         self.input_dim = identity_count + max(2, query_horizon)  # presence + query channels
         self.action_space = gym.spaces.Discrete(identity_count)
         self.observation_space = gym.spaces.Box(0.0, 1.0, (self.input_dim,), dtype=np.float32)
