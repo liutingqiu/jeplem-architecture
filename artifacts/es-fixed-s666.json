@@ -1,0 +1,58 @@
+{
+  "protocol": "evidence_seek_v1: composite task for the integration layer -- K identities, noisy clue frames (p=reliability), query frames ask 'what is identity X' (X uniform in observation); agent answers X's value (+1 correct, ends) or requests a clue for a self-chosen identity (-0.01, next unit shows it); timeout at units units. PPO on-policy, no teacher/oracle. Controls: mlp_no_memory (memoryless, capped at reliability), gru_policy (compressed state), jeplem_policy (explicit slots). Probes: answer accuracy/rate, episode reward, request-vs-oracle-max-gap match.",
+  "device": "cuda",
+  "units": 6,
+  "gap": 2,
+  "identity_count": 2,
+  "reliability": 0.65,
+  "updates": 100,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "mlp_no_memory",
+      "parameters": 5253,
+      "answer_accuracy": 0.5806451612903226,
+      "answer_rate": 0.96875,
+      "episode_reward": 0.14781250000000012,
+      "mean_steps": 3.6875,
+      "gap_match_rate": 0.07142857142857142,
+      "request_gap_mean": 0.33255242463958057,
+      "max_gap_mean": 0.46785714285714286
+    },
+    {
+      "name": "gru_policy",
+      "parameters": 15164,
+      "answer_accuracy": 0.4067796610169492,
+      "answer_rate": 0.921875,
+      "episode_reward": -0.18031249999999996,
+      "mean_steps": 3.6875,
+      "gap_match_rate": 0.1864406779661017,
+      "request_gap_mean": 0.3499766754781527,
+      "max_gap_mean": 0.47203389830508474
+    },
+    {
+      "name": "jeplem_policy",
+      "parameters": 51206,
+      "answer_accuracy": 0.4406779661016949,
+      "answer_rate": 0.921875,
+      "episode_reward": -0.11843749999999995,
+      "mean_steps": 3.8125,
+      "gap_match_rate": 0.2222222222222222,
+      "request_gap_mean": 0.3443335638091111,
+      "max_gap_mean": 0.4666666666666666
+    },
+    {
+      "name": "explicit_key_policy",
+      "parameters": 901,
+      "answer_accuracy": 0.4918032786885246,
+      "answer_rate": 0.953125,
+      "episode_reward": -0.0246875,
+      "mean_steps": 3.8125,
+      "gap_match_rate": 0.04918032786885246,
+      "request_gap_mean": 0.3483305760264702,
+      "max_gap_mean": 0.4778688524590165
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\es-fixed-s666.json"
+}

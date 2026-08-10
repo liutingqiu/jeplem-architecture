@@ -1,0 +1,25 @@
+{
+  "protocol": "evidence_seek_v1: composite task for the integration layer -- K identities, noisy clue frames (p=reliability), query frames ask 'what is identity X' (X uniform in observation); agent answers X's value (+1 correct, ends) or requests a clue for a self-chosen identity (-0.01, next unit shows it); timeout at units units. PPO on-policy, no teacher/oracle. Controls: mlp_no_memory (memoryless, capped at reliability), gru_policy (compressed state), jeplem_policy (explicit slots). Probes: answer accuracy/rate, episode reward, request-vs-oracle-max-gap match.",
+  "device": "cuda",
+  "units": 6,
+  "gap": 2,
+  "identity_count": 2,
+  "reliability": 0.65,
+  "updates": 300,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "jeplem_policy",
+      "parameters": 51206,
+      "answer_accuracy": 0.5483870967741935,
+      "answer_rate": 0.96875,
+      "episode_reward": 0.08781250000000006,
+      "mean_steps": 3.1875,
+      "gap_match_rate": 0.075,
+      "request_gap_mean": 0.3618692660550458,
+      "max_gap_mean": 0.4925
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\es-fixed300-s444.json"
+}

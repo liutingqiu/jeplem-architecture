@@ -197,6 +197,24 @@ step(obs, valid, goal=None)     # goal [B, goal_dim]；query_vec = W_q(encoded) 
 
 **产物**：`artifacts/es-gap-s{444,555,666}.json`、`--explicit-gap` 开关。
 
+### 9.5 核心任务 bug 修复（2026-08-11，v1 以来最深层的发现）
+
+显式策略调试中发现 `EvidenceSeekEnv._noisy_clue` 的核心 bug（**v1 起就存在**）：
+
+```python
+# 修复前（错误）：content 编码的是"身份编号"而非"身份的值"
+content = identity if rng.random() < reliability else (1 - identity)
+# 修复后（正确）：content 应编码 identities[identity]（值）带噪
+value = self._identities[identity]
+content = value if rng.random() < reliability else (1 - value)
+```
+
+identity_count=2 时身份编号（0/1）与值（0/1）同域但**独立随机**——旧代码使线索内容与"被问的值"零相关，**任务中的线索从未携带值信息**。这解释了此前所有异常：oracle 上界 0.59 是"错误线索下最优"、监督"真值正确率 0.45"、RL 卡 0.565、显式策略 0.49。
+
+**修复验证**：线索-值相关性 0.655（期望 0.65）✓；显式策略 acc 0.49 → **0.646**（正确线索下显著有效）；修复后 RL（jeplem）100 updates 0.50 → **300 updates ~0.60 且仍在上升**（answer_rate 0.969，开始出现"求"行为）。
+
+**影响面（诚实披露）**：此前 EvidenceSeek 全部结论（es-nopt 0.565、es-hier、es-gap、es-v5、oracle 上界）均在错误线索下测得——**需在修复后重跑**（es-fixed-s*、es-fixed300-s* 为修复后首批数据）。方法论层面：9.1 的"监督标签冲突"分析部分成立但被此 bug 掩盖（真实根因 = 线索无信息）；修复后的重跑才是干净数据。**任务构造纪律新增一条：生成的观测必须验证与目标变量的相关性**（本项目教训：oracle 上界计算也基于错误线索，自检不足）。
+
 ## 四、决策记录（已排除方向及理由）
 
 | 方向 | 排除理由 | 证据 |

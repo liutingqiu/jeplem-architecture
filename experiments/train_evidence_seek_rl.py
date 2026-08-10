@@ -102,7 +102,14 @@ class EvidenceSeekEnv(gym.Env):
         return self._observation(0), {}
 
     def _noisy_clue(self, identity: int) -> tuple[int, int]:
-        content = identity if self._rng.random() < self.reliability else (1 - identity)
+        # BUG FIX (2026-08-11, found during explicit-policy debugging): the
+        # clue VALUE must be the identity's VALUE (identities[identity]) with
+        # noise, NOT the identity number itself -- with identity_count=2 the
+        # number and the value are the same domain but independent, so the old
+        # code made clue content uncorrelated with the asked value (all
+        # downstream learning was capped at 0.5 for the value prediction).
+        value = self._identities[identity]
+        content = value if self._rng.random() < self.reliability else (1 - value)
         return identity, content
 
     def _observation(self, frame: int) -> np.ndarray:
@@ -287,16 +294,22 @@ class JEPLMEvidenceSeek(nn.Module):
     identity X (trailing K channels of the observation) modulates the content
     addressing so the query frame recalls X's clue, not a mix of both
     identities' clues -- this is the case that made cut 1's interface
-    necessary (DecideStream was too easy to show it)."""
+    necessary (DecideStream was too easy to show it).
+
+    ``actions=3`` (3-class policy): actions are {answer 0, answer 1, request};
+    the request TARGET is fully outside the policy gradient (explicit wiring
+    or random) -- clean test of mechanism wiring vs end-to-end (9.4)."""
 
     def __init__(self, input_dim: int, num_actions: int, *, latent: int = 64,
-                 slots: int = 8, write_mode: str = "fifo", goal_dim: int = 2) -> None:
+                 slots: int = 8, write_mode: str = "fifo", goal_dim: int = 2,
+                 actions: int = 4) -> None:
         super().__init__()
         self.goal_dim = goal_dim
+        self.num_policy_actions = actions  # 4 = {ans0,ans1,req0,req1}, 3 = {ans0,ans1,req}
         self.memory = JEPLMMemory(input_dim, latent=latent, slots=slots,
                                   identity_count=num_actions, aux_timescales=0,
                                   write_mode=write_mode, goal_dim=goal_dim)
-        self.head = nn.Linear(self.memory.head_in, num_actions + 1)
+        self.head = nn.Linear(self.memory.head_in, actions + 1)
 
     def reset(self, batch: int, device: torch.device) -> None:
         self.memory.reset(batch, device)
@@ -348,6 +361,23 @@ def _gap_argmax_request(env: EvidenceSeekEnv) -> int:
         if gap > best_gap:
             best_gap, best_i = gap, i
     return ACTION_REQUEST_0 + best_i
+
+
+def _map_policy_action(model: nn.Module, action: int, env: EvidenceSeekEnv,
+                       explicit_gap: bool) -> int:
+    """Map a policy action (4-class {ans0,ans1,req0,req1} or 3-class
+    {ans0,ans1,req}) to an env action.  3-class policies leave the request
+    TARGET outside the policy gradient: explicit max-gap wiring or random."""
+    if getattr(model, "num_policy_actions", 4) == 4:
+        if explicit_gap and action in (ACTION_REQUEST_0, ACTION_REQUEST_1):
+            return _gap_argmax_request(env)
+        return action
+    # 3-class policy
+    if action == 2:  # request
+        if explicit_gap:
+            return _gap_argmax_request(env)
+        return random.choice((ACTION_REQUEST_0, ACTION_REQUEST_1))
+    return action  # answer 0 / answer 1 map directly
 
 
 def _bayes_target(clue_values: list[int], reliability: float) -> int | None:
@@ -476,16 +506,19 @@ def _collect(model: nn.Module, env: EvidenceSeekEnv, *, count: int, seed_start: 
             if done[index]:
                 continue
             distribution = Categorical(logits=logits[index])
-            action = int(distribution.sample().item())
+            policy_action = int(distribution.sample().item())
             if exploring and random.random() < explore_ratio:
-                # forced exploration of the request actions (anti collapse)
+                # forced exploration of the request actions (anti collapse);
+                # the recorded target-policy action is 'request' for 3-class
+                # policies (request target is outside the gradient anyway)
                 action = random.choice((ACTION_REQUEST_0, ACTION_REQUEST_1))
-            if explicit_gap and action in (ACTION_REQUEST_0, ACTION_REQUEST_1):
-                # integration wiring: request target = explicit max-gap identity
-                action = _gap_argmax_request(envs[index])
+                if getattr(model, "num_policy_actions", 4) == 3:
+                    policy_action = 2
+            else:
+                action = _map_policy_action(model, policy_action, envs[index], explicit_gap)
             observation, reward, terminated, truncated, _info = envs[index].step(action)
             histories[index].append(observation_step[index])
-            action_lists[index].append(action)
+            action_lists[index].append(policy_action)
             reward_lists[index].append(reward)
             observations[index] = observation
             if terminated or truncated:
@@ -622,8 +655,7 @@ def _evaluate(model: nn.Module, env: EvidenceSeekEnv, *, episodes: int, seed_sta
             episode_reward += reward
             unit, position = divmod(frame, env.unit_len)
             if position == env.unit_len - 1:
-                if explicit_gap and action in (ACTION_REQUEST_0, ACTION_REQUEST_1):
-                    action = _gap_argmax_request(env)
+                action = _map_policy_action(model, action, env, explicit_gap)
                 if action in (ACTION_ANSWER_0, ACTION_ANSWER_1):
                     answered += 1
                     correct += int(reward > 0)
@@ -680,7 +712,7 @@ def run(*, device: str | torch.device | None = None, units: int = 6, gap: int = 
         heldout_seed_start: int = 1_000_000, slots: int = 8,
         jeplem_only: bool = False, pretrain_memory: bool = False,
         pretrain_steps: int = 600, explicit_gap: bool = False,
-        artifact: Path | None = None) -> Report:
+        policy_actions: int = 4, artifact: Path | None = None) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
     np.random.seed(experiment_seed)
@@ -691,7 +723,7 @@ def run(*, device: str | torch.device | None = None, units: int = 6, gap: int = 
     factories = (
         ("mlp_no_memory", lambda: MLPNoMemory(input_dim, N_ACTIONS)),
         ("gru_policy", lambda: GRUPolicy(input_dim, N_ACTIONS)),
-        ("jeplem_policy", lambda: JEPLMEvidenceSeek(input_dim, N_ACTIONS, slots=slots, goal_dim=identity_count)),
+        ("jeplem_policy", lambda: JEPLMEvidenceSeek(input_dim, N_ACTIONS, slots=slots, goal_dim=identity_count, actions=policy_actions)),
         ("explicit_key_policy", lambda: ExplicitKeyMemory(input_dim, N_ACTIONS, identity_count=identity_count)),
     )
     if jeplem_only:
@@ -756,6 +788,7 @@ if __name__ == "__main__":
     parser.add_argument("--pretrain-memory", action="store_true", help="hierarchical: Bayesian-supervised memory pretrain (aux, frozen) then RL policy head")
     parser.add_argument("--pretrain-steps", type=int, default=600)
     parser.add_argument("--explicit-gap", action="store_true", help="integration wiring: request target = explicit max-gap identity (Bayesian from observations); policy learns only when to answer")
+    parser.add_argument("--policy-actions", type=int, default=4, choices=[3, 4], help="3 = policy outputs {answer 0, answer 1, request} (request target outside gradient)")
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
     outcome = run(
@@ -766,6 +799,6 @@ if __name__ == "__main__":
         experiment_seed=args.experiment_seed, slots=args.jeplem_slots,
         jeplem_only=args.jeplem_only, pretrain_memory=args.pretrain_memory,
         pretrain_steps=args.pretrain_steps, explicit_gap=args.explicit_gap,
-        artifact=args.artifact,
+        policy_actions=args.policy_actions, artifact=args.artifact,
     )
     print(json.dumps(asdict(outcome), indent=2))
