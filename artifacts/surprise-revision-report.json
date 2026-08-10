@@ -1,0 +1,31 @@
+{
+  "protocol": "jeplem_surprise_revision_v1",
+  "device": "cuda",
+  "delay": 8,
+  "surprise_threshold": 0.5,
+  "stage1_updates": 300,
+  "stage2_updates": 100,
+  "adaptation_curves": {
+    "no_reset": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "surprise_reset": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "always_reset": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  }
+}

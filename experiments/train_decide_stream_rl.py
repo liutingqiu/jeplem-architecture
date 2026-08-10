@@ -34,6 +34,7 @@ from plwm.device import resolve_device
 from plwm.torch_model import TorchPLWM
 from plwm.jeplem_memory import JEPLMMemory
 from plwm.jeplem_agent import JEPLMAgent
+from plwm.jeplem_predictor import JEPLMPredictor
 
 
 class DecideStreamEnv(gym.Env):
@@ -309,16 +310,25 @@ class PolicyJEPLM(nn.Module):
 
     def __init__(self, input_dim: int, num_actions: int, *, latent: int = 64,
                  slots: int = 16, aux_timescales: int = 2, aux_coefficient: float = 0.5,
-                 write_mode: str = "fifo") -> None:
+                 write_mode: str = "fifo", predict: bool = False,
+                 pred_coefficient: float = 0.1) -> None:
         super().__init__()
         self.memory = JEPLMMemory(input_dim, latent=latent, slots=slots,
                                   identity_count=num_actions, aux_timescales=aux_timescales,
                                   write_mode=write_mode)
         self.head = nn.Linear(self.memory.head_in, num_actions + 1)
         self.aux_coefficient = aux_coefficient
+        self.predict = predict
+        self.pred_coefficient = pred_coefficient
+        if predict:
+            self.predictor = JEPLMPredictor(self.memory.head_in)
+        else:
+            self.predictor = None
+        self._pred_loss: Tensor | None = None
 
     def reset(self, batch: int, device: torch.device) -> None:
         self.memory.reset(batch, device)
+        self._pred_loss = None
 
     def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor, Tensor]:
         features, aux = self.memory.step(observation_step, valid_step)
@@ -331,12 +341,21 @@ class PolicyJEPLM(nn.Module):
         logits_list: list[Tensor] = []
         values_list: list[Tensor] = []
         aux_list: list[Tensor] = []
+        feature_list: list[Tensor] = []
         for index in range(length):
             logits, value, aux = self.step(observations[:, index], valid[:, index])
             logits_list.append(logits)
             values_list.append(value)
             if aux is not None:
                 aux_list.append(aux)
+            feature_list.append(self.memory.export_state()[0])
+        features = torch.stack(feature_list, dim=1)  # [B, T, latent]
+        if self.predictor is not None and length > 1:
+            pred = self.predictor(features[:, :-1])
+            target = features[:, 1:]
+            valid_pair = valid[:, :-1] & valid[:, 1:]
+            err = JEPLMPredictor.prediction_error(pred, target)
+            self._pred_loss = err[valid_pair].mean()
         out = torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
         return out + (torch.stack(aux_list, dim=1) if aux_list else None,)
 
@@ -639,6 +658,8 @@ def _train_ppo(
                         prev_onehot = torch.eye(2, device=observations.device)[prev_targets]
                         aux_loss = nn.functional.cross_entropy(aux_logits[aux_mask], prev_onehot[aux_mask].argmax(-1))
                     loss = loss + model.aux_coefficient * aux_loss
+            if getattr(model, "_pred_loss", None) is not None:
+                loss = loss + model.pred_coefficient * model._pred_loss
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
