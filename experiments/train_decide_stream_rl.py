@@ -40,14 +40,27 @@ from plwm.jeplem_predictor import JEPLMPredictor
 class DecideStreamEnv(gym.Env):
     metadata = {"render_modes": []}
 
-    def __init__(self, *, units: int = 3, gap: int = 4, identity_count: int = 2, seed: int = 0, switch_at: int | None = None, query_horizon: int = 2) -> None:
+    def __init__(self, *, units: int = 3, gap: int = 4, identity_count: int = 2, seed: int = 0, switch_at: int | None = None, query_horizon: int = 2, confounded: bool = False, clue_frames: int = 1, clue_reliability: float = 0.65) -> None:
         if units < 2:
             raise ValueError("stream needs at least two episodes for cross-episode queries")
         self.units, self.gap, self.identity_count = units, gap, identity_count
         self.switch_at = switch_at if switch_at is not None else units + 1
-        self.unit_len = gap + 1
+        # confounded mode: the identity is revealed through ``clue_frames``
+        # noisy clues instead of a single clean one-hot frame.  Each clue is
+        # the identity one-hot with probability ``clue_reliability`` and the
+        # OTHER identity channel with probability (1 - clue_reliability), so a
+        # single clue cannot identify the identity (P(o|s) overlap) but the
+        # clue history can (Bayesian accumulation).  This turns the task from
+        # "observation == state" into a genuine POMDP: prediction error now
+        # carries information (identity belief) not directly readable from a
+        # single observation -- the JEPA value niche identified in phase 30.
+        self.confounded = confounded
+        self.clue_frames = max(1, clue_frames if confounded else 1)
+        self.clue_reliability = clue_reliability
+        self.unit_len = gap + 1  # query frame sits at position == gap
         self.total_steps = units * self.unit_len
         self.query_horizon = query_horizon
+        self._clue_flips: list[list[bool]] | None = None
         self.input_dim = identity_count + max(2, query_horizon)  # presence + query channels
         self.action_space = gym.spaces.Discrete(identity_count)
         self.observation_space = gym.spaces.Box(0.0, 1.0, (self.input_dim,), dtype=np.float32)
@@ -69,14 +82,35 @@ class DecideStreamEnv(gym.Env):
             rng.randrange(1) if unit == 0 else rng.randrange(self.query_horizon)
             for unit in range(self.units)
         ]  # 0 = current, 1 = previous, 2 = two-back (query_horizon=3)
+        # Confounded mode: per-episode clue flip masks.  Seeded by a string
+        # hash of the episode seed so re-evaluation of the same episode
+        # regenerates identical clues, while adjacent integer seeds get fully
+        # decorrelated patterns (plain integer seeds share MT initial-state
+        # correlation, which made the flip-pattern distribution non-uniform).
+        if self.confounded:
+            clue_rng = random.Random(f"clue-{seed if seed is not None else self._seed}")
+            self._clue_flips = [
+                [clue_rng.random() >= self.clue_reliability for _ in range(self.clue_frames)]
+                for _ in range(self.units)
+            ]
         self._frame = 0
         return self._observation(0), {}
 
     def _observation(self, frame: int) -> np.ndarray:
         unit, position = divmod(frame, self.unit_len)
         vector = np.zeros(self.input_dim, dtype=np.float32)
-        if position == 0:
-            vector[self._identities[unit]] = 1.0
+        if position < self.clue_frames:
+            # identity clue frame.  Confounded mode: each clue independently
+            # shows the true identity channel with probability p and the
+            # opposite channel with probability 1-p (flip mask decided at
+            # reset, per episode).  Single-frame identity is ambiguous; the
+            # multi-frame clue history is not.
+            identity = self._identities[unit]
+            if not self.confounded:
+                vector[identity] = 1.0
+            else:
+                shown = identity if not self._clue_flips[unit][position] else (1 - identity)
+                vector[shown] = 1.0
         elif position == self.gap:
             vector[self.identity_count + self._query_types[unit]] = 1.0
         return vector
@@ -328,30 +362,35 @@ class PolicyJEPLM(nn.Module):
         self.predict = predict
         self.pred_coefficient = pred_coefficient
         if predict or conf_feature:
-            self.predictor = JEPLMPredictor(self.memory.latent)
+            # predictor learns the dynamics of the FULL features (state +
+            # recalled), not just the state: recalled carries the slot
+            # contents (e.g. noisy clues), so features dynamics are what
+            # change when a clue flips.  Phase-31 probe showed state-only
+            # conf cannot separate flipped/clean clues (state smooths them).
+            self.predictor = JEPLMPredictor(self.memory.head_in)
         else:
             self.predictor = None
         self._pred_loss: Tensor | None = None
-        self._prev_state: Tensor | None = None
+        self._prev_features: Tensor | None = None
 
     def reset(self, batch: int, device: torch.device) -> None:
         self.memory.reset(batch, device)
         self._pred_loss = None
-        self._prev_state = None
+        self._prev_features = None
 
     def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor, Tensor]:
         features, aux = self.memory.step(observation_step, valid_step)
+        self._raw_features = features.detach()
         if self.conf_feature and self.predictor is not None:
-            state = self.memory.export_state()[0]  # [B, latent]
-            if self._prev_state is not None:
-                pred = self.predictor(self._prev_state).detach()
-                err = JEPLMPredictor.prediction_error(pred, state)
+            if self._prev_features is not None:
+                pred = self.predictor(self._prev_features).detach()
+                err = JEPLMPredictor.prediction_error(pred, features)
                 conf = JEPLMPredictor.confidence(err).unsqueeze(-1)  # [B, 1]
             else:
-                conf = torch.zeros(state.shape[0], 1, device=state.device)
+                conf = torch.zeros(features.shape[0], 1, device=features.device)
             features = torch.cat((features, conf), dim=-1)
             self._last_conf = conf
-            self._prev_state = state.detach()
+            self._prev_features = self._raw_features
         output = self.head(features)
         return output[..., :-1], output[..., -1], aux
 
@@ -368,8 +407,8 @@ class PolicyJEPLM(nn.Module):
             values_list.append(value)
             if aux is not None:
                 aux_list.append(aux)
-            feature_list.append(self.memory.export_state()[0])
-        features = torch.stack(feature_list, dim=1)  # [B, T, latent]
+            feature_list.append(self._raw_features)
+        features = torch.stack(feature_list, dim=1)  # [B, T, head_in]
         if self.predictor is not None and length > 1:
             pred = self.predictor(features[:, :-1])
             target = features[:, 1:]
@@ -659,7 +698,9 @@ def _train_ppo(
                 cur_targets = labels_t[:, frame_units.clamp(max=labels_t.shape[1] - 1)]
                 prev_units = (frame_units - 1).clamp(min=0)
                 prev_targets = labels_t[:, prev_units]
-                frame_mask = (pos_in_unit > 0) & (pos_in_unit < env.gap) & (frame_units > 0)
+                # empty frames = after the clue block, before the query frame
+                # (position >= clue_frames keeps the aux off the noisy clues)
+                frame_mask = (pos_in_unit >= env.clue_frames) & (pos_in_unit < env.gap) & (frame_units > 0)
                 aux_mask = valid & frame_mask.unsqueeze(0)
                 if bool(aux_mask.any()):
                     aux_logits = outputs[2]
@@ -688,6 +729,52 @@ def _train_ppo(
         total_episodes += episodes_per_update
         total_successes += successes
     return total_episodes, total_successes
+
+
+@torch.no_grad()
+def _probe_conf_evidence(model: nn.Module, env: DecideStreamEnv, *, episodes: int, seed_start: int, device: torch.device) -> dict:
+    """Phase-31 diagnosis: does the JEPA confidence feature carry information
+    beyond a single observation?  In confounded mode a clue frame's conf is
+    the prediction error of the previous frame's latent vs the current clue's
+    latent -- if the predictor learned identity persistence, flipped (noisy)
+    clues should show LOWER conf than clean ones.  If conf separates
+    flipped/clean clues, the mechanism is alive and the decision-side wiring
+    (current-frame conf only) is the limiting factor; if it does not, the
+    predictor never learned the persistence dynamics.
+
+    Also records conf on gap/query frames as a frame-type baseline.
+    """
+    conf_flipped: list[float] = []
+    conf_clean: list[float] = []
+    conf_query: list[float] = []
+    for episode_index in range(episodes):
+        observation, _info = env.reset(seed=seed_start + episode_index)
+        model.reset(1, device)
+        for frame in range(env.total_steps):
+            unit, position = divmod(frame, env.unit_len)
+            observation_step = torch.tensor(observation).unsqueeze(0).to(device)
+            valid_step = torch.ones(1, dtype=torch.bool, device=device)
+            model.step(observation_step, valid_step)
+            conf = float(model._last_conf[0, 0].item())
+            if position < env.clue_frames:
+                if env._clue_flips[unit][position]:
+                    conf_flipped.append(conf)
+                else:
+                    conf_clean.append(conf)
+            elif position == env.gap:
+                conf_query.append(conf)
+            observation, _reward, terminated, truncated, _info = env.step(0)
+            if terminated or truncated:
+                break
+    mean = lambda xs: float(sum(xs) / len(xs)) if xs else float("nan")
+    return {
+        "conf_flipped_mean": mean(conf_flipped),
+        "conf_clean_mean": mean(conf_clean),
+        "conf_flipped_n": len(conf_flipped),
+        "conf_clean_n": len(conf_clean),
+        "conf_query_mean": mean(conf_query),
+        "conf_query_n": len(conf_query),
+    }
 
 
 @torch.no_grad()
@@ -752,6 +839,7 @@ class Report:
     results: list[Result]
     accepted: bool
     artifact: str
+    conf_probe: dict | None = None
 
 
 def run(
@@ -766,13 +854,14 @@ def run(
     evidence_aux_only: bool = False, query_horizon: int = 2, aux_timescales: int = 1,
     evidence_slots: int = 8, jeplem_only: bool = False, jeplem_slots: int = 8,
     jeplem_aux_timescales: int = 2, jeplem_write_mode: str = "fifo", jeplem_predict: bool = False,
-    jeplem_conf_feature: bool = False,
+    jeplem_conf_feature: bool = False, confounded: bool = False,
+    clue_frames: int = 1, clue_reliability: float = 0.65, probe_conf: bool = False,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
     np.random.seed(experiment_seed)
     random.seed(experiment_seed)
-    env = DecideStreamEnv(units=units, gap=gap, identity_count=identity_count, switch_at=switch_at, query_horizon=query_horizon)
+    env = DecideStreamEnv(units=units, gap=gap, identity_count=identity_count, switch_at=switch_at, query_horizon=query_horizon, confounded=confounded, clue_frames=clue_frames, clue_reliability=clue_reliability)
     input_dim = env.input_dim
     if rmt_probe:
         # probe mode: only RMT (+GRU as the gate baseline) -- cheap and
@@ -826,6 +915,7 @@ def run(
     if jeplem_only:
         factories = [f for f in factories if f[0] in ("jeplem_policy", "jeplem_agent_policy")]
     results = []
+    probe: dict | None = None
     for name, factory in factories:
         model = factory().to(resolved)
         _train_ppo(
@@ -839,6 +929,13 @@ def run(
             name, sum(parameter.numel() for parameter in model.parameters()),
             query_acc, cross_acc, before_acc, after_acc,
         ))
+        # phase-31 conf diagnosis: only meaningful for the conf_feature model
+        # (jeplem_policy runs before jeplem_agent_policy, so leaving probe
+        # unchanged on non-conf models keeps the diagnosis attached)
+        if probe_conf and name == "jeplem_policy" and hasattr(model, "_last_conf"):
+            probe = _probe_conf_evidence(
+                model, env, episodes=evaluation_episodes * 4, seed_start=heldout_seed_start + 10_000, device=resolved,
+            )
     by_name = {result.name: result for result in results}
     if rmt_probe or gru_focus or rmt_aux_only or evidence_aux_only or jeplem_only:
         # probe/focus modes lack the full controller set; the gate is
@@ -854,7 +951,7 @@ def run(
     report = Report(
         f"minigrid_decide_stream_rl_v1: continuous stream of episodes, each [identity frame, gap empty frames, query frame]; query one-hot selects current or previous episode's identity; reward only on query steps; PPO on-policy; no teacher, oracle, shaped reward, or privileged state; reports overall query accuracy, cross-episode accuracy, and before/after rule-switch accuracy (switch_at); rule 0: choice == identity, rule 1: choice == complement. rmt_segment_units={rmt_segment_units}, rmt_detach_mem={rmt_detach_mem}, rmt_probe={rmt_probe}",
         str(resolved), units, gap, identity_count, switch_at, updates, episodes_per_update,
-        results, accepted, str(target),
+        results, accepted, str(target), conf_probe=probe,
     )
     target.write_text(json.dumps(asdict(report), indent=2), encoding="utf-8")
     return report
@@ -880,6 +977,10 @@ if __name__ == "__main__":
     parser.add_argument("--jeplem-predict", action="store_true")
     parser.add_argument("--jeplem-conf-feature", action="store_true")
     parser.add_argument("--jeplem-write-mode", type=str, default="fifo", choices=["fifo", "gate", "delta_rule"])
+    parser.add_argument("--confounded", action="store_true", help="POMDP mode: identity revealed through noisy clue frames instead of one clean one-hot frame")
+    parser.add_argument("--clue-frames", type=int, default=4, help="clue frames per unit in confounded mode")
+    parser.add_argument("--clue-reliability", type=float, default=0.65, help="per-clue probability of showing the true identity channel")
+    parser.add_argument("--probe-conf", action="store_true", help="phase-31: record JEPA conf by clue-flip status (diagnosis probe)")
     parser.add_argument("--rmt-segment-units", type=float, default=1.0)
     parser.add_argument("--no-rmt-detach", action="store_true")
     parser.add_argument("--rmt-probe", action="store_true")
@@ -907,5 +1008,7 @@ if __name__ == "__main__":
         jeplem_write_mode=args.jeplem_write_mode,
         jeplem_predict=args.jeplem_predict,
         jeplem_conf_feature=args.jeplem_conf_feature,
+        confounded=args.confounded, clue_frames=args.clue_frames,
+        clue_reliability=args.clue_reliability, probe_conf=args.probe_conf,
     )
     print(json.dumps(asdict(outcome), indent=2))
