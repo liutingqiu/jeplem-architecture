@@ -72,12 +72,13 @@ class EvidenceSeekEnv(gym.Env):
     """
 
     def __init__(self, *, units: int = 4, identity_count: int = 2,
-                 reliability: float = 0.65, seed: int = 0) -> None:
+                 reliability: float = 0.65, seed: int = 0, max_requests: int = 3) -> None:
         super().__init__()
         self.units = units
         self.reliability = reliability  # p(true channel)
         self.identity_count = identity_count  # K
         self.gap = 0
+        self.max_requests = max_requests  # budget: opportunity cost, not penalty
         self.unit_len = 2  # [clue (if requested), query]
         self.total_steps = units * self.unit_len
         self.input_dim = identity_count + identity_count + 1 + 4 + identity_count
@@ -93,6 +94,7 @@ class EvidenceSeekEnv(gym.Env):
         self._identities = [rng.randrange(self.identity_count) for _ in range(self.identity_count)]
         self._frame = 0
         self._last_action: int | None = None
+        self._requests_left = self.max_requests
         self._asked: list[int] = [self._rng.randrange(self.identity_count) for _ in range(self.units)]
         self._clue_history: list[tuple[int, int]] = []  # (identity, noisy content), recorded when shown
         # Clues exist only after a request; unit 0 always has an empty clue frame.
@@ -135,12 +137,16 @@ class EvidenceSeekEnv(gym.Env):
                 terminated = True
             else:  # request a clue for self-chosen identity
                 requested = action - ACTION_REQUEST_0
-                reward = -0.01
-                if unit + 1 < self.units:
-                    # a request CREATES the next unit's clue (the only source)
-                    self._clues[unit + 1] = self._noisy_clue(requested)
-                if unit == self.units - 1:
-                    terminated = True  # timeout on the last unit
+                if self._requests_left <= 0:
+                    terminated = True  # budget exhausted: must concede (0)
+                else:
+                    self._requests_left -= 1
+                    reward = -0.01
+                    if unit + 1 < self.units:
+                        # a request CREATES the next unit's clue (the only source)
+                        self._clues[unit + 1] = self._noisy_clue(requested)
+                    if unit == self.units - 1:
+                        terminated = True  # timeout on the last unit
             self._last_action = action
         self._frame += 1
         if self._frame >= self.total_steps:
@@ -321,6 +327,29 @@ def _clue_valid(env: EvidenceSeekEnv, frame: int) -> bool:
     return divmod(frame, env.unit_len)[1] == 0
 
 
+def _gap_argmax_request(env: EvidenceSeekEnv) -> int:
+    """Explicit gap-driven request target (integration-layer mechanism wiring,
+    2026-08-11): Bayesian posterior per identity from the agent's OWN observed
+    clue history (no oracle -- attribution+value come from observations),
+    request the identity with the largest confidence gap.  Replaces the
+    end-to-end-learned request target; the policy only learns WHEN to answer."""
+    p = env.reliability
+    best_i, best_gap = 0, -1.0
+    for i in range(env.identity_count):
+        vals = [c for (ident, c) in env._clue_history if ident == i]
+        if not vals:
+            gap = 1.0
+        else:
+            n = len(vals)
+            c0 = vals.count(0)
+            log_odd = (2 * c0 - n) * (math.log(p) - math.log(1.0 - p))
+            prob0 = 1.0 / (1.0 + math.exp(-log_odd))
+            gap = 1.0 - max(prob0, 1.0 - prob0)
+        if gap > best_gap:
+            best_gap, best_i = gap, i
+    return ACTION_REQUEST_0 + best_i
+
+
 def _bayes_target(clue_values: list[int], reliability: float) -> int | None:
     """Bayesian posterior argmax of an identity's value given its noisy clue
     values (p=true channel).  None when there is no clue (un-answerable)."""
@@ -411,7 +440,8 @@ def pretrain_memory_stage1(model: JEPLMEvidenceSeek, env: EvidenceSeekEnv, *, st
 
 
 def _collect(model: nn.Module, env: EvidenceSeekEnv, *, count: int, seed_start: int,
-             device: torch.device, exploring: bool = False, explore_ratio: float = 0.5) -> tuple[list[list[Tensor]], list[list[int]], list[list[float]], list[list[int]]]:
+             device: torch.device, exploring: bool = False, explore_ratio: float = 0.5,
+             explicit_gap: bool = False) -> tuple[list[list[Tensor]], list[list[int]], list[list[float]], list[list[int]]]:
     """Batch-parallel episode collection.  Each stream resets per episode
     (episodes are independent tasks; no cross-episode memory requirement).
 
@@ -450,6 +480,9 @@ def _collect(model: nn.Module, env: EvidenceSeekEnv, *, count: int, seed_start: 
             if exploring and random.random() < explore_ratio:
                 # forced exploration of the request actions (anti collapse)
                 action = random.choice((ACTION_REQUEST_0, ACTION_REQUEST_1))
+            if explicit_gap and action in (ACTION_REQUEST_0, ACTION_REQUEST_1):
+                # integration wiring: request target = explicit max-gap identity
+                action = _gap_argmax_request(envs[index])
             observation, reward, terminated, truncated, _info = envs[index].step(action)
             histories[index].append(observation_step[index])
             action_lists[index].append(action)
@@ -491,14 +524,15 @@ def _gae(rewards: list[list[float]], values: Tensor, valid: Tensor, *, gamma: fl
 def _train_ppo(model: nn.Module, env: EvidenceSeekEnv, *, updates: int, episodes_per_update: int,
                seed_start: int, device: torch.device, ppo_epochs: int = 4,
                entropy_coefficient: float = 0.1, weight_decay: float = 1e-5,
-               explore_updates: int = 30, explore_ratio: float = 0.5) -> None:
+               explore_updates: int = 30, explore_ratio: float = 0.5,
+               explicit_gap: bool = False) -> None:
     optimizer = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=3e-4, weight_decay=weight_decay)
     for update in range(updates):
         model.train()
         exploring = update < explore_updates
         histories, action_lists, reward_lists, _ = _collect(
             model, env, count=episodes_per_update, seed_start=seed_start + update * episodes_per_update, device=device,
-            exploring=exploring, explore_ratio=explore_ratio,
+            exploring=exploring, explore_ratio=explore_ratio, explicit_gap=explicit_gap,
         )
         observations, valid = _pad(histories, device, env.input_dim)
         action_tensor = torch.full(valid.shape, -1, dtype=torch.long, device=device)
@@ -562,7 +596,7 @@ def _oracle_gap(env: EvidenceSeekEnv) -> list[float]:
 
 @torch.no_grad()
 def _evaluate(model: nn.Module, env: EvidenceSeekEnv, *, episodes: int, seed_start: int,
-              device: torch.device) -> dict:
+              device: torch.device, explicit_gap: bool = False) -> dict:
     """Returns answer accuracy, answer rate, mean episode reward, mean steps,
     and (jeplem only) request-target vs oracle-max-gap match rate."""
     answered = 0
@@ -588,6 +622,8 @@ def _evaluate(model: nn.Module, env: EvidenceSeekEnv, *, episodes: int, seed_sta
             episode_reward += reward
             unit, position = divmod(frame, env.unit_len)
             if position == env.unit_len - 1:
+                if explicit_gap and action in (ACTION_REQUEST_0, ACTION_REQUEST_1):
+                    action = _gap_argmax_request(env)
                 if action in (ACTION_ANSWER_0, ACTION_ANSWER_1):
                     answered += 1
                     correct += int(reward > 0)
@@ -643,7 +679,8 @@ def run(*, device: str | torch.device | None = None, units: int = 6, gap: int = 
         experiment_seed: int = 41_123, train_seed_start: int = 10_000,
         heldout_seed_start: int = 1_000_000, slots: int = 8,
         jeplem_only: bool = False, pretrain_memory: bool = False,
-        pretrain_steps: int = 600, artifact: Path | None = None) -> Report:
+        pretrain_steps: int = 600, explicit_gap: bool = False,
+        artifact: Path | None = None) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
     np.random.seed(experiment_seed)
@@ -681,9 +718,9 @@ def run(*, device: str | torch.device | None = None, units: int = 6, gap: int = 
                 param.requires_grad_(False)
             model.memory.eval()
         _train_ppo(model, env, updates=updates, episodes_per_update=episodes_per_update,
-                   seed_start=train_seed_start, device=resolved)
+                   seed_start=train_seed_start, device=resolved, explicit_gap=explicit_gap)
         metrics = _evaluate(model, env, episodes=evaluation_episodes,
-                            seed_start=heldout_seed_start, device=resolved)
+                            seed_start=heldout_seed_start, device=resolved, explicit_gap=explicit_gap)
         results.append({"name": name, "parameters": sum(p.numel() for p in model.parameters()), **metrics})
     by_name = {r["name"]: r for r in results}
     accepted = (
@@ -718,6 +755,7 @@ if __name__ == "__main__":
     parser.add_argument("--jeplem-only", action="store_true")
     parser.add_argument("--pretrain-memory", action="store_true", help="hierarchical: Bayesian-supervised memory pretrain (aux, frozen) then RL policy head")
     parser.add_argument("--pretrain-steps", type=int, default=600)
+    parser.add_argument("--explicit-gap", action="store_true", help="integration wiring: request target = explicit max-gap identity (Bayesian from observations); policy learns only when to answer")
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
     outcome = run(
@@ -727,6 +765,7 @@ if __name__ == "__main__":
         evaluation_episodes=args.evaluation_episodes,
         experiment_seed=args.experiment_seed, slots=args.jeplem_slots,
         jeplem_only=args.jeplem_only, pretrain_memory=args.pretrain_memory,
-        pretrain_steps=args.pretrain_steps, artifact=args.artifact,
+        pretrain_steps=args.pretrain_steps, explicit_gap=args.explicit_gap,
+        artifact=args.artifact,
     )
     print(json.dumps(asdict(outcome), indent=2))
