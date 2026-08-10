@@ -110,7 +110,7 @@ class DecideStreamRealEnv(gym.Env):
         self.switch_at = units + 1
         self.unit_len = gap + 1
         self.total_steps = units * self.unit_len
-        self.input_dim = (2 if (use_presence or use_perception) else SENSORY_DIM) + QUERY_DIM
+        self.input_dim = (2 if use_presence else SENSORY_DIM) + QUERY_DIM
         self.action_space = gym.spaces.Discrete(2)
         self.observation_space = gym.spaces.Box(0.0, 1.0, (INPUT_DIM,), dtype=np.float32)
         self._sequence: list[Tensor] | None = None
@@ -184,19 +184,9 @@ class DecideStreamRealEnv(gym.Env):
                 if self.use_presence:
                     obs = visible_object_presence(frames[frame_index].unsqueeze(0)).squeeze(0).clone()
                 elif self.use_perception:
-                    assert self.perception is not None
-                    with torch.no_grad():
-                        device = next(self.perception.parameters()).device
-                        frame_t = frames[frame_index].unsqueeze(0).to(device)
-                        logits = self.perception(frame_t).squeeze(0).cpu()
-                    if self.hard_perception:
-                        argmax = int(logits.argmax().item())
-                        obs = torch.zeros(2)
-                        if argmax in (1, 2):
-                            obs[argmax - 1] = 1.0
-                    else:
-                        probs = torch.softmax(logits, dim=-1)
-                        obs = probs[1:3].clone()  # [p_key, p_ball]
+                    # raw observation passes through; the differentiable
+                    # perception module lives inside the policy (joint train)
+                    obs = frames[frame_index].clone()
                 else:
                     obs = frames[frame_index].clone()
                 query_onehot = torch.zeros(QUERY_DIM)
@@ -285,12 +275,28 @@ def _evaluate_swap(
 class PolicyJEPLM(nn.Module):
     """JEPLM memory component as a stream policy (same wrapper as the
     synthetic-stream script): content-addressed slots + learned-gate write +
-    dual-timescale semantic aux.  Eco-validity check on real timing + presence."""
+    dual-timescale semantic aux.  Eco-validity check on real timing + presence.
+
+    With ``use_perception`` the raw observation (159 + query 2) passes through
+    a differentiable CNN perception module inside the policy, enabling
+    joint perception-memory training (end-to-end JEPLM)."""
 
     def __init__(self, input_dim: int, num_actions: int, *, latent: int = 64,
-                 slots: int = 8, aux_timescales: int = 2, aux_coefficient: float = 0.5) -> None:
+                 slots: int = 8, aux_timescales: int = 2, aux_coefficient: float = 0.5,
+                 use_perception: bool = False) -> None:
         super().__init__()
-        self.memory = JEPLMMemory(input_dim, latent=latent, slots=slots,
+        self.use_perception = use_perception
+        if use_perception:
+            from experiments.train_perception_layer import PerceptionNet, SENSORY_DIM
+            self.perception = PerceptionNet(SENSORY_DIM)
+            self.perception.load_state_dict(torch.load(ROOT / "artifacts" / "perception-layer.pt", map_location="cpu"))
+            semantic_dim = 2
+        else:
+            self.perception = None
+            semantic_dim = input_dim
+        query_dim = input_dim - (SENSORY_DIM if use_perception else 0) if use_perception else 0
+        self.query_dim = query_dim
+        self.memory = JEPLMMemory(semantic_dim + query_dim, latent=latent, slots=slots,
                                   identity_count=num_actions, aux_timescales=aux_timescales)
         self.head = nn.Linear(self.memory.head_in, num_actions + 1)
         self.aux_coefficient = aux_coefficient
@@ -299,7 +305,14 @@ class PolicyJEPLM(nn.Module):
         self.memory.reset(batch, device)
 
     def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor, Tensor]:
-        features, aux = self.memory.step(observation_step, valid_step)
+        if self.use_perception:
+            raw = observation_step[..., :SENSORY_DIM]
+            query = observation_step[..., SENSORY_DIM:]
+            semantic = torch.softmax(self.perception(raw), dim=-1)[..., 1:3]  # [p_key, p_ball]
+            memory_input = torch.cat((semantic, query), dim=-1)
+        else:
+            memory_input = observation_step
+        features, aux = self.memory.step(memory_input, valid_step)
         output = self.head(features)
         return output[..., :-1], output[..., -1], aux
 
@@ -356,7 +369,7 @@ def run(
     if aux_memory:
         factories = factories + (
             ("gru_aux_policy", lambda: PolicyGRUAux(input_dim, 2, aux_coefficient=aux_coefficient)),
-            ("jeplem_policy", lambda: PolicyJEPLM(input_dim, 2, aux_coefficient=aux_coefficient)),
+            ("jeplem_policy", lambda: PolicyJEPLM(input_dim, 2, aux_coefficient=aux_coefficient, use_perception=use_perception)),
         )
     if jeplem_only:
         factories = [f for f in factories if f[0] == "jeplem_policy"]
