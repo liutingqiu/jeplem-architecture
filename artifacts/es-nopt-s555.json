@@ -1,0 +1,58 @@
+{
+  "protocol": "evidence_seek_v1: composite task for the integration layer -- K identities, noisy clue frames (p=reliability), query frames ask 'what is identity X' (X uniform in observation); agent answers X's value (+1 correct, ends) or requests a clue for a self-chosen identity (-0.01, next unit shows it); timeout at units units. PPO on-policy, no teacher/oracle. Controls: mlp_no_memory (memoryless, capped at reliability), gru_policy (compressed state), jeplem_policy (explicit slots). Probes: answer accuracy/rate, episode reward, request-vs-oracle-max-gap match.",
+  "device": "cuda",
+  "units": 6,
+  "gap": 2,
+  "identity_count": 2,
+  "reliability": 0.65,
+  "updates": 100,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "mlp_no_memory",
+      "parameters": 5253,
+      "answer_accuracy": 0.546875,
+      "answer_rate": 1.0,
+      "episode_reward": 0.08796875000000004,
+      "mean_steps": 3.15625,
+      "gap_match_rate": 0.10810810810810811,
+      "request_gap_mean": 0.3280118716540449,
+      "max_gap_mean": 0.4763451524919415
+    },
+    {
+      "name": "gru_policy",
+      "parameters": 15164,
+      "answer_accuracy": 0.578125,
+      "answer_rate": 1.0,
+      "episode_reward": 0.14812500000000012,
+      "mean_steps": 3.625,
+      "gap_match_rate": 0.19230769230769232,
+      "request_gap_mean": 0.336206649848021,
+      "max_gap_mean": 0.47739943542695834
+    },
+    {
+      "name": "jeplem_policy",
+      "parameters": 51206,
+      "answer_accuracy": 0.5079365079365079,
+      "answer_rate": 0.984375,
+      "episode_reward": 0.0060937499999999985,
+      "mean_steps": 3.875,
+      "gap_match_rate": 0.19672131147540983,
+      "request_gap_mean": 0.35489547300345925,
+      "max_gap_mean": 0.46065573770491813
+    },
+    {
+      "name": "explicit_key_policy",
+      "parameters": 901,
+      "answer_accuracy": 0.4126984126984127,
+      "answer_rate": 0.984375,
+      "episode_reward": -0.18390624999999988,
+      "mean_steps": 4.375,
+      "gap_match_rate": 0.23376623376623376,
+      "request_gap_mean": 0.32973665583182554,
+      "max_gap_mean": 0.46298701298701306
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\es-nopt-s555.json"
+}

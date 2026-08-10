@@ -39,6 +39,7 @@ import numpy as np
 import torch
 from torch import nn
 from torch import Tensor
+import torch.nn.functional as F
 from torch.distributions import Categorical
 
 import sys
@@ -320,6 +321,95 @@ def _clue_valid(env: EvidenceSeekEnv, frame: int) -> bool:
     return divmod(frame, env.unit_len)[1] == 0
 
 
+def _bayes_target(clue_values: list[int], reliability: float) -> int | None:
+    """Bayesian posterior argmax of an identity's value given its noisy clue
+    values (p=true channel).  None when there is no clue (un-answerable)."""
+    if not clue_values:
+        return None
+    n = len(clue_values)
+    c0 = clue_values.count(0)
+    log_odd = (2 * c0 - n) * (math.log(reliability) - math.log(1.0 - reliability))
+    prob0 = 1.0 / (1.0 + math.exp(-log_odd))
+    return 0 if prob0 >= 0.5 else 1
+
+
+@torch.no_grad()
+def _bayes_batch(env: EvidenceSeekEnv, n: int, seed0: int) -> tuple[Tensor, Tensor, list[list[tuple[int, int, int]]]]:
+    """Collect n episodes under a fixed 'request both then answer' policy and
+    return (observations, valid, labels) where labels[b] = [(X, frame_idx,
+    bayes_target), ...] -- the SUPERVISABLE targets (never ground truth)."""
+    obs_list: list[np.ndarray] = []
+    val_list: list[np.ndarray] = []
+    lab_list: list[list[tuple[int, int, int]]] = []
+    tmax = 0
+    for i in range(n):
+        obs, _ = env.reset(seed=seed0 + i)
+        frames: list[np.ndarray] = []
+        valid: list[bool] = []
+        labels: list[tuple[int, int, int]] = []
+        clues: dict[int, list[int]] = {}
+        acts = [ACTION_REQUEST_0, ACTION_REQUEST_1, ACTION_REQUEST_0, ACTION_ANSWER_0]
+        for f in range(env.total_steps):
+            unit, pos = divmod(f, env.unit_len)
+            frames.append(obs.copy())
+            valid.append(_clue_valid(env, f))
+            if pos == 0 and env._clues[unit] is not None:
+                ident, content = env._clues[unit]
+                clues.setdefault(ident, []).append(content)
+            a = acts.pop(0) if pos == env.unit_len - 1 else 0
+            if pos == env.unit_len - 1:
+                x = env._asked[unit]
+                tgt = _bayes_target(clues.get(x, []), env.reliability)
+                if tgt is not None:
+                    labels.append((x, len(frames) - 1, tgt))
+            obs, r, term, trunc, _ = env.step(a)
+            if term or trunc:
+                break
+        tmax = max(tmax, len(frames))
+        obs_list.append(np.stack(frames))
+        val_list.append(np.array(valid, dtype=bool))
+        lab_list.append(labels)
+    obs_t = torch.zeros(n, tmax, env.input_dim)
+    valid_t = torch.zeros(n, tmax, dtype=torch.bool)
+    for b, o in enumerate(obs_list):
+        obs_t[b, : len(o)] = torch.tensor(o)
+        valid_t[b, : len(o)] = torch.tensor(val_list[b])
+    return obs_t, valid_t, lab_list
+
+
+def pretrain_memory_stage1(model: JEPLMEvidenceSeek, env: EvidenceSeekEnv, *, steps: int = 600,
+                    batch: int = 32, seed0: int = 5000, lr: float = 1e-3,
+                    device: torch.device) -> None:
+    """Stage 1 of hierarchical training: supervise the ANSWER path (memory +
+    head's answer logits) with BAYESIAN-POSTERIOR targets (never ground truth
+    -- noisy clues make ground truth un-supervisable, integration design 9.1).
+    Freezes the memory afterwards; the head starts stage 2 from this answer
+    path, so RL only has to learn the request/answer gating."""
+    opt = torch.optim.AdamW(model.parameters(), lr=lr)
+    for step in range(steps):
+        obs_t, valid_t, lab_list = _bayes_batch(env, batch, seed0 + step * batch)
+        obs_t, valid_t = obs_t.to(device), valid_t.to(device)
+        model.reset(batch, device)
+        loss = torch.tensor(0.0, device=device)
+        cnt = 0
+        for f in range(valid_t.shape[1]):
+            logits, _ = model.step(obs_t[:, f], valid_t[:, f])
+            for b in range(batch):
+                for x, fidx, tgt in lab_list[b]:
+                    if fidx == f:
+                        loss = loss + F.cross_entropy(logits[b, :2].unsqueeze(0), torch.tensor([tgt], device=device))
+                        cnt += 1
+        if cnt == 0:
+            continue
+        opt.zero_grad(set_to_none=True)
+        (loss / cnt).backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        opt.step()
+    for param in model.memory.parameters():
+        param.requires_grad_(False)
+    model.memory.eval()
+
+
 def _collect(model: nn.Module, env: EvidenceSeekEnv, *, count: int, seed_start: int,
              device: torch.device, exploring: bool = False, explore_ratio: float = 0.5) -> tuple[list[list[Tensor]], list[list[int]], list[list[float]], list[list[int]]]:
     """Batch-parallel episode collection.  Each stream resets per episode
@@ -402,7 +492,7 @@ def _train_ppo(model: nn.Module, env: EvidenceSeekEnv, *, updates: int, episodes
                seed_start: int, device: torch.device, ppo_epochs: int = 4,
                entropy_coefficient: float = 0.1, weight_decay: float = 1e-5,
                explore_updates: int = 30, explore_ratio: float = 0.5) -> None:
-    optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=weight_decay)
+    optimizer = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=3e-4, weight_decay=weight_decay)
     for update in range(updates):
         model.train()
         exploring = update < explore_updates
@@ -489,7 +579,8 @@ def _evaluate(model: nn.Module, env: EvidenceSeekEnv, *, episodes: int, seed_sta
         episode_reward = 0.0
         for frame in range(env.total_steps):
             observation_step = torch.tensor(observation).unsqueeze(0).to(device)
-            valid_step = torch.ones(1, dtype=torch.bool, device=device)
+            # only clue frames may write memory (same mask as training)
+            valid_step = torch.tensor([_clue_valid(env, frame)], dtype=torch.bool, device=device)
             outputs = model.step(observation_step, valid_step)
             distribution = Categorical(logits=outputs[0][0])
             action = int(distribution.sample().item())
@@ -551,7 +642,8 @@ def run(*, device: str | torch.device | None = None, units: int = 6, gap: int = 
         episodes_per_update: int = 24, evaluation_episodes: int = 64,
         experiment_seed: int = 41_123, train_seed_start: int = 10_000,
         heldout_seed_start: int = 1_000_000, slots: int = 8,
-        jeplem_only: bool = False, artifact: Path | None = None) -> Report:
+        jeplem_only: bool = False, pretrain_memory: bool = False,
+        pretrain_steps: int = 600, artifact: Path | None = None) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
     np.random.seed(experiment_seed)
@@ -567,9 +659,27 @@ def run(*, device: str | torch.device | None = None, units: int = 6, gap: int = 
     )
     if jeplem_only:
         factories = [f for f in factories if f[0] == "jeplem_policy"]
+    # hierarchical training (integration follow-up): stage 1 = Bayesian-
+    # supervised memory pretraining (aux head), frozen; stage 2 = RL on the
+    # policy head only.
+    pretrained = False
+    _mem_state: dict | None = None
+    _head_state: dict | None = None
+    if pretrain_memory:
+        probe = JEPLMEvidenceSeek(input_dim, N_ACTIONS, slots=slots, goal_dim=identity_count).to(resolved)
+        pretrain_memory_stage1(probe, env, steps=pretrain_steps, device=resolved)
+        _mem_state = {k: v.detach().clone() for k, v in probe.memory.state_dict().items()}
+        _head_state = {k: v.detach().clone() for k, v in probe.head.state_dict().items()}
+        pretrained = True
     results = []
     for name, factory in factories:
         model = factory().to(resolved)
+        if pretrained and name == "jeplem_policy":
+            model.memory.load_state_dict(_mem_state, strict=False)
+            model.head.load_state_dict(_head_state)
+            for param in model.memory.parameters():
+                param.requires_grad_(False)
+            model.memory.eval()
         _train_ppo(model, env, updates=updates, episodes_per_update=episodes_per_update,
                    seed_start=train_seed_start, device=resolved)
         metrics = _evaluate(model, env, episodes=evaluation_episodes,
@@ -606,6 +716,8 @@ if __name__ == "__main__":
     parser.add_argument("--experiment-seed", type=int, default=41_123)
     parser.add_argument("--jeplem-slots", type=int, default=8)
     parser.add_argument("--jeplem-only", action="store_true")
+    parser.add_argument("--pretrain-memory", action="store_true", help="hierarchical: Bayesian-supervised memory pretrain (aux, frozen) then RL policy head")
+    parser.add_argument("--pretrain-steps", type=int, default=600)
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
     outcome = run(
@@ -614,6 +726,7 @@ if __name__ == "__main__":
         updates=args.updates, episodes_per_update=args.episodes_per_update,
         evaluation_episodes=args.evaluation_episodes,
         experiment_seed=args.experiment_seed, slots=args.jeplem_slots,
-        jeplem_only=args.jeplem_only, artifact=args.artifact,
+        jeplem_only=args.jeplem_only, pretrain_memory=args.pretrain_memory,
+        pretrain_steps=args.pretrain_steps, artifact=args.artifact,
     )
     print(json.dumps(asdict(outcome), indent=2))
