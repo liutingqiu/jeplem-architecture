@@ -1,0 +1,10 @@
+{
+  "mi_xz": 0.0003861977782197599,
+  "mi_xz_given_y": 0.11579132438261024,
+  "collider_detected": true,
+  "do_x_prediction": 0.8967043848205767,
+  "true_do_x": 0.925,
+  "do_x_error": 0.02829561517942336,
+  "naive_do_y_error": 0.12558223429014742,
+  "accepted": true
+}

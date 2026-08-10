@@ -1,0 +1,22 @@
+{
+  "protocol": "causal_structure_learning_v1: Block-5 minimal experiment. Hidden confounder C->X,C->Y makes X and Y correlated while do(X) has no effect on Y. correlational uses P(Y|X) from passive data (misled by the confounded association); interventional calibrates P(Y|do(X)) from a small number of intervention samples. Criterion: interventional error <= 0.15 and >= 0.15 lower than correlational -- intervention-verifiable causal learning is realizable.",
+  "device": "None",
+  "n_passive": 2000,
+  "n_intervention": 40,
+  "results": [
+    {
+      "name": "correlational",
+      "predicted_p_y_do_x": 0.7706511175898931,
+      "true_p_y_do_x": 0.5,
+      "error": 0.27065111758989313
+    },
+    {
+      "name": "interventional",
+      "predicted_p_y_do_x": 0.525,
+      "true_p_y_do_x": 0.5,
+      "error": 0.025000000000000022
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\causal-structure-s222.json"
+}
