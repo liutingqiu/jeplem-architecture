@@ -33,9 +33,15 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from plwm.device import resolve_device
-from experiments.audit_minigrid_delayed_object_identity import _corpus as _real_corpus
-from experiments.audit_minigrid_decide_after_delay import PLWMDecision
-from plwm.minigrid_features import visible_object_presence
+try:
+    from experiments.audit_minigrid_delayed_object_identity import _corpus as _real_corpus
+    from experiments.audit_minigrid_decide_after_delay import PLWMDecision
+    from plwm.minigrid_features import visible_object_presence
+    _HAS_MINIGRID = True
+except ModuleNotFoundError:
+    # synthetic corpora do not need the minigrid environment; only the 'real'
+    # corpus requires it (run that on a machine with minigrid installed).
+    _HAS_MINIGRID = False
 
 
 class PLWMNoAux(nn.Module):
@@ -51,12 +57,13 @@ class PLWMNoAux(nn.Module):
 
 
 class AuxGRUDecision(nn.Module):
-    def __init__(self, input_dim: int, num_classes: int, *, width: int = 64, alpha: float = 0.5) -> None:
+    def __init__(self, input_dim: int, num_classes: int, *, width: int = 64, alpha: float = 0.5, aux_dim: int = 2) -> None:
         super().__init__()
         self.core = nn.GRU(input_dim, width, batch_first=True)
         self.head = nn.Linear(width, num_classes)
-        self.aux = nn.Linear(width, 2)  # identity one-hot predictor
+        self.aux = nn.Linear(width, aux_dim)  # memory-content predictor (identity one-hot, or [A,B] stacked)
         self.alpha = alpha
+        self.aux_dim = aux_dim
 
     def forward(self, events: Tensor) -> tuple[Tensor, Tensor]:
         outputs, _state = self.core(events)
@@ -64,7 +71,7 @@ class AuxGRUDecision(nn.Module):
 
 
 class AuxEvidenceDecision(nn.Module):
-    def __init__(self, input_dim: int, num_classes: int, *, width: int = 64, slots: int = 8, alpha: float = 0.5) -> None:
+    def __init__(self, input_dim: int, num_classes: int, *, width: int = 64, slots: int = 8, alpha: float = 0.5, aux_dim: int = 2) -> None:
         super().__init__()
         self.width = width
         self.slots = slots
@@ -75,8 +82,9 @@ class AuxEvidenceDecision(nn.Module):
         self.write_gate = nn.Linear(width, 1)
         self.state = nn.GRUCell(width * 2, width)
         self.head = nn.Linear(width, num_classes)
-        self.aux = nn.Linear(width, 2)
+        self.aux = nn.Linear(width, aux_dim)
         self.alpha = alpha
+        self.aux_dim = aux_dim
 
     def forward(self, events: Tensor) -> tuple[Tensor, Tensor]:
         batch = events.shape[0]
@@ -126,7 +134,7 @@ def _identity_onehot(labels: Tensor) -> Tensor:
     return torch.eye(2)[labels]
 
 
-def _train(model: nn.Module, events: Tensor, labels: Tensor, *, updates: int, batch_size: int, device: torch.device) -> None:
+def _train(model: nn.Module, events: Tensor, labels: Tensor, *, updates: int, batch_size: int, device: torch.device, distractor_pos: int | None = None, aux_targets: Tensor | None = None) -> None:
     optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-5)
     generator = torch.Generator(device="cpu").manual_seed(92_337)
     model.train()
@@ -138,9 +146,17 @@ def _train(model: nn.Module, events: Tensor, labels: Tensor, *, updates: int, ba
         main_loss = nn.functional.cross_entropy(decision_logits, labels[indices].to(device))
         loss = main_loss
         if aux_logits is not None:
-            aux_target = identity[indices].unsqueeze(1).expand(-1, aux_logits.shape[1], -1).to(device)
-            aux_loss = nn.functional.cross_entropy(
-                aux_logits.reshape(-1, 2), aux_target.reshape(-1, 2).argmax(-1))
+            if model.aux_dim == 4:
+                # two-identity: predict [A,B] stacked on frames AFTER the
+                # distractor appears (B not observable before distractor_pos)
+                batch_aux = aux_targets[indices].to(device)  # [B, 4]
+                aux_loss = nn.functional.cross_entropy(
+                    aux_logits[:, distractor_pos:].reshape(-1, 4),
+                    batch_aux.unsqueeze(1).expand(-1, aux_logits.shape[1] - distractor_pos, -1).reshape(-1, 4).argmax(-1))
+            else:
+                aux_target = identity[indices].unsqueeze(1).expand(-1, aux_logits.shape[1], -1).to(device)
+                aux_loss = nn.functional.cross_entropy(
+                    aux_logits.reshape(-1, 2), aux_target.reshape(-1, 2).argmax(-1))
             loss = loss + model.alpha * aux_loss
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
@@ -149,7 +165,7 @@ def _train(model: nn.Module, events: Tensor, labels: Tensor, *, updates: int, ba
 
 
 @torch.no_grad()
-def _evaluate(model: nn.Module, events: Tensor, labels: Tensor, swapped_labels: Tensor, device: torch.device) -> tuple[float, float, float]:
+def _evaluate(model: nn.Module, events: Tensor, labels: Tensor, swapped_labels: Tensor, device: torch.device, distractor_pos: int | None = None, aux_targets: Tensor | None = None) -> tuple[float, float, float]:
     model.eval()
     decision_logits, aux_logits = model(events.to(device))
     decision = decision_logits.argmax(-1).cpu()
@@ -157,9 +173,15 @@ def _evaluate(model: nn.Module, events: Tensor, labels: Tensor, swapped_labels: 
     swapped = float((decision == swapped_labels).float().mean())
     if aux_logits is None:
         return heldout, swapped, float("nan")
-    aux_target = _identity_onehot(labels).argmax(-1)  # [B]
-    aux_pred = aux_logits.argmax(-1).cpu()  # [B, T-1]
-    aux_acc = float((aux_pred == aux_target.unsqueeze(1)).all(dim=-1).float().mean())
+    if model.aux_dim == 4:
+        # two-identity aux: [A,B] stacked on post-distractor frames
+        aux_target = aux_targets  # [B,4]
+        aux_pred = aux_logits[:, distractor_pos:].argmax(-1).cpu()  # [B, T-1-distractor]
+        aux_acc = float((aux_pred == aux_target.argmax(-1).unsqueeze(1)).all(dim=-1).float().mean())
+    else:
+        aux_target = _identity_onehot(labels).argmax(-1)  # [B]
+        aux_pred = aux_logits.argmax(-1).cpu()  # [B, T-1]
+        aux_acc = float((aux_pred == aux_target.unsqueeze(1)).all(dim=-1).float().mean())
     return heldout, swapped, aux_acc
 
 
@@ -178,17 +200,46 @@ def _synthetic_single_corpus(*, examples: int, seed_start: int, delay: int) -> t
     return torch.stack(sequences), torch.tensor(labels, dtype=torch.long)
 
 
+def _synthetic_two_identity_corpus(*, examples: int, seed_start: int, delay: int, distractor_pos: int) -> tuple[Tensor, Tensor, Tensor]:
+    """Two-identity interference (JEPLM_AUX_REPORT legacy): one episode carries
+    TWO identities -- A at frame 0, distractor B at frame ``distractor_pos`` --
+    and the final query frame selects a ROLE (0 = identity A, 1 = identity B)
+    via a role one-hot (NOT the identity value, so the answer is not readable
+    from the input -- true memory demand).  Label = the identity value of the
+    selected role.  Memory must hold BOTH identities against interference;
+    aux (4-dim) supervises "keep [A,B]" on frames after B.
+    Returns (events [B, delay+1, 4], labels, aux_targets [B,4])."""
+    rng = random.Random(91_337 + seed_start)
+    sequences, labels, aux_targets = [], [], []
+    for _ in range(examples):
+        identity_a = rng.randrange(2)
+        identity_b = rng.randrange(2)
+        role = rng.randrange(2)
+        target = identity_a if role == 0 else identity_b
+        events = torch.zeros(delay + 1, 4)
+        events[0, identity_a] = 1.0
+        events[distractor_pos, 2 + identity_b] = 1.0  # B in the identity channel block
+        events[delay, 2 + role] = 1.0  # query frame selects the ROLE (answer not leaked)
+        sequences.append(events)
+        labels.append(target)
+        aux_targets.append(torch.cat((_identity_onehot(torch.tensor([identity_a])), _identity_onehot(torch.tensor([identity_b]))), dim=-1)[0])
+    return torch.stack(sequences), torch.tensor(labels, dtype=torch.long), torch.stack(aux_targets)
+
+
 def run(
     *, device: str | torch.device | None = None, corpus: str = "real",
     training_examples: int = 512, updates: int = 300, batch_size: int = 32,
     alpha: float = 0.5, delay: int = 8, experiment_seed: int = 93_337,
-    artifact: Path | None = None,
+    artifact: Path | None = None, distractor_pos: int | None = None,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
     np.random.seed(experiment_seed)
     random.seed(experiment_seed)
+    aux_targets_train = aux_targets_heldout = None
     if corpus == "real":
+        if not _HAS_MINIGRID:
+            raise RuntimeError("corpus='real' requires the minigrid environment (run on a machine with minigrid installed)")
         train_events, train_labels = _real_corpus(examples=training_examples, seed_start=50_000, sequence_length=delay + 1)
         heldout_events, heldout_labels = _real_corpus(examples=256, seed_start=6_000_000, sequence_length=delay + 1)
         train_events = visible_object_presence(train_events)
@@ -196,24 +247,38 @@ def run(
     elif corpus == "synthetic_single":
         train_events, train_labels = _synthetic_single_corpus(examples=training_examples, seed_start=50_000, delay=delay)
         heldout_events, heldout_labels = _synthetic_single_corpus(examples=256, seed_start=6_000_000, delay=delay)
+    elif corpus == "synthetic_two":
+        distractor_pos = distractor_pos if distractor_pos is not None else max(1, delay // 2)
+        if distractor_pos >= delay:
+            raise ValueError(f"distractor_pos ({distractor_pos}) must be < delay ({delay})")
+        train_events, train_labels, aux_targets_train = _synthetic_two_identity_corpus(
+            examples=training_examples, seed_start=50_000, delay=delay, distractor_pos=distractor_pos)
+        heldout_events, heldout_labels, aux_targets_heldout = _synthetic_two_identity_corpus(
+            examples=256, seed_start=6_000_000, delay=delay, distractor_pos=distractor_pos)
     else:
-        raise ValueError("corpus must be 'real' or 'synthetic_single'")
+        raise ValueError("corpus must be 'real', 'synthetic_single' or 'synthetic_two'")
     input_dim = train_events.shape[-1]
+    aux_dim = 4 if corpus == "synthetic_two" else 2
     factories = (
-        ("gru_base", lambda: AuxGRUDecision(input_dim, 2, alpha=0.0)),
-        ("gru_aux", lambda: AuxGRUDecision(input_dim, 2, alpha=alpha)),
-        ("evidence_base", lambda: AuxEvidenceDecision(input_dim, 2, alpha=0.0)),
-        ("evidence_aux", lambda: AuxEvidenceDecision(input_dim, 2, alpha=alpha)),
-        ("plwm_noaux", lambda: PLWMNoAux(input_dim, 2)),
-        ("plwm_slots16", lambda: PLWMNoAux(input_dim, 2, memory_slots=16)),
-        ("plwm_slots32", lambda: PLWMNoAux(input_dim, 2, memory_slots=32)),
+        ("gru_base", lambda: AuxGRUDecision(input_dim, 2, alpha=0.0, aux_dim=aux_dim)),
+        ("gru_aux", lambda: AuxGRUDecision(input_dim, 2, alpha=alpha, aux_dim=aux_dim)),
+        ("evidence_base", lambda: AuxEvidenceDecision(input_dim, 2, alpha=0.0, aux_dim=aux_dim)),
+        ("evidence_aux", lambda: AuxEvidenceDecision(input_dim, 2, alpha=alpha, aux_dim=aux_dim)),
     )
+    if _HAS_MINIGRID:
+        factories = factories + (
+            ("plwm_noaux", lambda: PLWMNoAux(input_dim, 2)),
+            ("plwm_slots16", lambda: PLWMNoAux(input_dim, 2, memory_slots=16)),
+            ("plwm_slots32", lambda: PLWMNoAux(input_dim, 2, memory_slots=32)),
+        )
     swapped_labels = 1 - heldout_labels
     results = []
     for name, factory in factories:
         model = factory().to(resolved)
-        _train(model, train_events, train_labels, updates=updates, batch_size=batch_size, device=resolved)
-        heldout, swapped, aux_acc = _evaluate(model, heldout_events, heldout_labels, swapped_labels, resolved)
+        _train(model, train_events, train_labels, updates=updates, batch_size=batch_size, device=resolved,
+               distractor_pos=distractor_pos, aux_targets=aux_targets_train)
+        heldout, swapped, aux_acc = _evaluate(model, heldout_events, heldout_labels, swapped_labels, resolved,
+                                              distractor_pos=distractor_pos, aux_targets=aux_targets_heldout)
         results.append(Result(name, sum(parameter.numel() for parameter in model.parameters()),
                               heldout, swapped, heldout - swapped, aux_acc))
     by_name = {r.name: r for r in results}
@@ -234,7 +299,8 @@ def run(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--device", default=None)
-    parser.add_argument("--corpus", default="real", choices=("real", "synthetic_single"))
+    parser.add_argument("--corpus", default="real", choices=("real", "synthetic_single", "synthetic_two"))
+    parser.add_argument("--distractor-pos", type=int, default=None, help="synthetic_two: frame index of the distractor identity")
     parser.add_argument("--training-examples", type=int, default=512)
     parser.add_argument("--updates", type=int, default=300)
     parser.add_argument("--batch-size", type=int, default=32)
@@ -245,5 +311,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     outcome = run(device=args.device, corpus=args.corpus, training_examples=args.training_examples,
                   updates=args.updates, batch_size=args.batch_size, alpha=args.alpha,
-                  delay=args.delay, experiment_seed=args.experiment_seed, artifact=args.artifact)
+                  delay=args.delay, experiment_seed=args.experiment_seed, artifact=args.artifact,
+                  distractor_pos=args.distractor_pos)
     print(json.dumps(asdict(outcome), indent=2))
