@@ -32,6 +32,7 @@ sys.path.insert(0, str(ROOT))
 
 from plwm.device import resolve_device
 from plwm.torch_model import TorchPLWM
+from plwm.jeplem_memory import JEPLMMemory
 
 
 class DecideStreamEnv(gym.Env):
@@ -297,6 +298,44 @@ class PolicyEvidenceAux(PolicyEvidence):
             aux_list.append(aux)
         return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1), torch.stack(aux_list, dim=1)
         return torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
+
+
+
+class PolicyJEPLM(nn.Module):
+    """JEPLM memory component (plwm.jeplem_memory) wrapped as a stream policy:
+    content-addressed slots + learned-gate write + dual-timescale semantic aux.
+    First end-to-end assembly of the architecture on the continuous stream."""
+
+    def __init__(self, input_dim: int, num_actions: int, *, latent: int = 64,
+                 slots: int = 16, aux_timescales: int = 2, aux_coefficient: float = 0.5) -> None:
+        super().__init__()
+        self.memory = JEPLMMemory(input_dim, latent=latent, slots=slots,
+                                  identity_count=num_actions, aux_timescales=aux_timescales)
+        self.head = nn.Linear(self.memory.head_in, num_actions + 1)
+        self.aux_coefficient = aux_coefficient
+
+    def reset(self, batch: int, device: torch.device) -> None:
+        self.memory.reset(batch, device)
+
+    def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        features, aux = self.memory.step(observation_step, valid_step)
+        output = self.head(features)
+        return output[..., :-1], output[..., -1], aux
+
+    def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        batch, length, _ = observations.shape
+        self.reset(batch, observations.device)
+        logits_list: list[Tensor] = []
+        values_list: list[Tensor] = []
+        aux_list: list[Tensor] = []
+        for index in range(length):
+            logits, value, aux = self.step(observations[:, index], valid[:, index])
+            logits_list.append(logits)
+            values_list.append(value)
+            if aux is not None:
+                aux_list.append(aux)
+        out = torch.stack(logits_list, dim=1), torch.stack(values_list, dim=1)
+        return out + (torch.stack(aux_list, dim=1) if aux_list else None,)
 
 
 class PolicyPLWM(nn.Module):
@@ -681,7 +720,7 @@ def run(
     rmt_probe: bool = False, aux_memory: bool = False,
     aux_coefficient: float = 0.5, gru_focus: bool = False, rmt_aux_only: bool = False,
     evidence_aux_only: bool = False, query_horizon: int = 2, aux_timescales: int = 1,
-    evidence_slots: int = 8,
+    evidence_slots: int = 8, jeplem_only: bool = False, jeplem_slots: int = 8,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -724,6 +763,8 @@ def run(
                 aux_coefficient=aux_coefficient)),
             ("evidence_aux_policy", lambda: PolicyEvidenceAux(
                 input_dim, identity_count, aux_coefficient=aux_coefficient)),
+            ("jeplem_policy", lambda: PolicyJEPLM(
+                input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient)),
         )
     if gru_focus:
         factories = [f for f in factories if f[0] in ("gru_policy", "gru_aux_policy", "gru_aux2_policy")]
@@ -731,6 +772,8 @@ def run(
         factories = [f for f in factories if f[0] in ("rmt_mem4_policy", "rmt_aux_mem4_policy")]
     if evidence_aux_only:
         factories = [f for f in factories if f[0] in ("evidence_policy", "evidence_aux_policy")]
+    if jeplem_only:
+        factories = [f for f in factories if f[0] == "jeplem_policy"]
     results = []
     for name, factory in factories:
         model = factory().to(resolved)
@@ -746,7 +789,7 @@ def run(
             query_acc, cross_acc, before_acc, after_acc,
         ))
     by_name = {result.name: result for result in results}
-    if rmt_probe or gru_focus or rmt_aux_only or evidence_aux_only:
+    if rmt_probe or gru_focus or rmt_aux_only or evidence_aux_only or jeplem_only:
         # probe/focus modes lack the full controller set; the gate is
         # meaningless there.
         accepted = False
@@ -780,6 +823,8 @@ if __name__ == "__main__":
     parser.add_argument("--query-horizon", type=int, default=2)
     parser.add_argument("--aux-timescales", type=int, default=1)
     parser.add_argument("--evidence-slots", type=int, default=8)
+    parser.add_argument("--jeplem-only", action="store_true")
+    parser.add_argument("--jeplem-slots", type=int, default=8)
     parser.add_argument("--rmt-segment-units", type=float, default=1.0)
     parser.add_argument("--no-rmt-detach", action="store_true")
     parser.add_argument("--rmt-probe", action="store_true")
@@ -802,5 +847,6 @@ if __name__ == "__main__":
         gru_focus=args.gru_focus, rmt_aux_only=args.rmt_aux_only,
         evidence_aux_only=args.evidence_aux_only, query_horizon=args.query_horizon,
         aux_timescales=args.aux_timescales, evidence_slots=args.evidence_slots,
+        jeplem_only=args.jeplem_only, jeplem_slots=args.jeplem_slots,
     )
     print(json.dumps(asdict(outcome), indent=2))
