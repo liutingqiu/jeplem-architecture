@@ -311,27 +311,47 @@ class PolicyJEPLM(nn.Module):
     def __init__(self, input_dim: int, num_actions: int, *, latent: int = 64,
                  slots: int = 16, aux_timescales: int = 2, aux_coefficient: float = 0.5,
                  write_mode: str = "fifo", predict: bool = False,
-                 pred_coefficient: float = 0.1) -> None:
+                 pred_coefficient: float = 0.1, conf_feature: bool = False) -> None:
         super().__init__()
         self.memory = JEPLMMemory(input_dim, latent=latent, slots=slots,
                                   identity_count=num_actions, aux_timescales=aux_timescales,
                                   write_mode=write_mode)
-        self.head = nn.Linear(self.memory.head_in, num_actions + 1)
+        # conf_feature: JEPA decision-side wiring -- the per-frame prediction
+        # error (predictor vs current latent, stop-grad) mapped to a [0,1]
+        # confidence scalar is concatenated to the head input.  This tests
+        # phase-28's positioning claim that JEPA prediction belongs on the
+        # decision side (as a belief signal), NOT as an RL training target.
+        self.conf_feature = conf_feature
+        head_in = self.memory.head_in + (1 if conf_feature else 0)
+        self.head = nn.Linear(head_in, num_actions + 1)
         self.aux_coefficient = aux_coefficient
         self.predict = predict
         self.pred_coefficient = pred_coefficient
-        if predict:
+        if predict or conf_feature:
             self.predictor = JEPLMPredictor(self.memory.latent)
         else:
             self.predictor = None
         self._pred_loss: Tensor | None = None
+        self._prev_state: Tensor | None = None
 
     def reset(self, batch: int, device: torch.device) -> None:
         self.memory.reset(batch, device)
         self._pred_loss = None
+        self._prev_state = None
 
     def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor, Tensor]:
         features, aux = self.memory.step(observation_step, valid_step)
+        if self.conf_feature and self.predictor is not None:
+            state = self.memory.export_state()[0]  # [B, latent]
+            if self._prev_state is not None:
+                pred = self.predictor(self._prev_state).detach()
+                err = JEPLMPredictor.prediction_error(pred, state)
+                conf = JEPLMPredictor.confidence(err).unsqueeze(-1)  # [B, 1]
+            else:
+                conf = torch.zeros(state.shape[0], 1, device=state.device)
+            features = torch.cat((features, conf), dim=-1)
+            self._last_conf = conf
+            self._prev_state = state.detach()
         output = self.head(features)
         return output[..., :-1], output[..., -1], aux
 
@@ -746,6 +766,7 @@ def run(
     evidence_aux_only: bool = False, query_horizon: int = 2, aux_timescales: int = 1,
     evidence_slots: int = 8, jeplem_only: bool = False, jeplem_slots: int = 8,
     jeplem_aux_timescales: int = 2, jeplem_write_mode: str = "fifo", jeplem_predict: bool = False,
+    jeplem_conf_feature: bool = False,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -790,7 +811,8 @@ def run(
                 input_dim, identity_count, aux_coefficient=aux_coefficient)),
             ("jeplem_policy", lambda: PolicyJEPLM(
                 input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient,
-                write_mode=jeplem_write_mode, predict=jeplem_predict, pred_coefficient=0.1)),
+                write_mode=jeplem_write_mode, predict=jeplem_predict, pred_coefficient=0.1,
+                conf_feature=jeplem_conf_feature)),
             ("jeplem_agent_policy", lambda: JEPLMAgent(
                 input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient,
                 aux_timescales=jeplem_aux_timescales, write_mode=jeplem_write_mode)),
@@ -856,6 +878,7 @@ if __name__ == "__main__":
     parser.add_argument("--jeplem-slots", type=int, default=8)
     parser.add_argument("--jeplem-aux-timescales", type=int, default=2)
     parser.add_argument("--jeplem-predict", action="store_true")
+    parser.add_argument("--jeplem-conf-feature", action="store_true")
     parser.add_argument("--jeplem-write-mode", type=str, default="fifo", choices=["fifo", "gate", "delta_rule"])
     parser.add_argument("--rmt-segment-units", type=float, default=1.0)
     parser.add_argument("--no-rmt-detach", action="store_true")
@@ -883,5 +906,6 @@ if __name__ == "__main__":
         jeplem_aux_timescales=args.jeplem_aux_timescales,
         jeplem_write_mode=args.jeplem_write_mode,
         jeplem_predict=args.jeplem_predict,
+        jeplem_conf_feature=args.jeplem_conf_feature,
     )
     print(json.dumps(asdict(outcome), indent=2))
