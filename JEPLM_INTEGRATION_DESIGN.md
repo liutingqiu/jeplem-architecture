@@ -160,6 +160,23 @@ step(obs, valid, goal=None)     # goal [B, goal_dim]；query_vec = W_q(encoded) 
 
 **产物**：`artifacts/es-hier-s{444,555,666}.json`（分层）、`es-nopt-s{444,555,666}.json`（纯 RL 对照）、`--pretrain-memory/--pretrain-steps` 开关。EvidenceSeek 任务线至此完整闭环（v1-v4 设计修正 + 诊断翻转 + 分层验证）。
 
+### 9.3 任务 v5（请求上限）与 gap_goals 集成结论（2026-08-11，负结果 + 机制决策）
+
+**v5 设计**：max_requests=3（请求预算 = 机会成本而非惩罚，耗尽后只能答），目标是让"求"更容易被探索、学出 gap 驱动请求。**结果（3 seed，150 updates）反而退化**：
+
+| 策略 | acc 均值 | answer_rate | gap_match |
+|---|---|---|---|
+| mlp | 0.537 | 0.90 | 0.19 |
+| gru | 0.436 | 0.98 | 0.10 |
+| jeplem | 0.479 | 0.92 | 0.20 |
+| explicit_key | 0.463 | 0.91 | 0.23 |
+
+（v4 基线：jeplem/gru 0.565，answer_rate 1.0）。请求预算引入后序列决策复杂度上升（求-答-求平衡 + 预算耗尽分支），PPO 完全学不出，gap_match 反选缺口小者（0.2 << 随机 0.5）。
+
+**机制决策（总控，负结果驱动）**：EvidenceSeek v1-v5 五轮迭代，"主动收集（求）"行为在 PPO 端到端下**始终学不出**——结构性困难（延迟 credit + 高方差 ±1 奖励 + 探索崩塌，v5 预算约束加剧）。**结论：gap_goals 自主目标不适合端到端 PPO 学习**，应作为**显式机制**接入（显式贝叶斯置信度 → 缺口计算 → 目标选择，决策层只学"何时用"），与 JEPA latent 预测降级同一模式（机制保留、默认不参与端到端梯度）。gap_goals 的机制本身已在 toy 级验证（train_autonomous_goal_generation.py，区块 4 ✅）。
+
+**EvidenceSeek 任务族完整闭环**：任务可学（记忆价值确认）、但"主动收集 + gap 驱动"的复合性在 PPO 下不可学——**集成层的"复合任务"路线验证结论：模块间协同需显式接线（机制直连），不能依赖端到端 RL 涌现**。这条结论本身就是集成层最重要的产出之一。
+
 ## 四、决策记录（已排除方向及理由）
 
 | 方向 | 排除理由 | 证据 |
