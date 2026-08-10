@@ -45,6 +45,7 @@ class JEPLMMemory(nn.Module):
         aux_timescales: int = 0,
         use_surprise_feature: bool = False,
         write_mode: str = "fifo",
+        goal_dim: int = 0,
     ) -> None:
         super().__init__()
         self.slots = slots
@@ -54,6 +55,12 @@ class JEPLMMemory(nn.Module):
         self.write_mode = write_mode  # 'fifo' | 'gate' | 'delta_rule'
         self.encoder = nn.Sequential(nn.Linear(input_dim, latent), nn.Tanh())
         self.query = nn.Linear(latent, latent, bias=False)
+        # goal-driven retrieval (integration layer, 2026-08-11): an optional
+        # goal vector is projected and added to the read query, so addressing
+        # is modulated by WHAT is being asked (e.g. the stream selector:
+        # current vs previous episode identity), not only by the raw frame.
+        # goal_dim=0 keeps the exact pre-integration behaviour (back-compat).
+        self.goal_proj = nn.Linear(goal_dim, latent, bias=False) if goal_dim > 0 else None
         self.key = nn.Linear(latent, latent, bias=False)
         self.value = nn.Linear(latent, latent)
         gate_in = latent + (1 if use_surprise_feature else 0)
@@ -101,8 +108,13 @@ class JEPLMMemory(nn.Module):
         observation_step: Tensor,
         valid_step: Tensor,
         surprise_feature: Tensor | None = None,
+        goal: Tensor | None = None,
     ) -> tuple[Tensor, Tensor | None]:
         """One frame: read, update state, gated write.
+
+        ``goal`` (optional): [B, goal_dim] vector that modulates the content
+        addressing (added to the projected query).  Ignored when the memory
+        was built without ``goal_dim``.
 
         Returns (features, aux_logits): features = cat(state, recalled) for
         the host's head; aux_logits = None unless aux_timescales > 0.
@@ -110,8 +122,11 @@ class JEPLMMemory(nn.Module):
         assert self._state is not None and self._keys is not None and self._values is not None
         batch = observation_step.shape[0]
         encoded = self.encoder(observation_step)
+        query_vec = self.query(encoded)
+        if goal is not None and self.goal_proj is not None:
+            query_vec = query_vec + self.goal_proj(goal)
         weights = torch.softmax(
-            torch.einsum("bd,bmd->bm", self.query(encoded), self._keys) / self.latent**0.5,
+            torch.einsum("bd,bmd->bm", query_vec, self._keys) / self.latent**0.5,
             dim=-1,
         )
         recalled = torch.einsum("bm,bmd->bd", weights, self._values)

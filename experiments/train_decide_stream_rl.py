@@ -928,6 +928,7 @@ def run(
     clue_frames: int = 1, clue_reliability: float = 0.65, probe_conf: bool = False,
     query_hint: bool = False, query_hint_reliability: float = 0.7,
     revision_mode: str = "none", fail_threshold: int = 2,
+    goal_query: bool = False,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -976,7 +977,8 @@ def run(
                 conf_feature=jeplem_conf_feature, revision_mode=revision_mode)),
             ("jeplem_agent_policy", lambda: JEPLMAgent(
                 input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient,
-                aux_timescales=jeplem_aux_timescales, write_mode=jeplem_write_mode)),
+                aux_timescales=jeplem_aux_timescales, write_mode=jeplem_write_mode,
+                use_goal_query=goal_query, goal_dim=query_horizon)),
         )
     if gru_focus:
         factories = [f for f in factories if f[0] in ("gru_policy", "gru_aux_policy", "gru_aux2_policy")]
@@ -1056,6 +1058,7 @@ if __name__ == "__main__":
     parser.add_argument("--query-hint", action="store_true", help="phase-32: query frame carries an identity hint (70%% reliable) - tests whether JEPA conf helps resist the hint shortcut")
     parser.add_argument("--query-hint-reliability", type=float, default=0.7, help="probability the query-frame identity hint is the true identity")
     parser.add_argument("--revision-mode", type=str, default="none", choices=["none", "one_shot", "always"], help="phase-35: surprise-driven memory revision on rule flip (consecutive query failures)")
+    parser.add_argument("--goal-query", action="store_true", help="integration-1: goal-driven retrieval -- stream selector modulates memory addressing")
     parser.add_argument("--fail-threshold", type=int, default=2, help="consecutive majority-failed query frames before revision clears memory")
     parser.add_argument("--rmt-segment-units", type=float, default=1.0)
     parser.add_argument("--no-rmt-detach", action="store_true")
@@ -1088,5 +1091,6 @@ if __name__ == "__main__":
         clue_reliability=args.clue_reliability, probe_conf=args.probe_conf,
         query_hint=args.query_hint, query_hint_reliability=args.query_hint_reliability,
         revision_mode=args.revision_mode, fail_threshold=args.fail_threshold,
+        goal_query=args.goal_query,
     )
     print(json.dumps(asdict(outcome), indent=2))

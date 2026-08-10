@@ -8,7 +8,7 @@
 ## 一、状态：组件已落地并端到端验证
 
 `plwm/jeplem_memory.py` 已实现（2026-08-10）：
-- **显式槽位主干**：内容寻址读（softmax attention over slot keys）+ 学习门控写（GRU 融合 + FIFO 位置 + sigmoid gate）
+- **显式槽位主干**：内容寻址读（softmax attention over slot keys）+ 写入（GRU 融合 + FIFO 位置）；学习门控写（gate/delta_rule）**RL 下已对照证伪**（2026-08-11：gate q 0.786 vs fifo 0.962），无条件 FIFO 为实证正确默认——见 JEPLM_INTEGRATION_DESIGN.md 第⑥节
 - **语义内容预测头**（可选多时标）：aux_head 从 state+recalled 特征预测最近 k 个身份的 one-hot
 - **无重建式 surprise**：门控为学习式，surprise 仅作可选特征（默认关闭）
 - API：`step(obs, valid, surprise_feature?) -> (features, aux_logits)`；`forward_sequence`；`export_state/load_state` 可插拔

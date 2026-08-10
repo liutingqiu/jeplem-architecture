@@ -44,10 +44,14 @@ class JEPLMAgent(nn.Module):
         sensory_dim: int = 159,
         query_dim: int = 2,
         write_mode: str = "fifo",
+        use_goal_query: bool = False,
+        goal_dim: int = 0,
     ) -> None:
         super().__init__()
         self.use_perception = use_perception
         self.sensory_dim = sensory_dim
+        self.use_goal_query = use_goal_query
+        self.goal_dim = goal_dim
         if use_perception:
             from experiments.train_perception_layer import PerceptionNet
 
@@ -62,7 +66,7 @@ class JEPLMAgent(nn.Module):
         self.memory = JEPLMMemory(
             memory_input_dim, latent=latent, slots=slots,
             identity_count=num_actions, aux_timescales=aux_timescales,
-            write_mode=write_mode,
+            write_mode=write_mode, goal_dim=goal_dim if use_goal_query else 0,
         )
         self.head = nn.Linear(self.memory.head_in, num_actions + 1)
         self.aux_coefficient = aux_coefficient
@@ -80,7 +84,12 @@ class JEPLMAgent(nn.Module):
             memory_input = torch.cat((semantic, query), dim=-1)
         else:
             memory_input = observation_step
-        features, aux = self.memory.step(memory_input, valid_step)
+        goal = None
+        if self.use_goal_query and self.goal_dim > 0:
+            # goal-driven retrieval: the trailing goal channels (e.g. the
+            # stream selector: current vs previous identity) address memory.
+            goal = observation_step[..., -self.goal_dim :]
+        features, aux = self.memory.step(memory_input, valid_step, goal=goal)
         output = self.head(features)
         return output[..., :-1], output[..., -1], aux
 
