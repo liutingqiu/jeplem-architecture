@@ -101,12 +101,14 @@ class DecideStreamRealEnv(gym.Env):
 
     def __init__(self, *, units: int = 3, gap: int = 4, seed: int = 0,
                  use_presence: bool = False, use_perception: bool = False,
-                 perception: PerceptionNet | None = None, hard_perception: bool = False) -> None:
+                 perception: PerceptionNet | None = None, hard_perception: bool = False,
+                 presence_noise: float = 0.0) -> None:
         self.units, self.gap, self.seed = units, gap, seed
         self.use_presence = use_presence
         self.use_perception = use_perception
         self.perception = perception
         self.hard_perception = hard_perception
+        self.presence_noise = presence_noise
         self.switch_at = units + 1
         self.unit_len = gap + 1
         self.total_steps = units * self.unit_len
@@ -183,6 +185,8 @@ class DecideStreamRealEnv(gym.Env):
             for position, frame_index in enumerate(episode):
                 if self.use_presence:
                     obs = visible_object_presence(frames[frame_index].unsqueeze(0)).squeeze(0).clone()
+                    if self.presence_noise > 0.0 and obs.sum() == 1 and random.Random(seed * 31 + unit * 7 + position).random() < self.presence_noise:
+                        obs = obs[[1, 0]]  # flip key<->ball (identity misread)
                 elif self.use_perception:
                     # raw observation passes through; the differentiable
                     # perception module lives inside the policy (joint train)
@@ -339,7 +343,7 @@ def run(
     heldout_seed_start: int = 1_000_000, use_presence: bool = False,
     rmt_probe: bool = False, aux_memory: bool = False, aux_coefficient: float = 0.5,
     jeplem_only: bool = False, use_perception: bool = False, hard_perception: bool = False,
-    artifact: Path | None = None,
+    presence_noise: float = 0.0, artifact: Path | None = None,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -352,7 +356,8 @@ def run(
         perception.eval()
     env = DecideStreamRealEnv(units=units, gap=gap, seed=experiment_seed,
                               use_presence=use_presence, use_perception=use_perception,
-                              perception=perception, hard_perception=hard_perception)
+                              perception=perception, hard_perception=hard_perception,
+                              presence_noise=presence_noise)
     input_dim = env.input_dim
     if rmt_probe:
         factories = (
@@ -410,6 +415,7 @@ if __name__ == "__main__":
     parser.add_argument("--use-presence", action="store_true")
     parser.add_argument("--use-perception", action="store_true")
     parser.add_argument("--hard-perception", action="store_true")
+    parser.add_argument("--presence-noise", type=float, default=0.0)
     parser.add_argument("--jeplem-only", action="store_true")
     parser.add_argument("--rmt-probe", action="store_true")
     parser.add_argument("--aux-memory", action="store_true")
@@ -423,6 +429,7 @@ if __name__ == "__main__":
         experiment_seed=args.experiment_seed,
         use_presence=args.use_presence, rmt_probe=args.rmt_probe,
         use_perception=args.use_perception, hard_perception=args.hard_perception,
+        presence_noise=args.presence_noise,
         jeplem_only=args.jeplem_only, aux_memory=args.aux_memory, aux_coefficient=args.aux_coefficient, artifact=args.artifact,
     )
     print(json.dumps(asdict(outcome), indent=2))

@@ -1,0 +1,19 @@
+{
+  "protocol": "decide_stream_real_rl_v1: continuous stream of REAL MemoryS13 observation episodes [identity frame -> gap empty frames -> query frame (real obs + injected one-hot current/previous)]; reward only on query steps; PPO on-policy; no teacher, oracle, shaped reward, or privileged state; real-observation analogue of DecideStreamEnv.",
+  "device": "cuda",
+  "units": 3,
+  "gap": 4,
+  "updates": 100,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "jeplem_policy",
+      "parameters": 50888,
+      "query_accuracy": 0.6354166666666666,
+      "cross_episode_accuracy": 0.5121951219512195,
+      "swap_query_accuracy": 0.3645833333333333,
+      "swap_cross_accuracy": 0.4878048780487805
+    }
+  ],
+  "artifact": "artifacts\\realstream-jeplem-noise0.15-s41_123.json"
+}
