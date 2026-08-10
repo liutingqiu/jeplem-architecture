@@ -44,12 +44,14 @@ class JEPLMMemory(nn.Module):
         identity_count: int = 2,
         aux_timescales: int = 0,
         use_surprise_feature: bool = False,
+        write_mode: str = "fifo",
     ) -> None:
         super().__init__()
         self.slots = slots
         self.latent = latent
         self.identity_count = identity_count
         self.aux_timescales = aux_timescales
+        self.write_mode = write_mode  # 'fifo' | 'gate' | 'delta_rule'
         self.encoder = nn.Sequential(nn.Linear(input_dim, latent), nn.Tanh())
         self.query = nn.Linear(latent, latent, bias=False)
         self.key = nn.Linear(latent, latent, bias=False)
@@ -58,6 +60,10 @@ class JEPLMMemory(nn.Module):
         self.write_gate = nn.Linear(gate_in, 1)
         self.state_cell = nn.GRUCell(latent * 2, latent)
         self.head_in = latent * 2  # state + recalled
+        if write_mode == "delta_rule":
+            # erase strength (modulated by content similarity) + add strength
+            self.erase_gate = nn.Linear(latent, 1)
+            self.add_gate = nn.Linear(latent, 1)
         if aux_timescales > 0:
             self.aux_head = nn.Linear(self.head_in, identity_count * aux_timescales)
         else:
@@ -122,9 +128,31 @@ class JEPLMMemory(nn.Module):
         candidate_values = torch.cat((self._values[:, 1:], self.value(encoded).unsqueeze(1)), dim=1)
         active = valid_step.unsqueeze(-1)
         active_slots = active.unsqueeze(-1)
+        new_keys, new_values = self._keys, self._values
+        if self.write_mode == "fifo":
+            # unconditional FIFO rotation (the de-facto behavior before 2026-08-11)
+            new_keys, new_values = candidate_keys, candidate_values
+        elif self.write_mode == "gate":
+            # learned per-frame gate controls how much of the new content
+            # replaces the recalled slot (the documented-but-unwired behavior)
+            recalled_slot = recalled.unsqueeze(1)  # [B,1,D]
+            new_values = (1 - gate) * recalled_slot + gate * self.value(encoded).unsqueeze(1)
+            new_keys = (1 - gate) * recalled_slot + gate * self.key(encoded).unsqueeze(1)
+        elif self.write_mode == "delta_rule":
+            # content-addressed erase + add (KDA-style): pick the most similar
+            # slot, erase it proportionally to similarity, then add new content
+            # with learned strength.  Keeps the explicit slot structure.
+            sim = torch.sigmoid(torch.einsum("bd,bmd->bm", self.key(encoded), self._keys))
+            erase = torch.sigmoid(self.erase_gate(encoded))  # [B,1]
+            add = torch.sigmoid(self.add_gate(encoded))  # [B,1]
+            selected = sim.argmax(dim=-1)  # [B]
+            idx = torch.arange(self.slots, device=selected.device)
+            mask = (idx.unsqueeze(0) == selected.unsqueeze(-1)).float().unsqueeze(-1)  # [B,S,1]
+            new_values = (1 - erase.unsqueeze(-1) * mask) * self._values + mask * (add * self.value(encoded)).unsqueeze(1)
+            new_keys = (1 - erase.unsqueeze(-1) * mask) * self._keys + mask * (add * self.key(encoded)).unsqueeze(1)
         self._state = torch.where(active, candidate_state, self._state)
-        self._keys = torch.where(active_slots, candidate_keys, self._keys)
-        self._values = torch.where(active_slots, candidate_values, self._values)
+        self._keys = torch.where(active_slots, new_keys, self._keys)
+        self._values = torch.where(active_slots, new_values, self._values)
         features = torch.cat((self._state, recalled), dim=-1)
         aux_logits = self.aux_head(features) if self.aux_head is not None else None
         return features, aux_logits

@@ -308,10 +308,12 @@ class PolicyJEPLM(nn.Module):
     First end-to-end assembly of the architecture on the continuous stream."""
 
     def __init__(self, input_dim: int, num_actions: int, *, latent: int = 64,
-                 slots: int = 16, aux_timescales: int = 2, aux_coefficient: float = 0.5) -> None:
+                 slots: int = 16, aux_timescales: int = 2, aux_coefficient: float = 0.5,
+                 write_mode: str = "fifo") -> None:
         super().__init__()
         self.memory = JEPLMMemory(input_dim, latent=latent, slots=slots,
-                                  identity_count=num_actions, aux_timescales=aux_timescales)
+                                  identity_count=num_actions, aux_timescales=aux_timescales,
+                                  write_mode=write_mode)
         self.head = nn.Linear(self.memory.head_in, num_actions + 1)
         self.aux_coefficient = aux_coefficient
 
@@ -722,7 +724,7 @@ def run(
     aux_coefficient: float = 0.5, gru_focus: bool = False, rmt_aux_only: bool = False,
     evidence_aux_only: bool = False, query_horizon: int = 2, aux_timescales: int = 1,
     evidence_slots: int = 8, jeplem_only: bool = False, jeplem_slots: int = 8,
-    jeplem_aux_timescales: int = 2,
+    jeplem_aux_timescales: int = 2, jeplem_write_mode: str = "fifo",
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
@@ -766,10 +768,11 @@ def run(
             ("evidence_aux_policy", lambda: PolicyEvidenceAux(
                 input_dim, identity_count, aux_coefficient=aux_coefficient)),
             ("jeplem_policy", lambda: PolicyJEPLM(
-                input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient)),
+                input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient,
+                write_mode=jeplem_write_mode)),
             ("jeplem_agent_policy", lambda: JEPLMAgent(
                 input_dim, identity_count, slots=jeplem_slots, aux_coefficient=aux_coefficient,
-                aux_timescales=jeplem_aux_timescales)),
+                aux_timescales=jeplem_aux_timescales, write_mode=jeplem_write_mode)),
         )
     if gru_focus:
         factories = [f for f in factories if f[0] in ("gru_policy", "gru_aux_policy", "gru_aux2_policy")]
@@ -831,6 +834,7 @@ if __name__ == "__main__":
     parser.add_argument("--jeplem-only", action="store_true")
     parser.add_argument("--jeplem-slots", type=int, default=8)
     parser.add_argument("--jeplem-aux-timescales", type=int, default=2)
+    parser.add_argument("--jeplem-write-mode", type=str, default="fifo", choices=["fifo", "gate", "delta_rule"])
     parser.add_argument("--rmt-segment-units", type=float, default=1.0)
     parser.add_argument("--no-rmt-detach", action="store_true")
     parser.add_argument("--rmt-probe", action="store_true")
@@ -855,5 +859,6 @@ if __name__ == "__main__":
         aux_timescales=args.aux_timescales, evidence_slots=args.evidence_slots,
         jeplem_only=args.jeplem_only, jeplem_slots=args.jeplem_slots,
         jeplem_aux_timescales=args.jeplem_aux_timescales,
+        jeplem_write_mode=args.jeplem_write_mode,
     )
     print(json.dumps(asdict(outcome), indent=2))

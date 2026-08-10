@@ -59,3 +59,13 @@
 2. ~~RMT + 语义 aux（流式 RL）~~ 已闭环：补救矩阵全无效，段边界结构性不可学（RMT_STREAMING_COLLAPSE_REPORT）
 3. ~~多时标 aux 上限~~ 已闭环（2026-08-10）：上限 = aux 头数；3 时标压缩+3aux 追平槽位；槽位免先验
 4. ~~PLWM d=64 崩机制 / PLWM RL 差距~~ 已闭环（2026-08-10）：RL 差距 = seed 效应（6 seed plwm_gated 0.857 ≈ evidence 0.841）；predictor/TTCD 均 RL 负担
+
+
+## 六、D3 补充（2026-08-11）：写入门控三连对照
+
+delta-rule 擦写（KDA 式，内容寻址 erase+add）对照完成（JEPLM_WRITE_MODE_REPORT）：
+**u3g4 连续流上 fifo 0.941/0.831 > gate 0.821/0.547 > delta_rule 0.793/0.657**。
+- 学习式写入门控在 RL 下是负担而非帮助（surprise/TTCD/delta-rule 三连负结果）——"什么值得记"
+  难以从稀疏奖励学习；无条件 FIFO 保证信息不丢，是事件流稳健默认。
+- 边界：门控的用武之地是低信息密度/冗余帧流（d=32 空帧，PLWM 0.862 vs evidence 0.720）。
+- 同时修复实现缺口：write_gate 此前是死代码（未接线），gate/delta_rule 模式现已真实实现。

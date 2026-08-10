@@ -43,6 +43,7 @@ class JEPLMAgent(nn.Module):
         perception_state_dict: str | None = None,
         sensory_dim: int = 159,
         query_dim: int = 2,
+        write_mode: str = "fifo",
     ) -> None:
         super().__init__()
         self.use_perception = use_perception
@@ -61,6 +62,7 @@ class JEPLMAgent(nn.Module):
         self.memory = JEPLMMemory(
             memory_input_dim, latent=latent, slots=slots,
             identity_count=num_actions, aux_timescales=aux_timescales,
+            write_mode=write_mode,
         )
         self.head = nn.Linear(self.memory.head_in, num_actions + 1)
         self.aux_coefficient = aux_coefficient
