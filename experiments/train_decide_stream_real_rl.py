@@ -35,6 +35,7 @@ sys.path.insert(0, str(ROOT))
 from plwm.device import resolve_device
 from plwm.minigrid_features import visible_object_presence
 from plwm.jeplem_memory import JEPLMMemory
+from experiments.train_perception_layer import PerceptionNet, SENSORY_DIM
 from experiments.train_minigrid_memory_actor_critic import encode_observation
 from experiments.train_decide_stream_rl import (
     PolicyGRU, PolicyEvidence, PolicyPLWM, PolicyRMTStream, PolicyGRUAux,
@@ -98,13 +99,18 @@ class DecideStreamRealEnv(gym.Env):
 
     metadata = {"render_modes": []}
 
-    def __init__(self, *, units: int = 3, gap: int = 4, seed: int = 0, use_presence: bool = False) -> None:
+    def __init__(self, *, units: int = 3, gap: int = 4, seed: int = 0,
+                 use_presence: bool = False, use_perception: bool = False,
+                 perception: PerceptionNet | None = None, hard_perception: bool = False) -> None:
         self.units, self.gap, self.seed = units, gap, seed
         self.use_presence = use_presence
+        self.use_perception = use_perception
+        self.perception = perception
+        self.hard_perception = hard_perception
         self.switch_at = units + 1
         self.unit_len = gap + 1
         self.total_steps = units * self.unit_len
-        self.input_dim = (2 if use_presence else SENSORY_DIM) + QUERY_DIM
+        self.input_dim = (2 if (use_presence or use_perception) else SENSORY_DIM) + QUERY_DIM
         self.action_space = gym.spaces.Discrete(2)
         self.observation_space = gym.spaces.Box(0.0, 1.0, (INPUT_DIM,), dtype=np.float32)
         self._sequence: list[Tensor] | None = None
@@ -177,6 +183,20 @@ class DecideStreamRealEnv(gym.Env):
             for position, frame_index in enumerate(episode):
                 if self.use_presence:
                     obs = visible_object_presence(frames[frame_index].unsqueeze(0)).squeeze(0).clone()
+                elif self.use_perception:
+                    assert self.perception is not None
+                    with torch.no_grad():
+                        device = next(self.perception.parameters()).device
+                        frame_t = frames[frame_index].unsqueeze(0).to(device)
+                        logits = self.perception(frame_t).squeeze(0).cpu()
+                    if self.hard_perception:
+                        argmax = int(logits.argmax().item())
+                        obs = torch.zeros(2)
+                        if argmax in (1, 2):
+                            obs[argmax - 1] = 1.0
+                    else:
+                        probs = torch.softmax(logits, dim=-1)
+                        obs = probs[1:3].clone()  # [p_key, p_ball]
                 else:
                     obs = frames[frame_index].clone()
                 query_onehot = torch.zeros(QUERY_DIM)
@@ -305,13 +325,21 @@ def run(
     experiment_seed: int = 41_123, train_seed_start: int = 10_000,
     heldout_seed_start: int = 1_000_000, use_presence: bool = False,
     rmt_probe: bool = False, aux_memory: bool = False, aux_coefficient: float = 0.5,
-    jeplem_only: bool = False, artifact: Path | None = None,
+    jeplem_only: bool = False, use_perception: bool = False, hard_perception: bool = False,
+    artifact: Path | None = None,
 ) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
     np.random.seed(experiment_seed)
     random.seed(experiment_seed)
-    env = DecideStreamRealEnv(units=units, gap=gap, seed=experiment_seed, use_presence=use_presence)
+    perception = None
+    if use_perception:
+        perception = PerceptionNet(SENSORY_DIM).to(resolved)
+        perception.load_state_dict(torch.load(ROOT / "artifacts" / "perception-layer.pt", map_location=resolved))
+        perception.eval()
+    env = DecideStreamRealEnv(units=units, gap=gap, seed=experiment_seed,
+                              use_presence=use_presence, use_perception=use_perception,
+                              perception=perception, hard_perception=hard_perception)
     input_dim = env.input_dim
     if rmt_probe:
         factories = (
@@ -367,6 +395,8 @@ if __name__ == "__main__":
     parser.add_argument("--evaluation-episodes", type=int, default=32)
     parser.add_argument("--experiment-seed", type=int, default=41_123)
     parser.add_argument("--use-presence", action="store_true")
+    parser.add_argument("--use-perception", action="store_true")
+    parser.add_argument("--hard-perception", action="store_true")
     parser.add_argument("--jeplem-only", action="store_true")
     parser.add_argument("--rmt-probe", action="store_true")
     parser.add_argument("--aux-memory", action="store_true")
@@ -379,6 +409,7 @@ if __name__ == "__main__":
         evaluation_episodes=args.evaluation_episodes,
         experiment_seed=args.experiment_seed,
         use_presence=args.use_presence, rmt_probe=args.rmt_probe,
+        use_perception=args.use_perception, hard_perception=args.hard_perception,
         jeplem_only=args.jeplem_only, aux_memory=args.aux_memory, aux_coefficient=args.aux_coefficient, artifact=args.artifact,
     )
     print(json.dumps(asdict(outcome), indent=2))

@@ -1,0 +1,9 @@
+{
+  "protocol": "jeplem_perception_layer_v1: learn Key/Ball presence class from RAW MemoryS13 observation encoding (159-dim); target class extracted from the same image (observable); this replaces the hand-crafted presence feature with a learned perception layer (JEPA-encoder role) for the real-stream RL loop.",
+  "device": "cuda",
+  "training_examples": 4096,
+  "updates": 800,
+  "heldout_accuracy": 0.9609375,
+  "accepted_perception_contract": true,
+  "artifact": "artifacts\\perception-layer-cnn-report.json"
+}
