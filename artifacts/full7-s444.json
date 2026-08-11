@@ -1,0 +1,11 @@
+{
+  "protocol": "phase2_full_subject_v7: REAL visual perception (frozen CNN, 0.961) feeds the body -- perceived identity semantics become runtime facts (ledger + snapshot chain); random policy (verifies the perception->semantics->body information chain). Criterion: perception >= 0.8, P1 >= 0.9, P5 >= 0.9.",
+  "seed": 444,
+  "results": {
+    "perception_accuracy": 0.819,
+    "continuity_p1": 1.0,
+    "consistency_p5": 1.0
+  },
+  "accepted": true,
+  "artifact": "artifacts\\full7-s444.json"
+}
