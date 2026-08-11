@@ -1,0 +1,11 @@
+{
+  "protocol": "phase2_body_v11_executive_v1: budgeted attention (Block-9) decides which frames are worth writing under a write budget (informative = clue disagrees with current belief), vs write-all (FIFO eviction) and random-budget controls. Criterion: attention query accuracy >= 0.85 and >= controls + 0.15.",
+  "seed": 555,
+  "results": {
+    "attention_query_acc": 0.87,
+    "write_all_acc": 0.543,
+    "random_budget_acc": 0.723
+  },
+  "accepted": false,
+  "artifact": "artifacts\\v11-s555.json"
+}
