@@ -95,17 +95,28 @@ class OrderGoalAgent(_Base):
 
 
 def _run_episode(agent, rng: random.Random, *, max_steps: int,
-                 unknown: set[int]) -> tuple[int, list[int]]:
+                 unknown: set[int]) -> tuple[int, list[int], list[float]]:
     goal_order: list[int] = []
+    goal_gaps: list[float] = []
     for step in range(max_steps):
         if agent.completed():
-            return step, goal_order
+            return step, goal_order, goal_gaps
         goal = agent.choose_goal()
         goal_order.append(goal)
+        goal_gaps.append(agent.gap(goal))
         for _ in range(EXAMPLES_PER_GOAL_STEP):
             identity = rng.randrange(N_IDENTITIES)
             agent.learn(goal, identity, domain_rule(goal, identity))
-    return max_steps, goal_order
+    return max_steps, goal_order, goal_gaps
+
+
+def _subgoal_gap_monotone(goal_gaps: list[float]) -> float:
+    """Block-4 subgoal-chain audit: the goal sequence should be a chain from
+    the largest gap to the smallest (gap-driven decomposition).  Fraction of
+    consecutive goal transitions whose gap does NOT increase (non-increasing)."""
+    if len(goal_gaps) < 2:
+        return 1.0
+    return sum(1 for i in range(1, len(goal_gaps)) if goal_gaps[i] <= goal_gaps[i - 1] + 1e-9) / (len(goal_gaps) - 1)
 
 
 def _first_goal_unknown(goal_order: list[int], unknown: set[int]) -> int:
@@ -119,6 +130,7 @@ class Result:
     steps_to_complete: float
     coverage: float  # fraction of episodes that completed all domains
     first_goal_unknown: float  # fraction of episodes whose first goal is a high-gap (unknown) domain
+    subgoal_monotone: float = 0.0  # Block-4 audit: fraction of goal transitions with non-increasing gap
 
 
 @dataclass
@@ -155,15 +167,17 @@ def run(*, device: str | torch.device | None = None, domains: int = 6,
     }
     results = []
     for name, factory in factories.items():
-        steps_list, completed, first_unknown = [], 0, 0
+        steps_list, completed, first_unknown, mono_list = [], 0, 0, []
         for _ in range(episodes):
             agent = factory()
-            steps, goal_order = _run_episode(agent, rng, max_steps=max_steps, unknown=unknown_domains)
+            steps, goal_order, goal_gaps = _run_episode(agent, rng, max_steps=max_steps, unknown=unknown_domains)
             steps_list.append(steps)
             completed += int(steps < max_steps)
             first_unknown += _first_goal_unknown(goal_order, unknown_domains)
+            mono_list.append(_subgoal_gap_monotone(goal_gaps))
         results.append(Result(name, float(np.mean(steps_list)), completed / episodes,
-                              first_unknown / episodes))
+                              first_unknown / episodes,
+                              float(np.mean(mono_list))))
 
     by_name = {r.name: r for r in results}
     accepted = (

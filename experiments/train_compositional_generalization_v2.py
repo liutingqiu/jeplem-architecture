@@ -118,6 +118,51 @@ class MonolithicGRU(nn.Module):
         return self.head(out)
 
 
+class CompositionalModel(nn.Module):
+    """Structural-composition model (Block-6 control): each operator is a
+    reusable learnable function (DUP: 1 child, REV: 2 children); a program is
+    parsed into a tree and encoded by recursive function application.  Any
+    UNSEEN nesting is then just a new combination of already-learned operator
+    functions -> compositional generalization, unlike the monolithic GRU."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.structural = True
+        self.atom = nn.Embedding(2, 16)
+        self.dup = nn.Sequential(nn.Linear(16, 16), nn.Tanh())
+        self.rev = nn.Sequential(nn.Linear(32, 16), nn.Tanh())
+        self.head = nn.Linear(16, MAX_OUT * len(ACTION_VOCAB))
+
+    def _split_top(self, body: str) -> tuple[str, str]:
+        depth = 0
+        for i, ch in enumerate(body):
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+            elif ch == "," and depth == 0:
+                return body[:i], body[i + 1:]
+        raise ValueError(body)
+
+    def _encode(self, prog: str) -> Tensor:
+        prog = prog.strip()
+        if prog in ("a", "b"):
+            idx = torch.tensor([0 if prog == "a" else 1], device=self.atom.weight.device)
+            return self.atom(idx)
+        if prog.startswith("DUP("):
+            return self.dup(self._encode(prog[4:-1]))
+        if prog.startswith("REV("):
+            left, right = self._split_top(prog[4:-1])
+            return self.rev(torch.cat([self._encode(left), self._encode(right)], dim=-1))
+        raise ValueError(prog)
+
+    def forward(self, programs: list[str]) -> Tensor:
+        roots = [self._encode(p) for p in programs]
+        x = torch.stack(roots)  # [B, 16]
+        out = self.head(x)  # [B, MAX_OUT*3]
+        return out.view(len(programs), MAX_OUT, len(ACTION_VOCAB))
+
+
 def _pad(seqs: list[list[int]], max_len: int, pad: int) -> Tensor:
     out = torch.full((len(seqs), max_len), pad, dtype=torch.long)
     for r, s in enumerate(seqs):
@@ -128,10 +173,20 @@ def _pad(seqs: list[list[int]], max_len: int, pad: int) -> Tensor:
 def _train(model: nn.Module, programs: list[str], device: torch.device, *, epochs: int = 800) -> None:
     optimizer = torch.optim.AdamW(model.parameters(), lr=5e-3)
     criterion = nn.CrossEntropyLoss(ignore_index=ACTION_VOCAB["<PAD>"])
-    xs = [_tokenize(p)[:MAX_TOKENS] for p in programs]
     ys = [[ACTION_VOCAB[c] for c in _eval_program(p)][:MAX_OUT] for p in programs]
-    xt = _pad(xs, MAX_TOKENS, VOCAB["<PAD>"]).to(device)
     yt = _pad(ys, MAX_OUT, ACTION_VOCAB["<PAD>"]).to(device)
+    if getattr(model, "structural", False):
+        # structural model: input is the program STRING (tree parsed internally)
+        for _ in range(epochs):
+            logits = model(programs)  # [B, MAX_OUT, 3]
+            loss = criterion(logits.permute(0, 2, 1), yt)
+            optimizer.zero_grad(set_to_none=True)
+            loss.backward()
+            optimizer.step()
+        model.eval()
+        return
+    xs = [_tokenize(p)[:MAX_TOKENS] for p in programs]
+    xt = _pad(xs, MAX_TOKENS, VOCAB["<PAD>"]).to(device)
     model.train()
     for _ in range(epochs):
         logits = model(xt)  # [B, T, 3]
@@ -144,6 +199,15 @@ def _train(model: nn.Module, programs: list[str], device: torch.device, *, epoch
 
 @torch.no_grad()
 def _accuracy(model: nn.Module, programs: list[str], device: torch.device) -> float:
+    if getattr(model, "structural", False):
+        logits = model(programs)
+        pred = logits.argmax(-1)
+        correct = 0
+        for r, p in enumerate(programs):
+            true_actions = [ACTION_VOCAB[c] for c in _eval_program(p)]
+            got = pred[r, : len(true_actions)].tolist()
+            correct += int(got == true_actions)
+        return correct / max(len(programs), 1)
     xs = _pad([_tokenize(p)[:MAX_TOKENS] for p in programs], MAX_TOKENS, VOCAB["<PAD>"]).to(device)
     logits = model(xs)
     pred = logits.argmax(-1)
@@ -182,15 +246,18 @@ def run(*, device: str | torch.device | None = None, experiment_seed: int = 41_1
     seen, unseen = _programs(experiment_seed)
 
     results = []
-    for name, factory in (("monolithic_gru", MonolithicGRU),):
+    for name, factory in (("monolithic_gru", MonolithicGRU), ("compositional", CompositionalModel)):
         model = factory().to(resolved)
         _train(model, seen, resolved)
         train_acc = _accuracy(model, seen, resolved)
         heldout = _accuracy(model, unseen, resolved)
         results.append(Result(name, train_acc, heldout))
 
-    r = results[0]
-    accepted = r.heldout_accuracy >= 0.8
+    by_name = {r.name: r for r in results}
+    accepted = (
+        by_name["compositional"].heldout_accuracy >= 0.8
+        and by_name["compositional"].heldout_accuracy >= by_name["monolithic_gru"].heldout_accuracy + 0.2
+    )
     target = artifact or ROOT / "artifacts" / "compositional-generalization-v2-report.json"
     target.parent.mkdir(exist_ok=True)
     report = Report(
