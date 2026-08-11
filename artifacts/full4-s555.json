@@ -1,0 +1,11 @@
+{
+  "protocol": "phase2_full_subject_v4: the runtime self-drive uses a REAL Bayesian belief (CategoricalBelief, Block-1) per identity (reliability 0.65 likelihood), replacing hand-written counts; RL agent carries the runtime through a random event stream. Criterion all >= 0.9.",
+  "seed": 555,
+  "results": {
+    "continuity_p1": 1.0,
+    "selfdrive_p2": 1.0,
+    "consistency_p5": 1.0
+  },
+  "accepted": true,
+  "artifact": "artifacts\\full4-s555.json"
+}
