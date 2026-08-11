@@ -1,0 +1,16 @@
+{
+  "protocol": "phase2_full_subject_v6: composite body task -- mid-stream identity flips create memory-vs-belief conflicts; meta-controller routes on body state; P4 flip detection, P1 retrievability, P5 idle stability. Criterion: routing >= 0.85, routed > best fixed, P4 >= 0.9, P1/P5 >= 0.9.",
+  "seed": 555,
+  "results": {
+    "routing_accuracy": 0.667,
+    "routed_answer_acc": 0.667,
+    "fixed_memory_acc": 0.5,
+    "fixed_belief_acc": 0.5,
+    "flip_detection_p4": 0.271,
+    "continuity_p1": 1.0,
+    "consistency_p5": 1.0,
+    "n_conflicts": 36
+  },
+  "accepted": false,
+  "artifact": "artifacts\\full6-s555.json"
+}
