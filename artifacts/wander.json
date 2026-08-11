@@ -1,0 +1,26 @@
+{
+  "protocol": "body_continuous_wander_v1: the body roams the real web indefinitely (full-modal sense_full + explore graph), checkpointed for crash-resume, status written for monitoring.",
+  "seed": 444,
+  "rounds_completed": 50,
+  "max_urls": 3000,
+  "status": {
+    "round": 50,
+    "tick": 17755,
+    "time_elapsed": 100.0,
+    "urls_sensed": 100,
+    "facts": 17755,
+    "graph_nodes": 79,
+    "graph_edges": 17676,
+    "modalities": {
+      "web-text": 79,
+      "web-link": 17676
+    },
+    "valence": 0.991,
+    "arousal": 0.75,
+    "trust_mean": 0.558,
+    "trust_min": 0.4,
+    "trust_max": 0.6,
+    "choice_log": 100
+  },
+  "artifact": "artifacts\\wander.json"
+}

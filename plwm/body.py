@@ -98,7 +98,7 @@ class BodyRunner:
         self._explored.add(url)
         from .web import WebFetchError
 
-        # 1. probe-based routing
+        # 1. probe-based routing (single fetch; slow/failed URLs cost one probe)
         try:
             content_type, _raw = self.backend.probe(url)
             modality = None
@@ -118,14 +118,12 @@ class BodyRunner:
                 if ok and ("text/html" in content_type or modality == "web-text"):
                     self.sense_one("web-link", url)
                 return {"url": url, "modality": modality, "ok": ok}
+            # content-type known but unsupported: one probe is enough, don't
+            # hammer the server with 6 more fetches
+            return {"url": url, "modality": None, "ok": False}
         except WebFetchError:
-            pass
-        # 2. fallback: try each sensor's magic-number validation in order
-        for modality in ("web-text", "web-json", "web-image", "web-link", "web-audio", "web-video"):
-            override = {"fact_value": url} if modality in ("web-text", "web-json") else None
-            if self.sense_one(modality, url, override=override):
-                return {"url": url, "modality": modality, "ok": True}
-        return {"url": url, "modality": None, "ok": False}
+            # probe itself failed (404/timeout/slow): record failure, move on
+            return {"url": url, "modality": None, "ok": False}
 
     def _track_source(self, modality: str, url: str, ok: bool) -> None:
         """来源可信度演化:成功升分,失败降分。"""
