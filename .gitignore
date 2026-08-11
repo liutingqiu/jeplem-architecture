@@ -13,3 +13,8 @@ artifacts/*.err.log
 artifacts/*.out.log
 artifacts/*.log
 .reasonix/
+
+# Runtime state files (live status / checkpoints, not reports)
+artifacts/*-status.json
+artifacts/*-checkpoint.json
+artifacts/STOP
