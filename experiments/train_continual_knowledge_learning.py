@@ -75,16 +75,32 @@ class BeliefConsolidationAgent:
 
 
 class NeuralControl(nn.Module):
-    """Standard continual-learning baseline: shared encoder + per-task heads,
-    trained sequentially (early tasks suffer shared-representation drift)."""
+    """Continual-learning baseline.
 
-    def __init__(self, rules: int = N_RULES) -> None:
+    v1 (default): shared encoder + per-task heads (modular decoupling, hard to
+    forget -- the 'no-forgetting' control).  v2 (shared_network=True, the
+    HARDER difficulty): rule enters a SINGLE shared network; sequential
+    training overwrites shared weights -> classic catastrophic forgetting
+    (Block-3 difficulty escalation, 2026-08-11)."""
+
+    def __init__(self, rules: int = N_RULES, identities: int = N_IDENTITIES,
+                 shared_network: bool = False) -> None:
         super().__init__()
         self.rules = rules
-        self.encoder = nn.Sequential(nn.Linear(N_IDENTITIES, 16), nn.ReLU())
-        self.heads = nn.ModuleList([nn.Linear(16, N_ACTIONS) for _ in range(rules)])
+        self.shared_network = shared_network
+        if shared_network:
+            self.net = nn.Sequential(
+                nn.Linear(identities + rules, 32), nn.ReLU(), nn.Linear(32, N_ACTIONS)
+            )
+        else:
+            self.encoder = nn.Sequential(nn.Linear(identities, 16), nn.ReLU())
+            self.heads = nn.ModuleList([nn.Linear(16, N_ACTIONS) for _ in range(rules)])
 
     def forward(self, identity: Tensor, rule: int) -> Tensor:
+        if self.shared_network:
+            rule_oh = torch.zeros(1, self.rules, device=identity.device)
+            rule_oh[0, rule] = 1.0
+            return self.net(torch.cat((identity, rule_oh), dim=-1))
         return self.heads[rule](self.encoder(identity))
 
 
@@ -109,7 +125,8 @@ class Report:
 
 def run(*, device: str | torch.device | None = None, rules: int = N_RULES,
         identities: int = N_IDENTITIES, examples_per_rule: int = EXAMPLES_PER_RULE,
-        experiment_seed: int = 41_123, artifact: Path | None = None) -> Report:
+        experiment_seed: int = 41_123, artifact: Path | None = None,
+        shared_network: bool = False) -> Report:
     resolved = resolve_device(device)
     torch.manual_seed(experiment_seed)
     np.random.seed(experiment_seed)
@@ -143,8 +160,8 @@ def run(*, device: str | torch.device | None = None, rules: int = N_RULES,
                       if shared.query(rule, identity) == rule_mapping(rule, identity))
         shared_acc.append(correct / identities)
 
-    # ---- control: sequential neural training with shared encoder ----
-    model = NeuralControl(rules).to(resolved)
+    # ---- control: sequential neural training (shared network = v2 difficulty) ----
+    model = NeuralControl(rules, identities, shared_network=shared_network).to(resolved)
     criterion = nn.CrossEntropyLoss()
     model.train()
     for rule in range(rules):
@@ -199,8 +216,10 @@ if __name__ == "__main__":
     parser.add_argument("--examples-per-rule", type=int, default=EXAMPLES_PER_RULE)
     parser.add_argument("--experiment-seed", type=int, default=41_123)
     parser.add_argument("--artifact", type=Path, default=None)
+    parser.add_argument("--shared-network", action="store_true", help="v2 difficulty: rule enters a single shared network (catastrophic forgetting baseline)")
     args = parser.parse_args()
     outcome = run(device=args.device, rules=args.rules, identities=args.identities,
                   examples_per_rule=args.examples_per_rule,
-                  experiment_seed=args.experiment_seed, artifact=args.artifact)
+                  experiment_seed=args.experiment_seed, artifact=args.artifact,
+                  shared_network=args.shared_network)
     print(json.dumps(asdict(outcome), indent=2))

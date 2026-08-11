@@ -123,7 +123,11 @@ class CompositionalModel(nn.Module):
     reusable learnable function (DUP: 1 child, REV: 2 children); a program is
     parsed into a tree and encoded by recursive function application.  Any
     UNSEEN nesting is then just a new combination of already-learned operator
-    functions -> compositional generalization, unlike the monolithic GRU."""
+    functions -> compositional generalization, unlike the monolithic GRU.
+
+    v2 (2026-08-11): AUTOREGRESSIVE decoder (GRUCell over the root encoding,
+    teacher-forced during training, greedy at eval) -- the v1 non-autoregressive
+    head could not adapt output length/structure to unseen nestings."""
 
     def __init__(self) -> None:
         super().__init__()
@@ -131,7 +135,10 @@ class CompositionalModel(nn.Module):
         self.atom = nn.Embedding(2, 16)
         self.dup = nn.Sequential(nn.Linear(16, 16), nn.Tanh())
         self.rev = nn.Sequential(nn.Linear(32, 16), nn.Tanh())
-        self.head = nn.Linear(16, MAX_OUT * len(ACTION_VOCAB))
+        self.init_h = nn.Linear(16, 32)
+        self.act_emb = nn.Embedding(len(ACTION_VOCAB), 16)
+        self.decoder = nn.GRUCell(16, 32)
+        self.head = nn.Linear(32, len(ACTION_VOCAB))
 
     def _split_top(self, body: str) -> tuple[str, str]:
         depth = 0
@@ -156,11 +163,20 @@ class CompositionalModel(nn.Module):
             return self.rev(torch.cat([self._encode(left), self._encode(right)], dim=-1))
         raise ValueError(prog)
 
-    def forward(self, programs: list[str]) -> Tensor:
-        roots = [self._encode(p) for p in programs]
-        x = torch.stack(roots)  # [B, 16]
-        out = self.head(x)  # [B, MAX_OUT*3]
-        return out.view(len(programs), MAX_OUT, len(ACTION_VOCAB))
+    def forward(self, programs: list[str], teacher: Tensor | None = None) -> Tensor:
+        roots = torch.stack([self._encode(p) for p in programs]).squeeze(1)  # [B, 16]
+        h = torch.tanh(self.init_h(roots))  # [B, 32]
+        inp = self.act_emb(torch.zeros(len(programs), dtype=torch.long, device=h.device))
+        outs: list[Tensor] = []
+        for t in range(MAX_OUT):
+            h = self.decoder(inp, h)
+            logits = self.head(h)
+            outs.append(logits)
+            if teacher is not None:
+                inp = self.act_emb(teacher[:, t])
+            else:
+                inp = self.act_emb(logits.argmax(-1))
+        return torch.stack(outs, dim=1)  # [B, MAX_OUT, 3]
 
 
 def _pad(seqs: list[list[int]], max_len: int, pad: int) -> Tensor:
@@ -176,9 +192,10 @@ def _train(model: nn.Module, programs: list[str], device: torch.device, *, epoch
     ys = [[ACTION_VOCAB[c] for c in _eval_program(p)][:MAX_OUT] for p in programs]
     yt = _pad(ys, MAX_OUT, ACTION_VOCAB["<PAD>"]).to(device)
     if getattr(model, "structural", False):
-        # structural model: input is the program STRING (tree parsed internally)
+        # structural model: input is the program STRING (tree parsed internally);
+        # autoregressive decoder, teacher-forced during training
         for _ in range(epochs):
-            logits = model(programs)  # [B, MAX_OUT, 3]
+            logits = model(programs, teacher=yt)  # [B, MAX_OUT, 3]
             loss = criterion(logits.permute(0, 2, 1), yt)
             optimizer.zero_grad(set_to_none=True)
             loss.backward()

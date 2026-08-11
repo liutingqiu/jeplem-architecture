@@ -1,0 +1,53 @@
+{
+  "protocol": "continual_knowledge_learning_v1: Block-3 minimal experiment. K rules presented in sequence; belief_consolidation accumulates Dirichlet confidence per (rule, identity) and freezes it in an auditable ledger once confident (later tasks cannot disturb it); belief_no_consolidation shares one belief across rules (no separation, pollution); neural_control is a sequential shared-encoder baseline. Criterion: consolidation retains all rules (mean >= 0.9) and beats no-consolidation by >= 0.3.",
+  "device": "cuda",
+  "rules": 8,
+  "identities": 3,
+  "examples_per_rule": 60,
+  "results": [
+    {
+      "name": "belief_consolidation",
+      "per_rule_accuracy": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean_accuracy": 1.0
+    },
+    {
+      "name": "belief_no_consolidation",
+      "per_rule_accuracy": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "mean_accuracy": 0.375
+    },
+    {
+      "name": "neural_control",
+      "per_rule_accuracy": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "mean_accuracy": 0.375
+    }
+  ],
+  "accepted": true,
+  "artifact": "artifacts\\b3v2-r8-s555.json"
+}
