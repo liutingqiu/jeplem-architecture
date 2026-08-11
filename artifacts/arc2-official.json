@@ -1,0 +1,27 @@
+{
+  "protocol": "arc2_official_v1: perception->rule-induction->apply on OFFICIAL ARC-AGI-2 (120 eval tasks). Measures template coverage on the adversarial benchmark. covered-accuracy vs random baseline.",
+  "seed": 41123,
+  "n_tasks": 120,
+  "results": {
+    "coverage": 0.0,
+    "covered_accuracy": 0.0,
+    "overall_accuracy": 0.0,
+    "random_baseline": 0.0,
+    "n_covered": 0,
+    "n_correct": 0
+  },
+  "uncovered_examples": [
+    "0934a4d8",
+    "135a2760",
+    "136b0064",
+    "13e47133",
+    "142ca369",
+    "16b78196",
+    "16de56c4",
+    "1818057f",
+    "195c6913",
+    "1ae2feb7"
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\arc2-official.json"
+}
