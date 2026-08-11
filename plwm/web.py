@@ -33,6 +33,7 @@ class WebResource:
     content_hash: str
     etag: str | None = None
     fetched_at: float = 0.0
+    html_raw: str | None = None
 
 
 class WebFetchBackend:
@@ -99,8 +100,9 @@ class WebFetchBackend:
 
     def fetch_text(self, url: str) -> WebResource:
         raw = self._open(url, "text/html,text/plain")
-        text = _strip_html(raw.decode("utf-8", errors="replace"))
-        return WebResource(url, "web-text", text, _sha256(text))
+        decoded = raw.decode("utf-8", errors="replace")
+        text = _strip_html(decoded)
+        return WebResource(url, "web-text", text, _sha256(text), html_raw=decoded)
 
     def fetch_image(self, url: str) -> WebResource:
         """拉取图片字节,校验 PNG 魔数。返回 WebResource(content=bytes)。"""

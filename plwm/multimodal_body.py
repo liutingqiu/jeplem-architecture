@@ -103,6 +103,7 @@ class MultimodalBody:
         fact_value: str | int | bool | None = None,
         confidence: float | None = None,
         skip_ledger: bool = False,
+        fact_key_override: str | None = None,
     ) -> RuntimeTick:
         """一次多模态观测。semantic 是该模态的预训练语义向量(非原始感官)。
 
@@ -132,7 +133,10 @@ class MultimodalBody:
             # fact presented in vision or text converges to the same ledger
             # key (Blueprint §3.3 "no bridging head"). Source stays the
             # modality, so ownership/audit is preserved.
-            fact_key = f"identity:{fact_value}"
+            if fact_key_override is not None:
+                fact_key = fact_key_override
+            else:
+                fact_key = f"identity:{fact_value}"
             if confidence is None:
                 if log_likelihood is None:
                     conf = 1.0

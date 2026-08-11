@@ -1,0 +1,80 @@
+{
+  "protocol": "knowledge_understanding_v1: StatementExtractor turns read HTML into readable knowledge statements (fact:{statement} keys). K1 Arm A has fact: keys; K2 extracted match ground truth; K3 Arm B (no extraction) zero fact: keys; K4 confidence reflects rule strength. Criterion: K1-K4 across 3 seeds.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "k1_fact_keys_avg": 7.0,
+    "k2_truth_match": 1.0,
+    "k3_control_fact_keys": 0.0,
+    "k4_strong_rules": 1
+  },
+  "arm_a": [
+    {
+      "fact_keys": 7,
+      "identity_keys": 2,
+      "match": 1.0,
+      "fact_key_list": [
+        "fact:Python is a programming language",
+        "fact:The sky is blue today.",
+        "fact:Water means a liquid.",
+        "fact:Temperature measures heat",
+        "fact:Dogs are loyal animals",
+        "fact:Music calms the mind",
+        "fact:Fire is hot."
+      ]
+    },
+    {
+      "fact_keys": 7,
+      "identity_keys": 2,
+      "match": 1.0,
+      "fact_key_list": [
+        "fact:Python is a programming language",
+        "fact:The sky is blue today.",
+        "fact:Water means a liquid.",
+        "fact:Temperature measures heat",
+        "fact:Dogs are loyal animals",
+        "fact:Music calms the mind",
+        "fact:Fire is hot."
+      ]
+    },
+    {
+      "fact_keys": 7,
+      "identity_keys": 2,
+      "match": 1.0,
+      "fact_key_list": [
+        "fact:Python is a programming language",
+        "fact:The sky is blue today.",
+        "fact:Water means a liquid.",
+        "fact:Temperature measures heat",
+        "fact:Dogs are loyal animals",
+        "fact:Music calms the mind",
+        "fact:Fire is hot."
+      ]
+    }
+  ],
+  "arm_b": [
+    {
+      "fact_keys": 0,
+      "identity_keys": 2,
+      "match": 0.0,
+      "fact_key_list": []
+    },
+    {
+      "fact_keys": 0,
+      "identity_keys": 2,
+      "match": 0.0,
+      "fact_key_list": []
+    },
+    {
+      "fact_keys": 0,
+      "identity_keys": 2,
+      "match": 0.0,
+      "fact_key_list": []
+    }
+  ],
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\knowledge-understanding.json"
+}

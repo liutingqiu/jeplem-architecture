@@ -121,16 +121,47 @@ class WebTextSensor:
 
     def __init__(self, backend: WebFetchBackend, body, space,
                  *, dim: int = DEFAULT_DIM, extractor: WebTextExtractor | None = None,
-                 confidence: bool = True) -> None:
+                 confidence: bool = True, statement_extractor=None,
+                 extract_statements: bool = True) -> None:
         self.backend = backend
         self.body = body
         self.space = space
         self.use_confidence = confidence
+        self.extract_statements = extract_statements
+        if statement_extractor is None and extract_statements:
+            from .statement_extractor import StatementExtractor
+            statement_extractor = StatementExtractor()
+        self.statement_extractor = statement_extractor
         extractor = extractor or WebTextExtractor()
         self.extractor = extractor
         encoder = ModalityEncoder(extractor.dim, dim=dim, state_dim=extractor.dim)
         if "web-text" not in self.space.encoders:
             self.space.register("web-text", encoder)
+
+    def _observe_statements(self, resource, semantic, url: str) -> int:
+        """提取网页知识陈述并写入账本 fact: 键。返回写入条数。"""
+        if (not self.extract_statements or self.statement_extractor is None
+                or resource.html_raw is None):
+            return 0
+        statements = self.statement_extractor.extract(resource.html_raw, url=url)
+        n = 0
+        for st in statements:
+            norm_key = re.sub(r"\s+", " ", st.statement).strip()[:120]
+            fact_key = f"fact:{norm_key}"
+            # statements are deterministic rule extractions (auditable), so
+            # they enter the ledger as strong facts; rule strength is kept in
+            # the payload for audit, not used to gate ledger acceptance.
+            self.body.observe(
+                "web-text",
+                semantic.squeeze(0),
+                payload={"url": resource.url, "hash": resource.content_hash,
+                         "rule": st.rule},
+                fact_value=st.statement,
+                fact_key_override=fact_key,
+                confidence=0.95,
+            )
+            n += 1
+        return n
 
     def sense(self, url: str, *, fact_value_override: str | None = None) -> bool:
         """fetch 一页 → 提取 → 进身体。返回是否成功进身体。
@@ -139,6 +170,7 @@ class WebTextSensor:
         None 沿用网页数字提取值(旧行为)。
         confidence=True 时:按内容丰富度给置信度(重读升高置信 → gap 下降
         → 驱动深化理解)。
+        extract_statements 时:从 HTML 提取可读知识陈述进账本 fact: 键。
         """
         try:
             resource = self.backend.fetch_text(url)
@@ -156,6 +188,7 @@ class WebTextSensor:
                 if record is not None:
                     prev_conf = float(record.confidence)
             confidence = max(prev_conf, self.extractor.confidence(resource.content))
+        self._observe_statements(resource, semantic, url)
         self.body.observe(
             "web-text",
             semantic.squeeze(0),
