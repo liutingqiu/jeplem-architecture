@@ -43,7 +43,7 @@ def _sample(rng: random.Random, n: int, task: int, mode: str) -> tuple[Tensor, T
     and label+2) -- distinguishable, answered confidently wrong.  OOD task B
     ('blur'): clean block + high noise (x3) -- different failure regime."""
     xs, ys, ts = [], [], []
-    id_noise = 0.3 if task == 0 else 1.2  # task 1 clearly harder
+    id_noise = 0.5 if task == 0 else 1.0  # task 1 harder but learnable
     for _ in range(n):
         label = rng.randrange(N_CLASSES)
         x = torch.zeros(N_FEAT)
@@ -61,17 +61,24 @@ def _sample(rng: random.Random, n: int, task: int, mode: str) -> tuple[Tensor, T
 
 
 class MultiTaskModel(nn.Module):
+    """Capability-model REGISTRY: one independent self_head PER task (decoupled,
+    the whitepaper P3 design), shared encoder + answer head."""
+
     def __init__(self) -> None:
         super().__init__()
         self.encoder = nn.Sequential(nn.Linear(N_FEAT, 32), nn.ReLU())
         self.answer_head = nn.Linear(32, N_CLASSES)
-        self.self_head = nn.Sequential(nn.Linear(32 + N_FEAT + TASKS, 32), nn.ReLU(), nn.Linear(32, 1))
+        self.self_heads = nn.ModuleList([
+            nn.Sequential(nn.Linear(32 + N_FEAT, 32), nn.ReLU(), nn.Linear(32, 1))
+            for _ in range(TASKS)
+        ])
 
     def forward(self, x: Tensor, task: Tensor) -> tuple[Tensor, Tensor]:
         h = self.encoder(x.float())
         logits = self.answer_head(h)
-        task_oh = torch.nn.functional.one_hot(task.long(), num_classes=TASKS).float()
-        conf = torch.sigmoid(self.self_head(torch.cat((h, x.float(), task_oh), dim=-1)))
+        confs = [torch.sigmoid(sh(torch.cat((h, x.float()), dim=-1))) for sh in self.self_heads]
+        confs_st = torch.stack(confs, dim=1)  # [B, TASKS, 1]
+        conf = confs_st[torch.arange(confs_st.shape[0], device=confs_st.device), task.long()]  # [B, 1]
         return logits, conf
 
 
@@ -107,14 +114,14 @@ def run(*, device: str | torch.device | None = None, n_train: int = 1200,
         loss.backward()
         opt.step()
     # phase 2: self_head on ID+OOD correctness of BOTH tasks
-    idA, yA, tA = _sample(rng, 400, 0, "id")
-    oodA, yoA, toA = _sample(rng, 400, 0, "double")
-    idB, yB, tB = _sample(rng, 400, 1, "id")
-    oodB, yoB, toB = _sample(rng, 400, 1, "blur")
+    idA, yA, tA = _sample(rng, 600, 0, "id")
+    oodA, yoA, toA = _sample(rng, 600, 0, "double")
+    idB, yB, tB = _sample(rng, 600, 1, "id")
+    oodB, yoB, toB = _sample(rng, 600, 1, "double")
     X2 = torch.cat((idA, oodA, idB, oodB)).to(resolved)
     T2 = torch.cat((tA, toA, tB, toB)).to(resolved)
     Y2 = torch.cat((yA, yoA, yB, yoB)).to(resolved)
-    opt2 = torch.optim.AdamW(model.self_head.parameters(), lr=3e-3)
+    opt2 = torch.optim.AdamW(model.self_heads.parameters(), lr=3e-3)
     for _ in range(250):
         logits, conf = model(X2, T2)
         with torch.no_grad():
