@@ -1,0 +1,12 @@
+{
+  "protocol": "phase2_body_v10_causality_v1: the body's event history (flip interventions vs observations) feeds the Block-5 CI test -- do(flip) predicts the value change (intervention error), naive marginal correlation is the confounded baseline. Criterion: do(flip) error <= 0.15 and corr error - do error >= 0.1.",
+  "seed": 666,
+  "results": {
+    "do_flip_error": 0.0,
+    "correlation_error": 0.833,
+    "p_change_given_flip": 1.0,
+    "p_change_overall": 0.167
+  },
+  "accepted": true,
+  "artifact": "artifacts\\v10-s666.json"
+}
