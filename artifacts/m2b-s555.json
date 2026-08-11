@@ -1,0 +1,12 @@
+{
+  "protocol": "phase2_m2b_p4_revision_v1: strong evidence (rule flip, >=3 consecutive failures) triggers an EVENT-LEVEL stale-mark on the rule; a single weak contradiction must NOT mark. Controls: no-detection agent. Criterion: flip-detection >= 0.9, weak stability >= 0.9, detection > no-detection.",
+  "seed": 555,
+  "episodes": 100,
+  "results": {
+    "flip_detection_rate": 1.0,
+    "weak_evidence_stability": 1.0,
+    "no_detection_rate": 0.0
+  },
+  "accepted": true,
+  "artifact": "artifacts\\m2b-s555.json"
+}
