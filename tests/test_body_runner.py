@@ -12,7 +12,7 @@ from plwm.web import JsonSchemaValidator, WebFetchBackend
 
 class _Handler(BaseHTTPRequestHandler):
     def do_GET(self):  # noqa: N802
-        if self.path == "/page":
+        if self.path in ("/page", "/a", "/b"):
             body = b"<html><body>The temperature is 23.</body></html>"
         elif self.path == "/api":
             body = json.dumps({"temperature": 23, "unit": "c", "city": "bj", "extra": 1}).encode()
@@ -123,6 +123,45 @@ class BodyRunnerTests(unittest.TestCase):
             runner.run_round([])  # idle
             d2 = runner.snapshot_digest()
         self.assertEqual(d1, d2)
+
+    def test_choose_targets_value_ordering(self):
+        runner = self._runner(6)
+        runner.whitelist = [
+            {"modality": "web-text", "url": "http://a.example", "value": 1.0},
+            {"modality": "web-text", "url": "http://b.example", "value": 10.0},
+        ]
+        chosen = runner.choose_targets(k=1)
+        # all unseen (gap 1.0), so value picks b first
+        self.assertEqual(chosen[0]["url"], "http://b.example")
+
+    def test_choose_targets_gap_first_after_perception(self):
+        runner = self._runner(7)
+        with LocalServer() as base:
+            url_a = f"{base}/a"
+            url_b = f"{base}/b"
+            runner.whitelist = [
+                {"modality": "web-text", "url": url_a, "value": 10.0,
+                 "override": {"fact_value": url_a}},
+                {"modality": "web-text", "url": url_b, "value": 1.0,
+                 "override": {"fact_value": url_b}},
+            ]
+            # perceive a (high value) once -> its gap drops
+            runner.run_round([{"modality": "web-text", "url": url_a,
+                               "override": {"fact_value": url_a}}])
+            # now b is unexplored (gap 1.0) and should be chosen over a
+            chosen = runner.choose_targets(k=1)
+        self.assertEqual(chosen[0]["url"], url_b)
+
+    def test_run_round_autonomous_default(self):
+        runner = self._runner(8)
+        runner.whitelist = [
+            {"modality": "web-text", "url": "http://x.example", "value": 1.0,
+             "override": {"fact_value": "http://x.example"}},
+        ]
+        # targets=None -> choose_targets (will try to fetch http://x.example,
+        # which fails, but the call itself works without crashing)
+        stats = runner.run_round()
+        self.assertEqual(stats["fail"], 1)
 
 
 if __name__ == "__main__":

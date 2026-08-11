@@ -1,0 +1,41 @@
+{
+  "protocol": "body_autonomy_v1: BodyRunner chooses next targets via value->gap->recency->trust layering (choose_targets, k=1 per round); random-choice control. A1 coverage >= 0.9; A2 first choices unseen high-gap; A3 top-value chosen first; A4 autonomous full-coverage rounds < random. Criterion: A1-A4 across 3 seeds.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "a1_coverage": 1.0,
+    "a2_all_unseen_first": 1.0,
+    "a3_top_value_first": 1.0,
+    "a4_auto_rounds": 5.0,
+    "a4_random_rounds": 10.7,
+    "random_coverage": 1.0
+  },
+  "per_seed_auto": [
+    {
+      "coverage": 1.0,
+      "top_first": 1,
+      "all_unseen_first": 1,
+      "n_choice_log": 12,
+      "rounds_to_full": 5
+    },
+    {
+      "coverage": 1.0,
+      "top_first": 1,
+      "all_unseen_first": 1,
+      "n_choice_log": 12,
+      "rounds_to_full": 5
+    },
+    {
+      "coverage": 1.0,
+      "top_first": 1,
+      "all_unseen_first": 1,
+      "n_choice_log": 12,
+      "rounds_to_full": 5
+    }
+  ],
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\body-autonomy.json"
+}

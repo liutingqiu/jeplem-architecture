@@ -10,6 +10,7 @@ emotion/effort/time_sense/trust/link_graph),供长时运行跨 checkpoint 存活
 from __future__ import annotations
 
 import json
+import math
 from typing import Any, Mapping, Sequence
 
 from .emotion import Effort, Emotion, TimeSense
@@ -42,6 +43,7 @@ class BodyRunner:
         struct_schema: Mapping[str, type] | None = None,
         social_subset: bool = False,
         struct_subset: bool = False,
+        whitelist: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
         self.body = body
         self.backend = backend
@@ -50,8 +52,10 @@ class BodyRunner:
         self.struct_schema = struct_schema or {"temperature": int, "unit": str, "city": str}
         self.social_subset = social_subset
         self.struct_subset = struct_subset
+        self.whitelist = list(whitelist) if whitelist else []
         self.sensors = self._build_sensors()
         self.round_stats: list[dict] = []
+        self.choice_log: list[dict] = []
 
     def _build_sensors(self) -> dict[str, object]:
         """组装全部 10 种感官(复用各 sensor 的 register 模式,幂等)。"""
@@ -86,8 +90,81 @@ class BodyRunner:
         source = f"{modality}:{url}"
         self.trust.report(source, correct=ok)
 
-    def run_round(self, targets: Sequence[Mapping[str, Any]]) -> dict:
-        """一轮感知:对每个 target(含 modality/url/可选 override)感知 + 演化。"""
+    def _candidate_signals(self, modality: str, url: str, value: float) -> dict:
+        """单个候选的驱力信号:gap / recency / value / trust。"""
+        key = f"identity:{url}"
+        record = self.body.ledger.current.get(key) if self.body.ledger is not None else None
+        if record is None:
+            gap, tick = 1.0, 0
+        else:
+            gap = 1.0 - float(record.confidence)
+            tick = int(record.tick)
+        if self.body.time_sense is not None and tick > 0:
+            recency = self.body.time_sense.recency(float(tick))
+        else:
+            elapsed = self.body.tick - tick
+            recency = math.exp(-elapsed / 20.0)
+        trust = self.trust.score(f"{modality}:{url}")
+        return {"modality": modality, "url": url, "value": float(value),
+                "gap": float(gap), "recency": float(recency), "trust": float(trust)}
+
+    def choose_targets(self, *, whitelist: Sequence[Mapping[str, Any]] | None = None,
+                       k: int | None = None) -> list[dict]:
+        """自主选择下一轮感知目标。
+
+        候选 = 白名单 ∪ ledger 已知事实。决策(v14 式分层):
+        score = (-value, gap, -recency, trust) 字典序 argmax——
+        价值选"哪个 URL",gap+recency 选"感知什么",trust 破平。
+        每候选记入 choice_log 审计。
+        """
+        wl = list(whitelist) if whitelist is not None else self.whitelist
+        candidates: list[dict] = []
+        seen: set[tuple[str, str]] = set()
+        for entry in wl:
+            modality = entry["modality"]
+            url = entry["url"]
+            seen.add((modality, url))
+            candidates.append(self._candidate_signals(modality, url, entry.get("value", 1.0)))
+        if self.body.ledger is not None:
+            for key in self.body.ledger.current:
+                if not key.startswith("identity:"):
+                    continue
+                url = key[len("identity:"):]
+                # find the modality that observed it (from observations)
+                modality = "web-text"
+                for obs in reversed(self.body.observations):
+                    if obs.fact_key == key:
+                        modality = obs.modality
+                        break
+                if (modality, url) in seen:
+                    continue
+                seen.add((modality, url))
+                candidates.append(self._candidate_signals(modality, url, 1.0))
+        # layered ranking: unexplored (high gap) first -- the body is curious
+        # about the unknown; within same gap, higher value; then older
+        # (low recency); trust breaks ties.  This keeps value as a preference
+        # while allowing exploration to move past already-perceived facts.
+        ranked = sorted(candidates, key=lambda c: (-c["gap"], -c["value"], c["recency"], -c["trust"]))
+        chosen = ranked if k is None else ranked[:k]
+        override_by: dict[tuple[str, str], dict] = {
+            (e["modality"], e["url"]): e.get("override") or {}
+            for e in wl if e.get("override")
+        }
+        for c in chosen:
+            self.choice_log.append({**c, "round": len(self.round_stats)})
+        return [{"modality": c["modality"], "url": c["url"],
+                 "value": c["value"],
+                 "override": override_by.get((c["modality"], c["url"]))}
+                for c in chosen]
+
+    def run_round(self, targets: Sequence[Mapping[str, Any]] | None = None) -> dict:
+        """一轮感知:对每个 target(含 modality/url/可选 override)感知 + 演化。
+
+        targets=None 时自主选择(self.choose_targets)。显式传 targets 保持
+        旧行为(向后兼容)。
+        """
+        if targets is None:
+            targets = self.choose_targets()
         stats = {"round": len(self.round_stats), "ok": 0, "fail": 0}
         for target in targets:
             modality = target["modality"]
