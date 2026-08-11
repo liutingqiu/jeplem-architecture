@@ -1,5 +1,5 @@
 {
-  "protocol": "sense_web_link_v1: real HTML with 3 <a> links -> WebLinkSensor -> LinkGraph edges + unified semantic space -> body ledger. C1 graph correctness (edges/neighbors/has_edge/anchor); C2 observe accepted; C3 ledger identity keys. Criterion: C1-C3 per seed.",
+  "protocol": "sense_web_link_v1: real HTML with 3 <a> links -> WebLinkSensor -> LinkGraph edges (links live in the graph, NOT the ledger under content-priority). C1 graph correctness (edges/neighbors/has_edge/anchor); C2 observe accepted; C3 no link keys in ledger. Criterion: C1-C3 per seed.",
   "seeds": [
     444,
     555,

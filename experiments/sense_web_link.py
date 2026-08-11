@@ -91,12 +91,12 @@ def run(*, seeds: tuple[int, ...] = (444, 555, 666),
         anchor = graph.anchor_of(page_url, target_a) == "Page A"
         # C2: accepted
         accepted = all(o.accepted for o in body.observations) if body.observations else False
-        # C3: ledger keys
-        edge_keys = [k for k in ledger.current if k.startswith("identity:")]
-        ledger_hit = len(edge_keys) == 3
+        # C3: content-priority -- links live in the graph, NOT the ledger
+        link_keys = [k for k in ledger.current if "->" in k]
+        no_ledger_links = len(link_keys) == 0
         results.append({
             "seed": seed, "ok": ok, "all_edges": all_edges, "neighbor_hit": neighbor_hit,
-            "has_edge": has_edge, "anchor": anchor, "accepted": accepted, "ledger_hit": ledger_hit,
+            "has_edge": has_edge, "anchor": anchor, "accepted": accepted, "ledger_hit": no_ledger_links,
         })
 
     ok = float(sum(r["ok"] for r in results)) / len(results)
@@ -111,7 +111,7 @@ def run(*, seeds: tuple[int, ...] = (444, 555, 666),
     c3 = ledger_hit >= 1.0
     accepted_verdict = c1 and c2 and c3
     report = {
-        "protocol": "sense_web_link_v1: real HTML with 3 <a> links -> WebLinkSensor -> LinkGraph edges + unified semantic space -> body ledger. C1 graph correctness (edges/neighbors/has_edge/anchor); C2 observe accepted; C3 ledger identity keys. Criterion: C1-C3 per seed.",
+        "protocol": "sense_web_link_v1: real HTML with 3 <a> links -> WebLinkSensor -> LinkGraph edges (links live in the graph, NOT the ledger under content-priority). C1 graph correctness (edges/neighbors/has_edge/anchor); C2 observe accepted; C3 no link keys in ledger. Criterion: C1-C3 per seed.",
         "seeds": list(seeds),
         "results": {
             "fetched": round(ok, 3),

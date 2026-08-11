@@ -1,0 +1,64 @@
+{
+  "protocol": "content_priority_v1: content-priority defaults (links only in graph, content confidence, filter link keys) fix the connect-vs-read bias. P1 no link keys in ledger + graph grows; P2 content facts > link facts; P3 rich-page confidence > thin; P4 control writes link facts, fixed writes none. Criterion: P1-P4 across 3 seeds.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "p1_link_facts_in_ledger": 0.0,
+    "p1_graph_edges": 10.0,
+    "p2_content_facts": 11.0,
+    "p3_rich_conf": 0.984,
+    "p3_thin_conf": 0.95,
+    "p4_control_link_facts": 10.0
+  },
+  "fixed": [
+    {
+      "link_facts": 0,
+      "content_facts": 11,
+      "graph_edges": 10,
+      "rich_conf": 0.9843666666666666,
+      "thin_conf": 0.9504499999999998
+    },
+    {
+      "link_facts": 0,
+      "content_facts": 11,
+      "graph_edges": 10,
+      "rich_conf": 0.9843666666666666,
+      "thin_conf": 0.9504499999999998
+    },
+    {
+      "link_facts": 0,
+      "content_facts": 11,
+      "graph_edges": 10,
+      "rich_conf": 0.9843666666666666,
+      "thin_conf": 0.9504499999999998
+    }
+  ],
+  "control": [
+    {
+      "link_facts": 10,
+      "content_facts": 13,
+      "graph_edges": 10,
+      "rich_conf": 1.0,
+      "thin_conf": 1.0
+    },
+    {
+      "link_facts": 10,
+      "content_facts": 13,
+      "graph_edges": 10,
+      "rich_conf": 1.0,
+      "thin_conf": 1.0
+    },
+    {
+      "link_facts": 10,
+      "content_facts": 13,
+      "graph_edges": 10,
+      "rich_conf": 1.0,
+      "thin_conf": 1.0
+    }
+  ],
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\content-priority.json"
+}

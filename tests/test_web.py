@@ -106,9 +106,22 @@ class WebTextExtractorTests(unittest.TestCase):
     def test_extracts_number_feature(self):
         extractor = WebTextExtractor(keywords=["temperature"])
         vec = extractor.extract("The temperature is 23 degrees.")
-        self.assertEqual(vec.shape[1], 2)  # 1 number + 1 keyword
+        self.assertEqual(vec.shape[1], 9)  # 1 number + 1 keyword + 7 rich
         self.assertEqual(float(vec[0, 0]), 1.0)  # has number
         self.assertEqual(float(vec[0, 1]), 1.0)  # has "temperature"
+
+    def test_rich_false_matches_legacy(self):
+        extractor = WebTextExtractor(keywords=["temperature"], rich=False)
+        vec = extractor.extract("The temperature is 23 degrees.")
+        self.assertEqual(vec.shape[1], 2)  # legacy: 1 number + 1 keyword
+
+    def test_richness_reflects_content(self):
+        extractor = WebTextExtractor()
+        rich = extractor.richness("A long page with many sentences. Here is more content. And another.")
+        thin = extractor.richness("ok")
+        self.assertGreater(rich, thin)
+        self.assertGreater(extractor.confidence("A long page with many sentences. Here is more."),
+                           extractor.confidence("ok"))
 
     def test_extract_value_gets_number(self):
         extractor = WebTextExtractor()

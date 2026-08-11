@@ -34,27 +34,67 @@ def _number_features(values: Mapping[str, Any], keys: list[str]) -> list[float]:
 
 
 class WebTextExtractor:
-    """把网页文本降为 N 维事实特征向量(标题/数字/关键词 one-hot)。
+    """把网页文本降为 N 维事实特征向量。
 
     这是一个极简、声明式、可审计的提取器——不是"理解"网页,而是提取
-    可验证的事实信号(数字、已知关键词),供身体经统一语义空间使用。
+    可验证的事实信号。rich=True 时在旧前缀([has_number]+[keyword*K])后
+    追加丰富度特征(词/字符/句/数字饱和度、标点多样性、字符熵、URL 长
+    度),让"读内容"不是退化信号;rich=False 完全复刻旧向量(控制组)。
     """
 
-    def __init__(self, keywords: list[str] | None = None) -> None:
+    def __init__(self, keywords: list[str] | None = None, *, rich: bool = True) -> None:
         self.keywords = keywords or ["temperature", "price", "score", "level"]
-        self._word_index: dict[str, int] = {w: i for i, w in enumerate(self.keywords)}
+        self.rich = rich
 
-    def extract(self, text: str) -> Tensor:
-        """文本 → [1 + 数字桶 + len(keywords)] 维 one-hot 特征。"""
+    def _rich_features(self, text: str, url: str | None = None) -> list[float]:
+        words = [w for w in text.split() if w.strip()]
+        chars = len(text)
+        sentences = max(1, len(re.findall(r"[.!?。！？]", text)) + (1 if text.strip() else 0))
+        numbers = re.findall(r"-?\d+(?:\.\d+)?", text)
+        word_sat = min(1.0, len(words) / 200.0)
+        char_sat = min(1.0, chars / 2000.0)
+        sent_sat = min(1.0, sentences / 20.0)
+        num_sat = min(1.0, len(numbers) / 20.0)
+        punct = len(re.findall(r"[.,;:!?。，；：！？]", text))
+        punct_div = min(1.0, punct / 40.0)
+        # normalized character entropy (diversity)
+        from collections import Counter
+        import math
+        counts = Counter(text.lower())
+        total = max(1, len(text))
+        entropy = -sum((c / total) * math.log(c / total) for c in counts.values())
+        entropy_norm = min(1.0, entropy / 4.0)
+        url_len = min(1.0, len(url or "") / 100.0)
+        return [word_sat, char_sat, sent_sat, num_sat, punct_div, entropy_norm, url_len]
+
+    def extract(self, text: str, *, url: str | None = None) -> Tensor:
+        """文本 → 特征向量。rich 时前缀保序 + 追加丰富度特征。"""
         lowered = text.lower()
         numbers = [float(m) for m in re.findall(r"-?\d+(?:\.\d+)?", text)]
         number_feature = 1.0 if numbers else 0.0
         keyword_feature = [1.0 if word in lowered else 0.0 for word in self.keywords]
-        return torch.tensor([[number_feature] + keyword_feature], dtype=torch.float32)
+        prefix = [number_feature] + keyword_feature
+        if self.rich:
+            return torch.tensor([prefix + self._rich_features(text, url)], dtype=torch.float32)
+        return torch.tensor([prefix], dtype=torch.float32)
+
+    def richness(self, text: str) -> float:
+        """文本丰富度 [0,1]:词/句/字符/数字饱和度的均值。"""
+        words = [w for w in text.split() if w.strip()]
+        sentences = min(1.0, len(re.findall(r"[.!?。！？]", text)) / 10.0)
+        return min(1.0, (min(1.0, len(words) / 100.0) + sentences + min(1.0, len(text) / 1000.0)) / 3.0)
+
+    def confidence(self, text: str) -> float:
+        """按内容丰富度给感知置信度。
+
+        首次感知总能记入账本(0.95 起),丰富度提高置信(重读升高置信 →
+        gap 下降 → 驱动深化理解)。richness 低只影响"多深",不影响"记不记"。
+        """
+        return min(1.0, 0.95 + 0.05 * self.richness(text))
 
     @property
     def dim(self) -> int:
-        return 1 + len(self.keywords)
+        return 1 + len(self.keywords) + (7 if self.rich else 0)
 
     def extract_value(self, text: str) -> str | None:
         """提取网页中的数字作为事实值(如 'temperature is 23' -> '23')。"""
@@ -80,10 +120,12 @@ class WebTextSensor:
     """文本感官:真实网页 → 事实特征 → 统一语义空间 → 身体。"""
 
     def __init__(self, backend: WebFetchBackend, body, space,
-                 *, dim: int = DEFAULT_DIM, extractor: WebTextExtractor | None = None) -> None:
+                 *, dim: int = DEFAULT_DIM, extractor: WebTextExtractor | None = None,
+                 confidence: bool = True) -> None:
         self.backend = backend
         self.body = body
         self.space = space
+        self.use_confidence = confidence
         extractor = extractor or WebTextExtractor()
         self.extractor = extractor
         encoder = ModalityEncoder(extractor.dim, dim=dim, state_dim=extractor.dim)
@@ -95,18 +137,31 @@ class WebTextSensor:
 
         fact_value_override:跨模态汇聚时强制用同一事实键(如 URL),默认
         None 沿用网页数字提取值(旧行为)。
+        confidence=True 时:按内容丰富度给置信度(重读升高置信 → gap 下降
+        → 驱动深化理解)。
         """
         try:
             resource = self.backend.fetch_text(url)
         except WebFetchError:
             return False
-        semantic = self.extractor.extract(resource.content)
+        semantic = self.extractor.extract(resource.content, url=url)
         fact_value = fact_value_override or self.extractor.extract_value(resource.content)
+        confidence = None
+        if self.use_confidence:
+            # max with any previous confidence so re-reading deepens (rises
+            # confidence, lowers gap) instead of being treated as fresh
+            prev_conf = 0.0
+            if self.body.ledger is not None:
+                record = self.body.ledger.current.get(f"identity:{fact_value}")
+                if record is not None:
+                    prev_conf = float(record.confidence)
+            confidence = max(prev_conf, self.extractor.confidence(resource.content))
         self.body.observe(
             "web-text",
             semantic.squeeze(0),
             payload={"url": resource.url, "hash": resource.content_hash},
             fact_value=fact_value,
+            confidence=confidence,
         )
         return True
 
@@ -192,17 +247,20 @@ class WebImageSensor:
 class WebLinkSensor:
     """超链接感官:真实 HTML → (source->target) 边入 LinkGraph + 进身体。
 
-    fact_value = f"{source}->{target}",账本键 identity:{source}->{target}。
+    fact_value = f"{source}->{target}"。write_ledger=False(默认,内容优先)
+    时边只进 LinkGraph、账本零链接键(skip_ledger);write_ledger=True 保留
+    旧行为(链接也写账本)。
     """
 
     def __init__(self, backend: WebFetchBackend, body, space, graph,
-                 *, dim: int = DEFAULT_DIM) -> None:
+                 *, dim: int = DEFAULT_DIM, write_ledger: bool = False) -> None:
         from .link_graph import LinkGraph
 
         self.backend = backend
         self.body = body
         self.space = space
         self.graph = graph
+        self.write_ledger = write_ledger
         # 1 (has-link) + 2 buckets for url length / anchor length
         encoder = ModalityEncoder(3, dim=dim, state_dim=3)
         if "web-link" not in self.space.encoders:
@@ -225,6 +283,7 @@ class WebLinkSensor:
                 semantic.squeeze(0),
                 payload={"source": url, "target": target, "anchor": anchor},
                 fact_value=f"{url}->{target}",
+                skip_ledger=not self.write_ledger,
             )
         return bool(links)
 

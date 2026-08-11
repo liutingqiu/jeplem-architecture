@@ -12,8 +12,10 @@ from plwm.web import JsonSchemaValidator, WebFetchBackend
 
 class _Handler(BaseHTTPRequestHandler):
     def do_GET(self):  # noqa: N802
-        if self.path in ("/page", "/a", "/b"):
+        if self.path in ("/page", "/b"):
             body = b"<html><body>The temperature is 23.</body></html>"
+        elif self.path == "/a":
+            body = b"<html><body>The temperature is 23 degrees Celsius today. It is warm and sunny. There are 5 reports total.</body></html>"
         elif self.path == "/page_with_link":
             body = b'<html><body>temp <a href="/other">x</a></body></html>'
         elif self.path == "/other":

@@ -45,6 +45,9 @@ class BodyRunner:
         struct_subset: bool = False,
         whitelist: Sequence[Mapping[str, Any]] | None = None,
         max_urls: int = 1000,
+        link_skip_ledger: bool = True,
+        content_confidence: bool = True,
+        filter_link_keys: bool = True,
     ) -> None:
         self.body = body
         self.backend = backend
@@ -55,6 +58,9 @@ class BodyRunner:
         self.struct_subset = struct_subset
         self.whitelist = list(whitelist) if whitelist else []
         self.max_urls = max_urls
+        self.link_skip_ledger = link_skip_ledger
+        self.content_confidence = content_confidence
+        self.filter_link_keys = filter_link_keys
         self.sensors = self._build_sensors()
         self.round_stats: list[dict] = []
         self.choice_log: list[dict] = []
@@ -64,13 +70,14 @@ class BodyRunner:
         """组装全部 10 种感官(复用各 sensor 的 register 模式,幂等)。"""
         body, backend, space = self.body, self.backend, self.body.space
         return {
-            "web-text": WebTextSensor(backend, body, space),
+            "web-text": WebTextSensor(backend, body, space, confidence=self.content_confidence),
             "web-json": WebStructSensor(backend, body, space,
                                         schema_name="weather",
                                         schema_fields=self.struct_schema,
                                         subset=self.struct_subset),
             "web-image": WebImageSensor(backend, body, space),
-            "web-link": WebLinkSensor(backend, body, space, self.link_graph),
+            "web-link": WebLinkSensor(backend, body, space, self.link_graph,
+                                      write_ledger=not self.link_skip_ledger),
             "web-audio": WebAudioSensor(backend, body, space),
             "web-social": WebSocialSensor(backend, body, space, subset=self.social_subset),
             "web-video": WebVideoSensor(backend, body, space),
@@ -169,6 +176,10 @@ class BodyRunner:
                 if not key.startswith("identity:"):
                     continue
                 url = key[len("identity:"):]
+                # content-priority: link facts (source->target) are not content
+                # candidates; only pure-URL content facts drive re-reading.
+                if self.filter_link_keys and "->" in url:
+                    continue
                 # find the modality that observed it (from observations)
                 modality = "web-text"
                 for obs in reversed(self.body.observations):
