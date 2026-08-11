@@ -1,0 +1,15 @@
+{
+  "protocol": "phase2_p3_v2_tasklevel_selfknowledge_v1: per-task capability registry (shared encoder, independent per-task cap heads) predicts EACH task's overall correctness on fresh ID+OOD; task0 easy (noise 0.5), task1 hard (noise 1.0). Criterion: per-task |pred-actual| <= 0.1, registry orders tasks correctly (easy > hard), registry error <= naive-uniform error - 0.15.",
+  "seed": 555,
+  "results": {
+    "task0_actual": 0.733,
+    "task0_predicted": 0.747,
+    "task1_actual": 0.746,
+    "task1_predicted": 0.743,
+    "max_abs_err": 0.014,
+    "registry_err": 0.017,
+    "naive_err": 0.478
+  },
+  "accepted": true,
+  "artifact": "artifacts\\p3v2-s555.json"
+}
