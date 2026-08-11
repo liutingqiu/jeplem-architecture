@@ -1,0 +1,13 @@
+{
+  "protocol": "phase2_m6a_integrated_stream_v1: ONE continuous runtime runs [learn rule0, idle, gap-goal pick, learn goal, flip, revision-mark, idle]; snapshot chain throughout. Criterion (all >= 0.9): continuity (P1, unflipped facts retrievable), self-drive (P2, goal = max-gap domain), revision (P4, flipped rule marked), consistency (P5, idle snapshots unchanged).",
+  "seed": 555,
+  "episodes": 30,
+  "results": {
+    "continuity_p1": 1.0,
+    "selfdrive_p2": 1.0,
+    "revision_p4": 1.0,
+    "consistency_p5": 1.0
+  },
+  "accepted": true,
+  "artifact": "artifacts\\m6a-deep-s555.json"
+}

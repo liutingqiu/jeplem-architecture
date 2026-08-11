@@ -1,0 +1,11 @@
+{
+  "protocol": "phase2_full_subject_v1: RL-trained JEPLM agent (perception+slot memory+policy) carries the subjectivity runtime (ledger+snapshot chain+gap goals) through EvidenceSeek episodes; verdicts: P1 observed facts retrievable at end, P2 gap goals point at max-gap identity, P5 idle snapshots unchanged. Criterion all >= 0.9.",
+  "seed": 444,
+  "results": {
+    "continuity_p1": 0.583,
+    "selfdrive_p2": 1.0,
+    "consistency_p5": 1.0
+  },
+  "accepted": false,
+  "artifact": "artifacts\\full-deep-s444.json"
+}
