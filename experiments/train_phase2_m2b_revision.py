@@ -44,32 +44,30 @@ class DetectingRuntime:
         self.detect = detect
         self.belief: dict[tuple[int, int], list[float]] = {}
         self.marked: set[int] = set()  # rules flagged as stale (event-level)
+        self.revision_window: dict[int, list[int]] = {}
 
     def observe(self, rule: int, identity: int, action: int) -> bool:
         entry = self.belief.setdefault((rule, identity), [1.0] * N_ACTIONS)
         predicted = int(np.argmax(entry))
         entry[action] += 1.0
+        # AUTONOMOUS detection via window-majority (probe-verified): mark a
+        # rule when >=3 of the last 4 observations of it contradict argmax.
+        w = self.revision_window.setdefault(rule, [])
+        w.append(int(predicted != action))
+        if len(w) > 4:
+            w.pop(0)
+        if sum(w) >= 3:
+            self.mark_stale(rule)
         return int(predicted == action)
 
     def mark_stale(self, rule: int) -> None:
         self.marked.add(rule)
 
     def check_strong(self, rule: int, identity: int, flipped: bool, rng: random.Random) -> None:
-        """Feed strong flip evidence; mark the rule once >= threshold failures."""
-        if not self.detect:
-            for _ in range(FLIP_THRESHOLD):
-                self.observe(rule, identity, mapping(rule, identity, flipped))
-            return
-        failures = 0
+        """Observe the flipped truth a few times; the WINDOW detects it if the
+        rule really changed (no scripted threshold forcing)."""
         for _ in range(FLIP_THRESHOLD + 2):
-            ok = self.observe(rule, identity, mapping(rule, identity, flipped))
-            if not ok:
-                failures += 1
-                if failures >= FLIP_THRESHOLD:
-                    self.mark_stale(rule)  # one-shot event-level mark
-                    return
-            else:
-                failures = 0
+            self.observe(rule, identity, mapping(rule, identity, flipped))
 
     def check_weak(self, rule: int, identity: int) -> None:
         """Feed ONE noisy contradiction: must NOT mark (weak evidence stays)."""
@@ -96,28 +94,29 @@ def run(*, episodes: int = 100, experiment_seed: int = 41_123,
         rt.check_weak(1, 0)
         detect_rate.append(int(0 in rt.marked and 1 not in rt.marked))
         weak_stab.append(int(1 not in rt.marked))
-        # no-revision control
-        rt2 = DetectingRuntime(seed=experiment_seed, detect=False)
+        # FALSE-POSITIVE control: a detect agent with NO flip must NOT mark --
+        # this replaced the old no-detection control which was a guaranteed
+        # loser (detect=False never marks, so `dr > nr` was always 1.0 > 0.0).
+        rt2 = DetectingRuntime(seed=experiment_seed, detect=True)
         for rule in (0, 1):
             for identity in range(N_IDENTITIES):
                 for _ in range(5):
                     rt2.observe(rule, identity, mapping(rule, identity))
-        rt2.check_strong(0, 0, flipped=True, rng=rng)
-        rt2.check_weak(1, 0)
-        none_rate.append(int(0 in rt2.marked))  # never marks (0)
+        rt2.check_weak(0, 0)  # single weak contradiction, no real flip
+        none_rate.append(int(0 in rt2.marked or 1 in rt2.marked))  # false positive
 
     dr = float(np.mean(detect_rate))
     ws = float(np.mean(weak_stab))
-    nr = float(np.mean(none_rate))
-    accepted = dr >= 0.9 and ws >= 0.9 and dr > nr
+    fp = float(np.mean(none_rate))
+    accepted = dr >= 0.9 and ws >= 0.9 and fp <= 0.1
     report = {
-        "protocol": "phase2_m2b_p4_revision_v1: strong evidence (rule flip, >=3 consecutive failures) triggers an EVENT-LEVEL stale-mark on the rule; a single weak contradiction must NOT mark. Controls: no-detection agent. Criterion: flip-detection >= 0.9, weak stability >= 0.9, detection > no-detection.",
+        "protocol": "phase2_m2b_p4_revision_v1: strong evidence (rule flip) triggers an EVENT-LEVEL stale-mark via window-majority autonomous detection; a single weak contradiction must NOT mark. Controls: false-positive agent (detect, no flip). Criterion: flip-detection >= 0.9, weak stability >= 0.9, false-positive <= 0.1.",
         "seed": experiment_seed,
         "episodes": episodes,
         "results": {
             "flip_detection_rate": round(dr, 3),
             "weak_evidence_stability": round(ws, 3),
-            "no_detection_rate": round(nr, 3),
+            "false_positive_rate": round(fp, 3),
         },
         "accepted": accepted,
         "artifact": str(artifact or ROOT / "artifacts" / "phase2-m2b-revision.json"),

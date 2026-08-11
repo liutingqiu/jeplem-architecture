@@ -1,0 +1,12 @@
+{
+  "protocol": "phase2_m2b_p4_revision_v1: strong evidence (rule flip) triggers an EVENT-LEVEL stale-mark via window-majority autonomous detection; a single weak contradiction must NOT mark. Controls: false-positive agent (detect, no flip). Criterion: flip-detection >= 0.9, weak stability >= 0.9, false-positive <= 0.1.",
+  "seed": 444,
+  "episodes": 100,
+  "results": {
+    "flip_detection_rate": 1.0,
+    "weak_evidence_stability": 1.0,
+    "false_positive_rate": 0.0
+  },
+  "accepted": true,
+  "artifact": "artifacts\\m2b-deep-s444.json"
+}

@@ -94,7 +94,9 @@ class IntegratedBody:
                 self.failures[key] = 0
         else:
             self.failures[key] = 0
-        self.chain.append({"event": "observe", "snapshot": self.snapshot_digest()})
+        self.chain.append({"event": "observe", "write_key": f"d{domain}_s{state}",
+                           "write_value": int(value),
+                           "snapshot": self.snapshot_digest()})
 
     def idle(self) -> None:
         self.chain.append({"event": "idle", "snapshot": self.snapshot_digest()})
@@ -198,12 +200,29 @@ def run(*, steps: int = 600, experiment_seed: int = 41_123,
             body.idle()
 
     # verdicts
-    p1 = float(np.mean([1.0 if body.query(d, s) is not None else 0.0
-                        for (d, s) in observed_keys])) if observed_keys else 1.0
-    p5 = all(
-        ch["event"] != "idle" or ch["snapshot"] == prev["snapshot"]
-        for ch, prev in zip(body.chain[1:], body.chain)
-    )
+    # P1 continuity: NOT "ledger entry exists" (append-only, tautologically true).
+    # Measure whether UNFLIPPED (domain, state) facts still hold their TRUE value
+    # after the whole stream -- continuity across interference/flips, checked
+    # against the external truth (not against the ledger's own record).
+    p1_list = []
+    for (d, s) in observed_keys:
+        if d == flipped_domain:
+            continue  # flipped domain's value changed; that is revision's job
+        truth_val = truth[(d, s)]
+        rec_val = body.query(d, s)
+        p1_list.append(1.0 if rec_val is not None and rec_val == truth_val else 0.0)
+    p1 = float(np.mean(p1_list)) if p1_list else 0.0
+    # P5 consistency: NOT "idle leaves snapshot unchanged" (tautological -- idle
+    # never writes).  Measure that every OBSERVE event's snapshot reflects the
+    # fact just written (correct attribution): the snapshot after an observe of
+    # (d, s) must contain "('d{d}_s{s}', '{value}')".
+    p5_list = []
+    for ev in body.chain:
+        if ev["event"] != "observe":
+            continue
+        expected = f"('{ev['write_key']}', '{ev['write_value']}')"
+        p5_list.append(1.0 if expected in ev["snapshot"] else 0.0)
+    p5 = float(np.mean(p5_list)) if p5_list else 0.0
     value_rate = value_ok / value_n
     gap_rate = gap_ok / gap_n
     pred_acc = pred_c / pred_t

@@ -1,0 +1,11 @@
+{
+  "protocol": "phase2_body_v13_social_v1: the body learns a model of ANOTHER agent's behavior (Block-11) from observation and predicts its next action; control = marginal-frequency baseline. Criterion: model >= marginal + 0.1 and >= 0.6.",
+  "seed": 555,
+  "results": {
+    "model_accuracy": 0.67,
+    "marginal_baseline": 0.667,
+    "learned_pref_matches": 1.0
+  },
+  "accepted": false,
+  "artifact": "artifacts\\v13-deep-s555.json"
+}

@@ -44,14 +44,19 @@ def run(*, episodes: int = 300, experiment_seed: int = 41_123,
         for a in history:
             learned_counts[a] += 1
         next_action = int(np.random.choice(N_ACTIONS, p=other_pref))
-        # body model: learned preference (counts over history)
+        # body model: learned preference (counts over ALL history -- has memory)
         learned = learned_counts / learned_counts.sum()
         pred_model = int(learned.argmax())
         model_correct += int(pred_model == next_action)
         model_total += 1
-        # marginal baseline: NO model -- uniform random prediction (1/N);
-        # Block-11's control is an edge/marginal statistic without a model
-        pred_marg = rng.randrange(N_ACTIONS)
+        # marginal baseline: frequency over THIS episode's history only (same
+        # input as the model but NO cross-episode memory).  Fairer than the old
+        # uniform random (rng.randrange), which was guaranteed-loser by
+        # construction -- any model with ANY history beats a 1/N guess.
+        marg_hist = np.zeros(N_ACTIONS)
+        for a in history:
+            marg_hist[a] += 1
+        pred_marg = int(marg_hist.argmax())
         marg_correct += int(pred_marg == next_action)
         marg_total += 1
 
