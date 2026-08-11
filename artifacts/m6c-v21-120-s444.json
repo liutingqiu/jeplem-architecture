@@ -1,0 +1,15 @@
+{
+  "protocol": "phase2_m6c_v2_autonomous: RANDOM long stream with AUTONOMOUS flip detection -- a flip is a SINGLE world change, the body must detect it via consecutive prediction failures (threshold 3, deterministic world). No scripted evidence burst. Criterion all >= 0.9: P1 continuity, P2 self-drive, P4 revision (autonomously detected), P5 idle consistency.",
+  "seed": 444,
+  "episodes": 20,
+  "n_events": 120,
+  "results": {
+    "continuity_p1": 1.0,
+    "selfdrive_p2": 1.0,
+    "revision_p4": 0.733,
+    "consistency_p5": 1.0,
+    "flipped_domains_detected": 0.733
+  },
+  "accepted": false,
+  "artifact": "artifacts\\m6c-v21-120-s444.json"
+}
