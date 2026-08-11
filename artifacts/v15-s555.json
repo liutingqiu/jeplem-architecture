@@ -1,0 +1,13 @@
+{
+  "protocol": "phase2_body_v15_full_real_perception_v1: RL-trained JEPLM agent (frozen CNN + slots + policy) on real visual stream carries the runtime (ledger of perceived facts + snapshot); verdicts: trained query accuracy > random, perception, P1/P5. Criterion: trained > random, perception >= 0.8, P1/P5 >= 0.9.",
+  "seed": 555,
+  "results": {
+    "trained_query_acc": 0.792,
+    "random_query_acc": 0.5,
+    "perception_accuracy": 0.833,
+    "continuity_p1": 1.0,
+    "consistency_p5": 1.0
+  },
+  "accepted": true,
+  "artifact": "artifacts\\v15-s555.json"
+}
