@@ -145,10 +145,11 @@ def run(*, updates: int = 100, episodes: int = 16, experiment_seed: int = 41_123
             "consistency_p5": round(p5, 3),
         },
         "accepted": accepted,
-        "artifact": str(artifact or ROOT / "artifacts" / "phase2-body-v15-full-real.json"),
+        "artifact": str(artifact or ROOT / "artifacts" / "v15-s" + f"{experiment_seed}" + ".json"),
     }
-    (artifact or ROOT / "artifacts" / "phase2-body-v15-full-real.json").parent.mkdir(exist_ok=True)
-    (artifact or ROOT / "artifacts" / "phase2-body-v15-full-real.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    out = Path(str(artifact or ROOT / "artifacts" / "v15-s" + f"{experiment_seed}" + ".json"))
+    out.parent.mkdir(exist_ok=True)
+    out.write_text(json.dumps(report, indent=2), encoding="utf-8")
     return report
 
 
