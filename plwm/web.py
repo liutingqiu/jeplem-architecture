@@ -11,8 +11,10 @@ from __future__ import annotations
 import hashlib
 import html
 import json
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass
+from html.parser import HTMLParser
 from typing import Any
 from urllib.error import URLError
 
@@ -68,6 +70,35 @@ class WebFetchBackend:
         text = _strip_html(raw.decode("utf-8", errors="replace"))
         return WebResource(url, "web-text", text, _sha256(text))
 
+    def fetch_image(self, url: str) -> WebResource:
+        """拉取图片字节,校验 PNG 魔数。返回 WebResource(content=bytes)。"""
+        raw = self._open(url, "image/png")
+        if raw[:8] != b"\x89PNG\r\n\x1a\n":
+            raise WebFetchError(f"{url} is not a PNG image")
+        return WebResource(url, "web-image", raw, _sha256(raw.hex()))
+
+    def fetch_links(self, url: str) -> list[tuple[str, str]]:
+        """从 HTML 提取 (target_url, anchor_text) 对。用 html.parser 而非正则。
+
+        返回绝对 URL,去重,过滤 javascript:/空链接。
+        """
+        raw = self._open(url, "text/html,text/plain")
+        html_text = raw.decode("utf-8", errors="replace")
+        parser = _LinkParser()
+        parser.feed(html_text)
+        base = url
+        seen: set[str] = set()
+        links: list[tuple[str, str]] = []
+        for href, anchor in parser.links:
+            resolved = urllib.parse.urljoin(base, href)
+            if resolved.startswith(("javascript:", "mailto:", "#")) or not resolved:
+                continue
+            if resolved in seen:
+                continue
+            seen.add(resolved)
+            links.append((resolved, anchor.strip()))
+        return links
+
     def fetch_json(self, url: str) -> WebResource:
         raw = self._open(url, "application/json")
         try:
@@ -122,3 +153,30 @@ def _strip_html(raw: str) -> str:
 
 def _sha256(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+class _LinkParser(HTMLParser):
+    """提取 <a href> 与锚文本。"""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.links: list[tuple[str, str]] = []
+        self._current_href: str | None = None
+        self._current_anchor: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "a":
+            self._current_href = None
+            self._current_anchor = []
+            for key, value in attrs:
+                if key == "href" and value:
+                    self._current_href = value
+
+    def handle_data(self, data: str) -> None:
+        if self._current_href is not None:
+            self._current_anchor.append(data)
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "a" and self._current_href is not None:
+            self.links.append((self._current_href, "".join(self._current_anchor)))
+            self._current_href = None

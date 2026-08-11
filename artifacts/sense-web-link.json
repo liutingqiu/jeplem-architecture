@@ -1,0 +1,19 @@
+{
+  "protocol": "sense_web_link_v1: real HTML with 3 <a> links -> WebLinkSensor -> LinkGraph edges + unified semantic space -> body ledger. C1 graph correctness (edges/neighbors/has_edge/anchor); C2 observe accepted; C3 ledger identity keys. Criterion: C1-C3 per seed.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "fetched": 1.0,
+    "graph_edges": 1.0,
+    "neighbor_query": 1.0,
+    "has_edge": 1.0,
+    "anchor": 1.0,
+    "accepted_obs": 1.0,
+    "ledger_hit": 1.0
+  },
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\sense-web-link.json"
+}

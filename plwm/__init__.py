@@ -25,7 +25,9 @@ try:
     from .semantic_space import ModalityEncoder, SemanticSpace, cosine
     from .multimodal_body import BodyObservation, MultimodalBody
     from .web import JsonSchemaValidator, WebFetchBackend, WebFetchError, WebResource
-    from .web_sensors import WebStructSensor, WebTextSensor
+    from .web_sensors import WebImageSensor, WebLinkSensor, WebStructSensor, WebTextSensor
+    from .image_features import PixelFeatureExtractor, decode_png
+    from .link_graph import LinkGraph
 except ModuleNotFoundError:  # The dependency-free core remains importable.
     pass
 
@@ -79,4 +81,9 @@ __all__ = [
     "WebResource",
     "WebStructSensor",
     "WebTextSensor",
+    "WebImageSensor",
+    "WebLinkSensor",
+    "PixelFeatureExtractor",
+    "decode_png",
+    "LinkGraph",
 ]

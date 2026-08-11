@@ -14,6 +14,7 @@ from typing import Any, Mapping
 import torch
 from torch import Tensor, nn
 
+from .image_features import decode_png
 from .semantic_space import ModalityEncoder
 from .web import JsonSchemaValidator, WebFetchBackend, WebFetchError, WebResource
 
@@ -142,3 +143,81 @@ class WebStructSensor:
             fact_value=fact_value,
         )
         return True
+
+
+class WebImageSensor:
+    """图像感官:真实图片 → 像素特征 → 统一语义空间 → 身体。
+
+    用纯标准库解码 PNG 并提取确定性像素特征(零新增依赖)。
+    fact_value = URL,账本键 identity:{url}(URL 作身份便于跨模态)。
+    """
+
+    def __init__(self, backend: WebFetchBackend, body, space,
+                 *, dim: int = DEFAULT_DIM, extractor=None) -> None:
+        from .image_features import PixelFeatureExtractor
+
+        self.backend = backend
+        self.body = body
+        self.space = space
+        self.extractor = extractor or PixelFeatureExtractor()
+        encoder = ModalityEncoder(self.extractor.dim, dim=dim, state_dim=self.extractor.dim)
+        if "web-image" not in self.space.encoders:
+            self.space.register("web-image", encoder)
+
+    def sense(self, url: str) -> bool:
+        try:
+            resource = self.backend.fetch_image(url)
+        except WebFetchError:
+            return False
+        try:
+            width, height, pixels = decode_png(resource.content)
+        except WebFetchError:
+            return False
+        semantic = self.extractor.extract(width, height, pixels)
+        self.body.observe(
+            "web-image",
+            semantic.squeeze(0),
+            payload={"url": resource.url, "hash": resource.content_hash, "w": width, "h": height},
+            fact_value=url,
+        )
+        return True
+
+
+class WebLinkSensor:
+    """超链接感官:真实 HTML → (source->target) 边入 LinkGraph + 进身体。
+
+    fact_value = f"{source}->{target}",账本键 identity:{source}->{target}。
+    """
+
+    def __init__(self, backend: WebFetchBackend, body, space, graph,
+                 *, dim: int = DEFAULT_DIM) -> None:
+        from .link_graph import LinkGraph
+
+        self.backend = backend
+        self.body = body
+        self.space = space
+        self.graph = graph
+        # 1 (has-link) + 2 buckets for url length / anchor length
+        encoder = ModalityEncoder(3, dim=dim, state_dim=3)
+        if "web-link" not in self.space.encoders:
+            self.space.register("web-link", encoder)
+
+    @staticmethod
+    def _link_features(source: str, target: str, anchor: str) -> Tensor:
+        return torch.tensor([[1.0, len(source) / 100.0, len(anchor) / 100.0]], dtype=torch.float32)
+
+    def sense(self, url: str) -> bool:
+        try:
+            links = self.backend.fetch_links(url)
+        except WebFetchError:
+            return False
+        for target, anchor in links:
+            self.graph.add_edge(url, target, anchor)
+            semantic = self._link_features(url, target, anchor)
+            self.body.observe(
+                "web-link",
+                semantic.squeeze(0),
+                payload={"source": url, "target": target, "anchor": anchor},
+                fact_value=f"{url}->{target}",
+            )
+        return bool(links)
