@@ -1,0 +1,14 @@
+{
+  "protocol": "phase2_m6b_stress_v1: 6-domain long stream (learn x2, idle, gap-goal, learn, idle x5, flip x2 -> marks, interference x3, learn, idle x3) with snapshot chain. Criterion all >= 0.9: P1 long-horizon continuity, P2 self-drive, P4 revision, P5 idle-snapshot consistency, interference recorded.",
+  "seed": 555,
+  "episodes": 20,
+  "results": {
+    "continuity_p1": 1.0,
+    "selfdrive_p2": 1.0,
+    "revision_p4": 1.0,
+    "consistency_p5": 1.0,
+    "interference_recorded": 1.0
+  },
+  "accepted": true,
+  "artifact": "artifacts\\m6b-v2-s555.json"
+}

@@ -27,7 +27,6 @@ from plwm.fact_ledger import FactRecord, VersionedFactLedger
 
 N_IDENTITIES = 3
 N_ACTIONS = 3
-FLIP_THRESHOLD = 3
 
 
 def mapping(domain: int, identity: int, flipped: bool = False) -> int:
@@ -46,8 +45,9 @@ class StressRuntime:
         self.marked: set[int] = set()
         self.chain: list[dict] = []
         self.goal_log: list[dict] = []
-        self.failures = 0
         self.interference_log: list[str] = []
+        self.revision_window: dict[int, list[int]] = {}
+        self.flipped: set[int] = set()
 
     def snapshot_digest(self) -> str:
         current = sorted((k, str(v["value"])) for k, v in self.ledger.snapshot()["current"].items())
@@ -63,6 +63,30 @@ class StressRuntime:
                                        source="self", tick=self.tick, confidence=0.95, version=1))
         counts = self.counts.setdefault((domain, identity), [1.0] * N_ACTIONS)
         counts[action] += 1.0
+        self._chain("learn")
+
+    def _observe_truth(self, domain: int, identity: int) -> None:
+        """Observe the CURRENT truth for (domain, identity): flipped mapping if
+        the world changed here, original otherwise.  Unified entry for
+        autonomous revision detection (window-majority)."""
+        self.tick += 1
+        action = mapping(domain, identity, flipped=(domain in self.flipped))
+        self.ledger.observe(FactRecord(key=f"d{domain}_i{identity}", value=int(action),
+                                       source="self", tick=self.tick, confidence=0.95, version=1))
+        counts = self.counts.setdefault((domain, identity), [1.0] * N_ACTIONS)
+        predicted = int(np.argmax(counts))
+        counts[action] += 1.0
+        # AUTONOMOUS change detection via window-majority (probe-verified):
+        # mark when >=3 of the last 4 observations of a domain contradict argmax.
+        w = self.revision_window.setdefault(domain, [])
+        w.append(int(predicted != action))
+        if len(w) > 4:
+            w.pop(0)
+        if sum(w) >= 3:
+            self.marked.add(domain)
+
+    def learn(self, domain: int, identity: int) -> None:
+        self._observe_truth(domain, identity)
         self._chain("learn")
 
     def _gap(self, domain: int) -> float:
@@ -90,22 +114,6 @@ class StressRuntime:
     def choose_goal(self) -> int:
         candidates = [d for d in range(self.n_domains) if d not in self.done]
         return max(candidates, key=self._gap)
-
-    def observe_flipped(self, domain: int, identity: int) -> None:
-        self.tick += 1
-        action = mapping(domain, identity, flipped=True)
-        self.ledger.observe(FactRecord(key=f"d{domain}_i{identity}", value=int(action),
-                                       source="self", tick=self.tick, confidence=0.95, version=1))
-        counts = self.counts.setdefault((domain, identity), [1.0] * N_ACTIONS)
-        predicted = int(np.argmax(counts))
-        counts[action] += 1.0
-        if predicted != action:
-            self.failures += 1
-            if self.failures >= FLIP_THRESHOLD:
-                self.marked.add(domain)
-        else:
-            self.failures = 0
-        self._chain("flip_evidence")
 
     def inject_conflict(self, domain: int, identity: int) -> None:
         """Inject a random conflicting fact (world noise) on an unflipped entry."""
@@ -155,9 +163,15 @@ def run(*, n_domains: int = 6, episodes: int = 20, experiment_seed: int = 41_123
         for _ in range(5):
             rt.idle()
         # phase 4: flip TWO early domains (domain 0,1) -> revision marks (P4)
+        # WORLD flips: mapping changes, NO scripted evidence burst.  The body
+        # only learns the change when it observes the domain again via learn
+        # (which now yields the flipped mapping) and must detect it on its own
+        # via the window-majority counter.
         for d in (0, 1):
-            for _ in range(FLIP_THRESHOLD + 1):
-                rt.observe_flipped(d, 0)
+            rt.flipped.add(d)
+            for _ in range(2):  # re-observe the flipped domain a few times
+                for i in range(N_IDENTITIES):
+                    rt.learn(d, i)
         revision.append(int(0 in rt.marked and 1 in rt.marked))
         # phase 5: interference on an unflipped learned domain (low confidence)
         for i in range(N_IDENTITIES):
