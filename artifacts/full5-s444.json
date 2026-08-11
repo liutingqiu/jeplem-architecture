@@ -1,0 +1,15 @@
+{
+  "protocol": "phase2_full_subject_v5: meta-controller mounted INSIDE the body routes queries to memory-ledger vs Bayesian-belief on body-internal state features (M5 mechanism in the body); verdicts: routing accuracy, routed-answer accuracy vs fixed sources, P1/P5 hold. Criterion: routing >= 0.85, routed >= best fixed source, P1/P5 >= 0.9.",
+  "seed": 444,
+  "results": {
+    "routing_accuracy": 0.75,
+    "routed_answer_acc": 0.75,
+    "fixed_memory_acc": 0.25,
+    "fixed_belief_acc": 0.75,
+    "continuity_p1": 1.0,
+    "consistency_p5": 1.0,
+    "n_samples": 4
+  },
+  "accepted": false,
+  "artifact": "artifacts\\full5-s444.json"
+}
