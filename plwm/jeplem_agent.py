@@ -46,6 +46,8 @@ class JEPLMAgent(nn.Module):
         write_mode: str = "fifo",
         use_goal_query: bool = False,
         goal_dim: int = 0,
+        semantic_dim: int | None = None,
+        semantic_space: "SemanticSpace | None" = None,
     ) -> None:
         super().__init__()
         self.use_perception = use_perception
@@ -58,10 +60,24 @@ class JEPLMAgent(nn.Module):
             self.perception = PerceptionNet(sensory_dim)
             if perception_state_dict:
                 self.perception.load_state_dict(torch.load(perception_state_dict, map_location="cpu"))
-            semantic_dim = 2
-            memory_input_dim = semantic_dim + query_dim
+            if semantic_dim is not None:
+                # unified multimodal body: the frozen CNN's semantic (2-dim)
+                # is projected into a shared semantic space before memory.
+                from plwm.semantic_space import ModalityEncoder, SemanticSpace
+
+                if semantic_space is None:
+                    semantic_space = SemanticSpace(dim=semantic_dim)
+                    semantic_space.register(
+                        "vision", ModalityEncoder(2, dim=semantic_dim, state_dim=2)
+                    )
+                self.semantic_space = semantic_space
+                memory_input_dim = semantic_dim + query_dim
+            else:
+                self.semantic_space = None
+                memory_input_dim = 2 + query_dim
         else:
             self.perception = None
+            self.semantic_space = None
             memory_input_dim = input_dim
         self.memory = JEPLMMemory(
             memory_input_dim, latent=latent, slots=slots,
@@ -81,6 +97,8 @@ class JEPLMAgent(nn.Module):
             query = observation_step[..., self.sensory_dim:]
             with torch.no_grad():  # frozen perception
                 semantic = torch.softmax(self.perception(raw), dim=-1)[..., 1:3]
+            if self.semantic_space is not None:
+                semantic = self.semantic_space("vision", semantic)
             memory_input = torch.cat((semantic, query), dim=-1)
         else:
             memory_input = observation_step

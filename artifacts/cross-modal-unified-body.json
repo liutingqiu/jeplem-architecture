@@ -1,0 +1,15 @@
+{
+  "protocol": "cross_modal_unified_body_v1: same fact presented as vision (frozen-CNN 2-dim semantic) and text (language-port 5-dim event) both project into one D=16 SemanticSpace and hit the same memory slot. C1 modal cosine (same > 0.9, diff < 0.6); C2 cross-modal memory recall hit; C3 no bridging head (architecture).",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "c1_same_cosine": 0.928,
+    "c1_diff_cosine": 0.288,
+    "c2_memory_hit": 1.0
+  },
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\cross-modal-unified-body.json"
+}

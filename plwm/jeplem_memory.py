@@ -46,6 +46,7 @@ class JEPLMMemory(nn.Module):
         use_surprise_feature: bool = False,
         write_mode: str = "fifo",
         goal_dim: int = 0,
+        shared_address: bool = False,
     ) -> None:
         super().__init__()
         self.slots = slots
@@ -53,15 +54,21 @@ class JEPLMMemory(nn.Module):
         self.identity_count = identity_count
         self.aux_timescales = aux_timescales
         self.write_mode = write_mode  # 'fifo' | 'gate' | 'delta_rule'
+        self.shared_address = shared_address
         self.encoder = nn.Sequential(nn.Linear(input_dim, latent), nn.Tanh())
-        self.query = nn.Linear(latent, latent, bias=False)
         # goal-driven retrieval (integration layer, 2026-08-11): an optional
         # goal vector is projected and added to the read query, so addressing
         # is modulated by WHAT is being asked (e.g. the stream selector:
         # current vs previous episode identity), not only by the raw frame.
         # goal_dim=0 keeps the exact pre-integration behaviour (back-compat).
         self.goal_proj = nn.Linear(goal_dim, latent, bias=False) if goal_dim > 0 else None
+        # shared_address: the read query uses the SAME projection as the slot
+        # key, so semantic closeness in the encoded space transfers to
+        # content-addressed recall. Without it, two independent random linear
+        # layers (key vs query) can rotate a multi-modal semantic apart and
+        # break cross-modal retrieval (Blueprint §3.3 "no bridging head").
         self.key = nn.Linear(latent, latent, bias=False)
+        self.query = self.key if shared_address else nn.Linear(latent, latent, bias=False)
         self.value = nn.Linear(latent, latent)
         gate_in = latent + (1 if use_surprise_feature else 0)
         self.write_gate = nn.Linear(gate_in, 1)
