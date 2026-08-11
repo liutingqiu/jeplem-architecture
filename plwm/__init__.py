@@ -41,6 +41,7 @@ try:
     from .link_graph import LinkGraph
     from .trust import TrustRegistry
     from .modulation import modulation_vector, salience_from_modulation
+    from .body import BodyRunner, build_default_body
 except ModuleNotFoundError:  # The dependency-free core remains importable.
     pass
 
@@ -110,4 +111,6 @@ __all__ = [
     "TrustRegistry",
     "modulation_vector",
     "salience_from_modulation",
+    "BodyRunner",
+    "build_default_body",
 ]

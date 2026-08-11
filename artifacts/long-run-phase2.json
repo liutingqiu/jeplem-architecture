@@ -1,0 +1,56 @@
+{
+  "protocol": "long_run_phase2_v1: full BodyRunner senses REAL public URLs (example.com, jsonplaceholder, api.github.com) with subset schema; failures tolerated + trust downgraded; snapshot/restore every K rounds. R1 facts perceived; R2 success-source trust > failure; R3 checkpoint_exact; R4 early facts preserved. Criterion: R1-R4 across 3 seeds (network-dependent; failures are honest data).",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "r1_facts_perceived": 1.0,
+    "r2_trust_ordering": 1.0,
+    "r3_checkpoint_exact": 1.0,
+    "r4_memory_preserved": 1.0,
+    "avg_facts": 2.0,
+    "avg_sources": 3.0
+  },
+  "per_seed": [
+    {
+      "seed": 444,
+      "r1_perceived": true,
+      "r2_trust": true,
+      "r3_checkpoint": true,
+      "r4_memory": true,
+      "preserved": 1.0,
+      "n_facts": 2,
+      "n_sources": 3,
+      "ok_sources": 3,
+      "fail_sources": 0
+    },
+    {
+      "seed": 555,
+      "r1_perceived": true,
+      "r2_trust": true,
+      "r3_checkpoint": true,
+      "r4_memory": true,
+      "preserved": 1.0,
+      "n_facts": 2,
+      "n_sources": 3,
+      "ok_sources": 3,
+      "fail_sources": 0
+    },
+    {
+      "seed": 666,
+      "r1_perceived": true,
+      "r2_trust": true,
+      "r3_checkpoint": true,
+      "r4_memory": true,
+      "preserved": 1.0,
+      "n_facts": 2,
+      "n_sources": 3,
+      "ok_sources": 3,
+      "fail_sources": 0
+    }
+  ],
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\long-run-phase2.json"
+}

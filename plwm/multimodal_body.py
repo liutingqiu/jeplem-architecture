@@ -11,7 +11,7 @@ MultimodalBody 是"健全身体"的门面——它不重造任何机制,只做�
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any, Mapping, Sequence
 
 import torch
@@ -158,3 +158,63 @@ class MultimodalBody:
 
     def _noop_tick(self) -> RuntimeTick:
         return self.runtime.ingest(None, None)
+
+    def snapshot(self) -> dict:
+        """完整保存 body 状态(runtime + body + ledger + gate + 情绪/时间)。
+
+        供 BodyRunner 长时运行 checkpoint。restore() 反向重建。
+        """
+        snapshot: dict[str, Any] = {
+            "world_id": self.world_id,
+            "tick": self.tick,
+            "observations": [asdict(obs) for obs in self.observations],
+            "runtime": self.runtime.snapshot(),
+            "ledger": self.ledger.snapshot() if self.ledger is not None else None,
+            "gate": {
+                "mechanism_version": self.gate.mechanism_version,
+                "last_tick": dict(self.gate._last_tick),
+                "accepted_count": self.gate.accepted_count,
+                "rejected_stale": self.gate.rejected_stale,
+            },
+        }
+        if self.emotion is not None:
+            snapshot["emotion"] = {"_valence": self.emotion._valence, "_arousal": self.emotion._arousal}
+        if self.effort is not None:
+            snapshot["effort"] = {"_level": self.effort._level}
+        if self.time_sense is not None:
+            snapshot["time_sense"] = {"elapsed": self.time_sense.elapsed}
+        return snapshot
+
+    def restore(self, snapshot: dict) -> None:
+        """从 snapshot 重建 body 状态。"""
+        self.world_id = snapshot["world_id"]
+        self.tick = snapshot["tick"]
+        self.observations = [BodyObservation(**obs) for obs in snapshot["observations"]]
+        # runtime + ledger restored via their own restore
+        restored_runtime = type(self.runtime).restore(
+            snapshot["runtime"], self.runtime.core.config.input_dim
+            if hasattr(self.runtime, "core") else self.runtime.model.core.config.input_dim,
+            self.runtime.belief.log_probs.shape[-1],
+            latent_dim=self.runtime.core.config.latent_dim
+            if hasattr(self.runtime, "core") else self.runtime.model.core.config.latent_dim,
+        )
+        # restore runtime state in place (keep the same runtime object)
+        self.runtime.core.state = restored_runtime.core.state
+        self.runtime.belief = restored_runtime.belief
+        self.runtime.ledger = restored_runtime.ledger
+        if self.ledger is not None and snapshot.get("ledger") is not None:
+            self.ledger.current = {k: FactRecord(**r) for k, r in snapshot["ledger"]["current"].items()}
+            self.ledger.history = [FactRecord(**r) for r in snapshot["ledger"]["history"]]
+            self.ledger.isolated = [FactRecord(**r) for r in snapshot["ledger"]["isolated"]]
+        gate = snapshot["gate"]
+        self.gate.mechanism_version = gate["mechanism_version"]
+        self.gate._last_tick = dict(gate["last_tick"])
+        self.gate.accepted_count = gate["accepted_count"]
+        self.gate.rejected_stale = gate["rejected_stale"]
+        if self.emotion is not None and "emotion" in snapshot:
+            self.emotion._valence = snapshot["emotion"]["_valence"]
+            self.emotion._arousal = snapshot["emotion"]["_arousal"]
+        if self.effort is not None and "effort" in snapshot:
+            self.effort._level = snapshot["effort"]["_level"]
+        if self.time_sense is not None and "time_sense" in snapshot:
+            self.time_sense.elapsed = snapshot["time_sense"]["elapsed"]

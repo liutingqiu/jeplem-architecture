@@ -137,13 +137,23 @@ class JsonSchemaValidator:
             raise ValueError("at least one schema is required")
         self.schemas = schemas
 
-    def validate(self, name: str, data: dict[str, Any]) -> dict[str, Any]:
+    def validate(self, name: str, data: dict[str, Any], *, subset: bool = False) -> dict[str, Any]:
+        """校验 data 是否符合 schema。
+
+        subset=False(默认):精确键集匹配,多余键/缺失键都拒绝(凭证或无关
+        数据永不进门)。
+        subset=True:只要求 schema 的已知键都在 data 中(缺已知键拒,多余键
+        忽略),用于真实互联网数据(网页/API 常带多余字段)。
+        """
         if name not in self.schemas:
             raise ValueError(f"unknown schema: {name!r}")
         if not isinstance(data, dict):
             raise ValueError(f"data for {name!r} must be a mapping")
         fields = self.schemas[name]
-        if set(data) != set(fields):
+        if subset:
+            if not all(key in data for key in fields):
+                raise ValueError(f"schema {name!r} requires keys {sorted(fields)}, missing from data")
+        elif set(data) != set(fields):
             raise ValueError(f"schema {name!r} requires exactly keys {sorted(fields)}, got {sorted(data)}")
         cleaned: dict[str, Any] = {}
         for key, field_type in fields.items():

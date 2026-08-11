@@ -116,11 +116,13 @@ class WebStructSensor:
 
     def __init__(self, backend: WebFetchBackend, body, space,
                  *, schema_name: str, schema_fields: dict[str, type],
-                 dim: int = DEFAULT_DIM, encoder: WebStructEncoder | None = None) -> None:
+                 dim: int = DEFAULT_DIM, encoder: WebStructEncoder | None = None,
+                 subset: bool = False) -> None:
         self.backend = backend
         self.body = body
         self.space = space
         self.schema_name = schema_name
+        self.subset = subset
         self.validator = JsonSchemaValidator({schema_name: schema_fields})
         encoder = encoder or WebStructEncoder(numeric_keys=list(schema_fields.keys()))
         self.encoder = encoder
@@ -135,7 +137,7 @@ class WebStructSensor:
         except WebFetchError:
             return False
         try:
-            validated = self.validator.validate(self.schema_name, resource.content)
+            validated = self.validator.validate(self.schema_name, resource.content, subset=self.subset)
         except ValueError:
             return False
         semantic = self.encoder.encode(validated)
@@ -296,10 +298,12 @@ class WebSocialSensor:
     SOCIAL_SCHEMA = {"content_url": str, "like_count": int, "comment_count": int, "view_count": int}
 
     def __init__(self, backend: WebFetchBackend, body, space,
-                 *, dim: int = DEFAULT_DIM, encoder: SocialEngagementEncoder | None = None) -> None:
+                 *, dim: int = DEFAULT_DIM, encoder: SocialEngagementEncoder | None = None,
+                 subset: bool = False) -> None:
         self.backend = backend
         self.body = body
         self.space = space
+        self.subset = subset
         self.validator = JsonSchemaValidator({"engagement": self.SOCIAL_SCHEMA})
         self.encoder = encoder or SocialEngagementEncoder()
         mod = ModalityEncoder(self.encoder.dim, dim=dim, state_dim=self.encoder.dim)
@@ -312,7 +316,7 @@ class WebSocialSensor:
         except WebFetchError:
             return False
         try:
-            validated = self.validator.validate("engagement", resource.content)
+            validated = self.validator.validate("engagement", resource.content, subset=self.subset)
         except ValueError:
             return False
         semantic = self.encoder.encode(validated)
