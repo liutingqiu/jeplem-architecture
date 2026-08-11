@@ -1,0 +1,10 @@
+{
+  "protocol": "phase2_m5_metacontroller_v2: routing the same content to different parts depending on the parts' INTERNAL STATE (recall buffer / belief evidence); meta-controller input WITH vs WITHOUT internal state (ablation). Criterion: with-state routing >= 0.9 and beats without-state by >= 0.2.",
+  "seed": 444,
+  "results": {
+    "with_state": 0.949,
+    "without_state": 0.5
+  },
+  "accepted": true,
+  "artifact": "artifacts\\m5-s444.json"
+}
