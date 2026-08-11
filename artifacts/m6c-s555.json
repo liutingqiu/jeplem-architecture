@@ -1,0 +1,13 @@
+{
+  "protocol": "phase2_m6c_random_stress_v1: 120-event RANDOM stream (learn/idle/flip/interference/gap-goal per-event); subject must hold under unpredictable events. Criterion all >= 0.9: P1 continuity (unflipped facts), P2 self-drive (gap goal = max gap), P4 revision (flipped marked), P5 idle-snapshot consistency.",
+  "seed": 555,
+  "episodes": 20,
+  "results": {
+    "continuity_p1": 1.0,
+    "selfdrive_p2": 1.0,
+    "revision_p4": 0.917,
+    "consistency_p5": 1.0
+  },
+  "accepted": true,
+  "artifact": "artifacts\\m6c-s555.json"
+}
