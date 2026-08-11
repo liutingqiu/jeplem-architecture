@@ -79,6 +79,27 @@ def _try_dilate(g, p) -> np.ndarray:
     return rule_logical_or(g, {"mapping": []})
 
 
+def _try_recolor_by_value(g, p) -> np.ndarray:
+    """Value->color map: each nonzero cell's value maps to a new color."""
+    out = g.copy()
+    mapping = p  # dict value->color
+    for v, c in mapping.items():
+        out[out == v] = c
+    return out
+
+
+def _try_extract_bbox(g, p) -> np.ndarray:
+    """Extract the minimal bounding box containing all non-background cells."""
+    scene = perceive(g)
+    if not scene.objects:
+        return g.copy()
+    rs = [o.r for o in scene.objects] + [o.r + o.h for o in scene.objects]
+    cs = [o.c for o in scene.objects] + [o.c + o.w for o in scene.objects]
+    r0, r1 = min(rs), max(rs)
+    c0, c1 = min(cs), max(cs)
+    return g[r0:r1, c0:c1].copy()
+
+
 # --- parameter spaces --------------------------------------------------------
 
 def _ps_none(g) -> list:
@@ -100,6 +121,23 @@ def _ps_offset(g) -> list:
     return [(dr, dc) for dr in range(-3, 4) for dc in range(-3, 4) if (dr, dc) != (0, 0)]
 
 
+def _ps_value_map(g) -> list:
+    """Candidate value->color maps (identity and single swaps)."""
+    vals = sorted({int(v) for v in g.flatten().tolist() if v != 0})
+    if not vals:
+        return [{}]
+    cands = [{}]  # identity (no change)
+    for v in vals:
+        for c in range(1, 10):
+            if c != v:
+                cands.append({v: c})
+    return cands
+
+
+def _ps_none_flex(g) -> list:
+    return [None]
+
+
 # --- template library --------------------------------------------------------
 
 TEMPLATES = [
@@ -107,9 +145,11 @@ TEMPLATES = [
     RuleTemplate("vmirror", _try_vmirror, _ps_none, 1),
     RuleTemplate("rot90", _try_rot90, _ps_none, 1),
     RuleTemplate("map_color", _try_map_color, _ps_map_color, 1),
+    RuleTemplate("recolor_by_value", _try_recolor_by_value, _ps_value_map, 1),
     RuleTemplate("copy", _try_copy, _ps_offset, 2),
     RuleTemplate("fill", _try_fill, _ps_none, 2),
     RuleTemplate("dilate", _try_dilate, _ps_none, 2),
+    RuleTemplate("extract_bbox", _try_extract_bbox, _ps_none_flex, 2),
 ]
 
 
