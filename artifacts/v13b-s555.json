@@ -1,0 +1,12 @@
+{
+  "protocol": "phase2_body_v13b_social_drift_v1: the body learns a model of ANOTHER agent whose preference DRIFTS periodically; model uses recency-weighted counts to track the current preference, marginal uses the unweighted recent window (lags after drift). Criterion: model >= marginal + 0.1 and >= 0.6.",
+  "seed": 555,
+  "results": {
+    "model_accuracy": 0.793,
+    "marginal_baseline": 0.787,
+    "drift_tracking": 0.0,
+    "model_beats_marginal": false
+  },
+  "accepted": false,
+  "artifact": "artifacts\\v13b-s555.json"
+}
