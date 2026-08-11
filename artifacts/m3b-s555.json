@@ -1,0 +1,12 @@
+{
+  "protocol": "phase2_m3b_p5_selfconsistency_v1: persistent ledger + snapshot chain; IDLE events must leave snapshots byte-identical (no random drift); LEARN events must produce attributable changes (diff = the written fact); conflicting fact must be recorded (auditable revision). Criterion: idle stability >= 0.9, learn attribution >= 0.9, interference recorded >= 0.9.",
+  "seed": 555,
+  "episodes": 50,
+  "results": {
+    "idle_snapshot_stability": 1.0,
+    "learn_attribution": 1.0,
+    "interference_recorded": 1.0
+  },
+  "accepted": true,
+  "artifact": "artifacts\\m3b-s555.json"
+}

@@ -1,0 +1,12 @@
+{
+  "protocol": "phase2_m3a_p3_multitask_selfknowledge_v1: shared encoder+answer (ID of both tasks); self_head receives (h, x, task-id), trained on ID+OOD correctness of BOTH tasks (A OOD=double-block, B OOD=blur). Criterion: per-task OOD ECE(self_head) >= 0.05 lower than softmax OOD ECE -- calibrated boundary PER task, not just overall.",
+  "seed": 444,
+  "results": {
+    "task0_self_ood_ece": 0.115,
+    "task0_softmax_ood_ece": 0.162,
+    "task1_self_ood_ece": 0.423,
+    "task1_softmax_ood_ece": 0.372
+  },
+  "accepted": false,
+  "artifact": "artifacts\\m3a-s444.json"
+}
