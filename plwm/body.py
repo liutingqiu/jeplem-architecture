@@ -161,7 +161,8 @@ class BodyRunner:
         """一轮感知:对每个 target(含 modality/url/可选 override)感知 + 演化。
 
         targets=None 时自主选择(self.choose_targets)。显式传 targets 保持
-        旧行为(向后兼容)。
+        旧行为(向后兼容)。感知结果同时驱动情绪:outcome(效价)+ surprise
+        (失败=意外/高唤起),使 arousal 有内部信号。
         """
         if targets is None:
             targets = self.choose_targets()
@@ -175,8 +176,12 @@ class BodyRunner:
                 stats["ok"] += 1
             else:
                 stats["fail"] += 1
-            # internal feeling: outcome valence + effort from the round
-            self.body.feel(outcome=1.0 if ok else -1.0)
+            # internal feeling: success -> positive valence + low surprise;
+            # failure -> negative valence + surprise (arousal rises)
+            surprise = 0.0 if ok else 1.0
+            gap = float(1.0 - self.body.runtime.belief.confidence().item()) \
+                if hasattr(self.body.runtime, "belief") else None
+            self.body.feel(outcome=1.0 if ok else -1.0, surprise=surprise, gap=gap)
         self.round_stats.append(stats)
         return stats
 

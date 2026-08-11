@@ -1,0 +1,21 @@
+{
+  "protocol": "long_run_autonomy_v1: the self-directing body (choose_targets) lives N rounds over a local multi-format server with periodic checkpoint/restore; per-round telemetry recorded.",
+  "seed": 555,
+  "rounds": 500,
+  "restore_every": 25,
+  "status": {
+    "round": 500,
+    "tick": 1500,
+    "time_elapsed": 1500.0,
+    "facts": 9,
+    "coverage": 9,
+    "valence": 1.0,
+    "arousal": 0.75,
+    "effort": 0.0,
+    "trust_mean": 0.733,
+    "trust_min": 0.6,
+    "trust_max": 1.0,
+    "digest": "{\"ledger_current\":[[\"ide"
+  },
+  "artifact": "artifacts\\long-run-autonomy.json"
+}
