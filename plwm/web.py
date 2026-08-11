@@ -51,16 +51,17 @@ class WebFetchBackend:
         self.max_bytes = max_bytes
         self.user_agent = user_agent
 
-    def _open(self, url: str, accept: str) -> bytes:
+    def _open(self, url: str, accept: str, *, max_bytes: int | None = None) -> bytes:
         request = urllib.request.Request(
             url,
             headers={"User-Agent": self.user_agent, "Accept": accept},
         )
+        limit = max_bytes if max_bytes is not None else self.max_bytes
         try:
             with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                data = response.read(self.max_bytes + 1)
-                if len(data) > self.max_bytes:
-                    raise WebFetchError(f"response exceeds max_bytes={self.max_bytes}")
+                data = response.read(limit + 1)
+                if len(data) > limit:
+                    raise WebFetchError(f"response exceeds max_bytes={limit}")
                 return data
         except (URLError, OSError, ValueError) as error:
             raise WebFetchError(f"failed to fetch {url}: {error}") from error
@@ -83,6 +84,13 @@ class WebFetchBackend:
         if raw[:4] != b"RIFF" or raw[8:12] != b"WAVE":
             raise WebFetchError(f"{url} is not a WAV audio file")
         return WebResource(url, "web-audio", raw, _sha256(raw.hex()))
+
+    def fetch_video(self, url: str) -> WebResource:
+        """拉取视频字节,校验常见容器魔数(视频允许更大上限)。"""
+        raw = self._open(url, "video/mp4", max_bytes=8 * 1024 * 1024)
+        if not _is_video(raw):
+            raise WebFetchError(f"{url} is not a supported video container")
+        return WebResource(url, "web-video", raw, _sha256(raw.hex()))
 
     def fetch_links(self, url: str) -> list[tuple[str, str]]:
         """从 HTML 提取 (target_url, anchor_text) 对。用 html.parser 而非正则。
@@ -156,6 +164,13 @@ def _strip_html(raw: str) -> str:
     text = html.unescape(text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
+
+
+def _is_video(raw: bytes) -> bool:
+    """常见视频容器魔数:mp4/mov(ftyp), avi(RIFF), webm(WEBM), mkv/mka。"""
+    if len(raw) >= 8 and raw[4:8] == b"ftyp":
+        return True
+    return raw[:4] in (b"RIFF", b"WEBM") or raw[:4] == b"\x1a\x45\xdf\xa3"
 
 
 def _sha256(text: str) -> str:

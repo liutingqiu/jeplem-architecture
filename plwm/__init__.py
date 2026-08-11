@@ -33,9 +33,11 @@ try:
         WebSocialSensor,
         WebStructSensor,
         WebTextSensor,
+        WebVideoSensor,
     )
     from .image_features import PixelFeatureExtractor, decode_png
     from .audio_features import WaveFeatureExtractor, decode_wav
+    from .video_features import VideoFeatureExtractor, extract_frames
     from .link_graph import LinkGraph
     from .trust import TrustRegistry
 except ModuleNotFoundError:  # The dependency-free core remains importable.
@@ -95,11 +97,14 @@ __all__ = [
     "WebLinkSensor",
     "WebAudioSensor",
     "WebSocialSensor",
+    "WebVideoSensor",
     "SocialEngagementEncoder",
     "PixelFeatureExtractor",
     "decode_png",
     "WaveFeatureExtractor",
     "decode_wav",
+    "VideoFeatureExtractor",
+    "extract_frames",
     "LinkGraph",
     "TrustRegistry",
 ]

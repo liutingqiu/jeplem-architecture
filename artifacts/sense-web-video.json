@@ -1,0 +1,18 @@
+{
+  "protocol": "sense_web_video_v1: real mp4 (dynamic/static) over HTTP -> WebVideoSensor (ffmpeg frames + motion features) -> unified semantic space -> body ledger. C1 fetched/frame-extracted; C2 accepted; C3 ledger key; C4 dynamic motion > static. Criterion: C1-C4 per seed.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "fetched_decoded": 1.0,
+    "accepted_obs": 1.0,
+    "ledger_hit": 1.0,
+    "dynamic_motion": 0.057,
+    "static_motion": 0.0,
+    "motion_gap": 0.057
+  },
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\sense-web-video.json"
+}

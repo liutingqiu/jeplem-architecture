@@ -324,3 +324,43 @@ class WebSocialSensor:
             fact_value=validated["content_url"],
         )
         return True
+
+
+class WebVideoSensor:
+    """视频感官:真实视频 → ffmpeg 帧提取 → 运动特征 → 统一语义空间 → 身体。
+
+    fact_value = url,账本键 identity:{url}。帧数不足 2 视为拉取失败。
+    """
+
+    def __init__(self, backend: WebFetchBackend, body, space,
+                 *, dim: int = DEFAULT_DIM, extractor=None, n_frames: int = 8) -> None:
+        from .video_features import VideoFeatureExtractor, extract_frames
+
+        self.backend = backend
+        self.body = body
+        self.space = space
+        self.extract_frames = extract_frames
+        self.n_frames = n_frames
+        self.extractor = extractor or VideoFeatureExtractor()
+        encoder = ModalityEncoder(self.extractor.dim, dim=dim, state_dim=self.extractor.dim)
+        if "web-video" not in self.space.encoders:
+            self.space.register("web-video", encoder)
+
+    def sense(self, url: str) -> bool:
+        try:
+            resource = self.backend.fetch_video(url)
+        except WebFetchError:
+            return False
+        try:
+            video = self.extract_frames(resource.content, n_frames=self.n_frames)
+        except WebFetchError:
+            return False
+        semantic = self.extractor.extract(video.frames)
+        self.body.observe(
+            "web-video",
+            torch.tensor(semantic, dtype=torch.float32),
+            payload={"url": resource.url, "hash": resource.content_hash,
+                     "n_frames": len(video.frames), "duration": video.duration},
+            fact_value=url,
+        )
+        return True
