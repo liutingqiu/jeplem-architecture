@@ -1,0 +1,23 @@
+{
+  "protocol": "phase2_body_v12b_value_learned_v2: the body LEARNS task values from noisy rewards (sample-mean estimation, hidden true values) and selects by its ESTIMATED value; random selector control. Criterion: first-completed task is the true-top-value task >= 0.7, >= random + 0.2, and estimated-vs-true Spearman >= 0.8.",
+  "seed": 666,
+  "results": {
+    "learned_first_top": 0.975,
+    "random_first_top": 0.2,
+    "true_values": [
+      3,
+      10,
+      1,
+      7
+    ],
+    "estimated_values": [
+      2.65,
+      10.18,
+      1.18,
+      7.39
+    ],
+    "spearman_true_est": 1.0
+  },
+  "accepted": true,
+  "artifact": "artifacts\\v12b-s666.json"
+}
