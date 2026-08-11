@@ -1,0 +1,111 @@
+{
+  "protocol": "audit_memory_emotion_trust_modulation_v1: emotion (valence/arousal) + trust modulate JEPLMMemory write gate and salience buffer; retrieval reweights high-salience slots. High vs low modulation in separate memories (identical init); control = None. M1 high salience gap > 0.15 (all modes); M2 ambiguous-query retrieval favors high slot (fifo, ratio > 1.2); M3 control flat 1.0. Criterion: M1/M2(fifo)/M3 across 3 seeds x 3 write modes.",
+  "results": {
+    "m1_salience_gap": 1.6,
+    "m2_attention_ratio_fifo": 1.208,
+    "m3_control_flat": 0.0
+  },
+  "per_mode": [
+    {
+      "write_mode": "fifo",
+      "seed": 111,
+      "high_salience": 1.7999998331069946,
+      "low_salience": 0.20000003278255463,
+      "salience_gap": 1.59999980032444,
+      "high_att": 0.06430466642433946,
+      "low_att": 0.05354825712063096,
+      "att_ratio": 1.2008731914369684,
+      "ctrl_flat": 0.0
+    },
+    {
+      "write_mode": "fifo",
+      "seed": 222,
+      "high_salience": 1.7999998331069946,
+      "low_salience": 0.20000003278255463,
+      "salience_gap": 1.59999980032444,
+      "high_att": 0.06704772196032784,
+      "low_att": 0.05548493835059079,
+      "att_ratio": 1.2083949978762827,
+      "ctrl_flat": 0.0
+    },
+    {
+      "write_mode": "fifo",
+      "seed": 333,
+      "high_salience": 1.7999998331069946,
+      "low_salience": 0.20000003278255463,
+      "salience_gap": 1.59999980032444,
+      "high_att": 0.06568504057147286,
+      "low_att": 0.05402373353188688,
+      "att_ratio": 1.2158552598498773,
+      "ctrl_flat": 0.0
+    },
+    {
+      "write_mode": "gate",
+      "seed": 111,
+      "high_salience": 1.7999955415725708,
+      "low_salience": 0.20143140852451324,
+      "salience_gap": 1.5985641330480576,
+      "high_att": 0.0625,
+      "low_att": 0.0625,
+      "att_ratio": 1.0,
+      "ctrl_flat": 0.0
+    },
+    {
+      "write_mode": "gate",
+      "seed": 222,
+      "high_salience": 1.7985306978225708,
+      "low_salience": 0.20006167888641357,
+      "salience_gap": 1.5984690189361572,
+      "high_att": 0.0625,
+      "low_att": 0.0625,
+      "att_ratio": 1.0,
+      "ctrl_flat": 0.0
+    },
+    {
+      "write_mode": "gate",
+      "seed": 333,
+      "high_salience": 1.7999813556671143,
+      "low_salience": 0.20083393156528473,
+      "salience_gap": 1.5991474241018295,
+      "high_att": 0.0624999962747097,
+      "low_att": 0.0625,
+      "att_ratio": 0.9999999403953552,
+      "ctrl_flat": 0.0
+    },
+    {
+      "write_mode": "delta_rule",
+      "seed": 111,
+      "high_salience": 1.7999999523162842,
+      "low_salience": 0.20000000298023224,
+      "salience_gap": 1.599999949336052,
+      "high_att": 0.05943265354091471,
+      "low_att": 0.06744944913820787,
+      "att_ratio": 0.8811436460975941,
+      "ctrl_flat": 0.0
+    },
+    {
+      "write_mode": "delta_rule",
+      "seed": 222,
+      "high_salience": 1.7999999523162842,
+      "low_salience": 0.20000000298023224,
+      "salience_gap": 1.599999949336052,
+      "high_att": 0.05958756601268595,
+      "low_att": 0.06789035282351753,
+      "att_ratio": 0.8777029951160387,
+      "ctrl_flat": 0.0
+    },
+    {
+      "write_mode": "delta_rule",
+      "seed": 333,
+      "high_salience": 1.7999999523162842,
+      "low_salience": 0.20000000298023224,
+      "salience_gap": 1.599999949336052,
+      "high_att": 0.05951118164441802,
+      "low_att": 0.06588213213465431,
+      "att_ratio": 0.9032977488157955,
+      "ctrl_flat": 0.0
+    }
+  ],
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\mem-emotion-trust-modulation.json"
+}

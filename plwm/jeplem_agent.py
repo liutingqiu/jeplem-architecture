@@ -90,8 +90,14 @@ class JEPLMAgent(nn.Module):
     def reset(self, batch: int, device: torch.device) -> None:
         self.memory.reset(batch, device)
 
-    def step(self, observation_step: Tensor, valid_step: Tensor) -> tuple[Tensor, Tensor, Tensor | None]:
-        """One frame -> (policy_logits, value, aux_logits|None)."""
+    def step(self, observation_step: Tensor, valid_step: Tensor,
+             modulation: Tensor | None = None) -> tuple[Tensor, Tensor, Tensor | None]:
+        """One frame -> (policy_logits, value, aux_logits|None).
+
+        ``modulation`` (optional): [B, K] internal-feeling vector forwarded to
+        the memory's write gate / salience buffer.  None keeps current
+        behaviour.
+        """
         if self.use_perception:
             raw = observation_step[..., : self.sensory_dim]
             query = observation_step[..., self.sensory_dim:]
@@ -107,18 +113,19 @@ class JEPLMAgent(nn.Module):
             # goal-driven retrieval: the trailing goal channels (e.g. the
             # stream selector: current vs previous identity) address memory.
             goal = observation_step[..., -self.goal_dim :]
-        features, aux = self.memory.step(memory_input, valid_step, goal=goal)
+        features, aux = self.memory.step(memory_input, valid_step, goal=goal, modulation=modulation)
         output = self.head(features)
         return output[..., :-1], output[..., -1], aux
 
-    def forward(self, observations: Tensor, valid: Tensor) -> tuple[Tensor, Tensor, Tensor | None]:
+    def forward(self, observations: Tensor, valid: Tensor,
+                modulation: Tensor | None = None) -> tuple[Tensor, Tensor, Tensor | None]:
         batch, length, _ = observations.shape
         self.reset(batch, observations.device)
         logits_list: list[Tensor] = []
         values_list: list[Tensor] = []
         aux_list: list[Tensor] = []
         for index in range(length):
-            logits, value, aux = self.step(observations[:, index], valid[:, index])
+            logits, value, aux = self.step(observations[:, index], valid[:, index], modulation=modulation)
             logits_list.append(logits)
             values_list.append(value)
             if aux is not None:

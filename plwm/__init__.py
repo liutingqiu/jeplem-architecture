@@ -40,6 +40,7 @@ try:
     from .video_features import VideoFeatureExtractor, extract_frames
     from .link_graph import LinkGraph
     from .trust import TrustRegistry
+    from .modulation import modulation_vector, salience_from_modulation
 except ModuleNotFoundError:  # The dependency-free core remains importable.
     pass
 
@@ -107,4 +108,6 @@ __all__ = [
     "extract_frames",
     "LinkGraph",
     "TrustRegistry",
+    "modulation_vector",
+    "salience_from_modulation",
 ]

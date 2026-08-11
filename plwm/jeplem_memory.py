@@ -47,6 +47,7 @@ class JEPLMMemory(nn.Module):
         write_mode: str = "fifo",
         goal_dim: int = 0,
         shared_address: bool = False,
+        modulation_dim: int = 0,
     ) -> None:
         super().__init__()
         self.slots = slots
@@ -70,7 +71,7 @@ class JEPLMMemory(nn.Module):
         self.key = nn.Linear(latent, latent, bias=False)
         self.query = self.key if shared_address else nn.Linear(latent, latent, bias=False)
         self.value = nn.Linear(latent, latent)
-        gate_in = latent + (1 if use_surprise_feature else 0)
+        gate_in = latent + (1 if use_surprise_feature else 0) + modulation_dim
         self.write_gate = nn.Linear(gate_in, 1)
         self.state_cell = nn.GRUCell(latent * 2, latent)
         self.head_in = latent * 2  # state + recalled
@@ -83,9 +84,11 @@ class JEPLMMemory(nn.Module):
         else:
             self.aux_head = None
         self.use_surprise_feature = use_surprise_feature
+        self.modulation_dim = modulation_dim
         self._state: Tensor | None = None
         self._keys: Tensor | None = None
         self._values: Tensor | None = None
+        self._salience: Tensor | None = None
 
     # -- lifecycle ----------------------------------------------------------
 
@@ -93,20 +96,28 @@ class JEPLMMemory(nn.Module):
         self._state = torch.zeros(batch, self.latent, device=device)
         self._keys = torch.zeros(batch, self.slots, self.latent, device=device)
         self._values = torch.zeros_like(self._keys)
+        self._salience = torch.ones(batch, self.slots, device=device)
 
-    def initial_state(self, batch: int, device: torch.device) -> tuple[Tensor, Tensor, Tensor]:
+    def initial_state(self, batch: int, device: torch.device) -> tuple:
         return (
             torch.zeros(batch, self.latent, device=device),
             torch.zeros(batch, self.slots, self.latent, device=device),
             torch.zeros(batch, self.slots, self.latent, device=device),
+            torch.ones(batch, self.slots, device=device),
         )
 
-    def load_state(self, state: tuple[Tensor, Tensor, Tensor]) -> None:
-        self._state, self._keys, self._values = state
+    def load_state(self, state: tuple) -> None:
+        # back-compat: accept the old 3-tuple (state, keys, values)
+        if len(state) == 3:
+            self._state, self._keys, self._values = state
+            self._salience = torch.ones_like(self._keys[..., 0])
+        else:
+            self._state, self._keys, self._values, self._salience = state
 
-    def export_state(self) -> tuple[Tensor, Tensor, Tensor]:
+    def export_state(self) -> tuple:
         assert self._state is not None
-        return self._state, self._keys, self._values
+        assert self._salience is not None
+        return self._state, self._keys, self._values, self._salience
 
     # -- core ---------------------------------------------------------------
 
@@ -116,6 +127,7 @@ class JEPLMMemory(nn.Module):
         valid_step: Tensor,
         surprise_feature: Tensor | None = None,
         goal: Tensor | None = None,
+        modulation: Tensor | None = None,
     ) -> tuple[Tensor, Tensor | None]:
         """One frame: read, update state, gated write.
 
@@ -123,10 +135,17 @@ class JEPLMMemory(nn.Module):
         addressing (added to the projected query).  Ignored when the memory
         was built without ``goal_dim``.
 
+        ``modulation`` (optional): [B, modulation_dim] internal-feeling vector
+        (e.g. emotion valence/arousal + source trust).  It feeds the write
+        gate (high arousal/trust -> stronger write) and the per-slot salience
+        buffer, so retrieval reweights high-salience slots higher.  Ignored
+        when the memory was built without ``modulation_dim``.
+
         Returns (features, aux_logits): features = cat(state, recalled) for
         the host's head; aux_logits = None unless aux_timescales > 0.
         """
         assert self._state is not None and self._keys is not None and self._values is not None
+        assert self._salience is not None
         batch = observation_step.shape[0]
         encoded = self.encoder(observation_step)
         query_vec = self.query(encoded)
@@ -136,6 +155,11 @@ class JEPLMMemory(nn.Module):
             torch.einsum("bd,bmd->bm", query_vec, self._keys) / self.latent**0.5,
             dim=-1,
         )
+        if self.modulation_dim > 0:
+            # salience reweighting: high-salience slots retrieve stronger
+            sal = 0.5 + 0.5 * self._salience  # [B,S] in [0.5, 1.0]
+            weights = weights * sal
+            weights = weights / weights.sum(dim=-1, keepdim=True).clamp_min(1e-8)
         recalled = torch.einsum("bm,bmd->bd", weights, self._values)
         candidate_state = self.state_cell(torch.cat((encoded, recalled), dim=-1), self._state)
         if self.use_surprise_feature:
@@ -145,21 +169,36 @@ class JEPLMMemory(nn.Module):
             )
         else:
             gate_input = encoded
+        if self.modulation_dim > 0:
+            mod = modulation if modulation is not None else torch.zeros(batch, self.modulation_dim, device=encoded.device)
+            gate_input = torch.cat((gate_input, mod), dim=-1)
         gate = torch.sigmoid(self.write_gate(gate_input)).view(batch, 1, 1)
+        # modulation salience for the write: arousal + trust, neutral 1.0
+        if self.modulation_dim > 0 and modulation is not None and modulation.shape[-1] >= 2:
+            mod_sal = torch.clamp(
+                modulation[:, 1] + modulation[:, -1], 0.0, 2.0
+            ).view(batch, 1)  # [B,1], neutral 1.0
+        else:
+            mod_sal = torch.ones(batch, 1, device=encoded.device)
         candidate_keys = torch.cat((self._keys[:, 1:], self.key(encoded).unsqueeze(1)), dim=1)
         candidate_values = torch.cat((self._values[:, 1:], self.value(encoded).unsqueeze(1)), dim=1)
+        candidate_salience = torch.cat((self._salience[:, 1:], mod_sal), dim=1)
         active = valid_step.unsqueeze(-1)
         active_slots = active.unsqueeze(-1)
         new_keys, new_values = self._keys, self._values
+        new_salience = self._salience
         if self.write_mode == "fifo":
             # unconditional FIFO rotation (the de-facto behavior before 2026-08-11)
             new_keys, new_values = candidate_keys, candidate_values
+            new_salience = candidate_salience
         elif self.write_mode == "gate":
             # learned per-frame gate controls how much of the new content
             # replaces the recalled slot (the documented-but-unwired behavior)
             recalled_slot = recalled.unsqueeze(1)  # [B,1,D]
+            recalled_sal = self._salience[:, -1].unsqueeze(1) if self.modulation_dim == 0 else self._salience.mean(dim=1, keepdim=True)
             new_values = (1 - gate) * recalled_slot + gate * self.value(encoded).unsqueeze(1)
             new_keys = (1 - gate) * recalled_slot + gate * self.key(encoded).unsqueeze(1)
+            new_salience = (1 - gate.squeeze(-1)) * recalled_sal + gate.squeeze(-1) * mod_sal
         elif self.write_mode == "delta_rule":
             # content-addressed erase + add (KDA-style): pick the most similar
             # slot, erase it proportionally to similarity, then add new content
@@ -172,9 +211,13 @@ class JEPLMMemory(nn.Module):
             mask = (idx.unsqueeze(0) == selected.unsqueeze(-1)).float().unsqueeze(-1)  # [B,S,1]
             new_values = (1 - erase.unsqueeze(-1) * mask) * self._values + mask * (add * self.value(encoded)).unsqueeze(1)
             new_keys = (1 - erase.unsqueeze(-1) * mask) * self._keys + mask * (add * self.key(encoded)).unsqueeze(1)
+            sel_mask = mask.squeeze(-1)  # [B,S]
+            new_salience = (1 - sel_mask) * self._salience + sel_mask * mod_sal
         self._state = torch.where(active, candidate_state, self._state)
         self._keys = torch.where(active_slots, new_keys, self._keys)
         self._values = torch.where(active_slots, new_values, self._values)
+        # salience is [B,S]; use the 2-D active mask (not the 3-D active_slots)
+        self._salience = torch.where(active, new_salience, self._salience)
         features = torch.cat((self._state, recalled), dim=-1)
         aux_logits = self.aux_head(features) if self.aux_head is not None else None
         return features, aux_logits
