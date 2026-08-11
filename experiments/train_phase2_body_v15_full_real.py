@@ -60,8 +60,9 @@ class RealPerceptionRuntime:
         return int(record.value) if record is not None else None
 
 
-def run(*, updates: int = 30, episodes: int = 16, experiment_seed: int = 41_123,
-        device: str | torch.device | None = None, artifact: Path | None = None) -> dict:
+def run(*, updates: int = 100, episodes: int = 16, experiment_seed: int = 41_123,
+        device: str | torch.device | None = None, artifact: Path | None = None,
+        episodes_per_update: int = 24) -> dict:
     from plwm.device import resolve_device
     from torch.distributions import Categorical
     resolved = resolve_device(device)
@@ -80,7 +81,7 @@ def run(*, updates: int = 30, episodes: int = 16, experiment_seed: int = 41_123,
         env.input_dim, env.action_space.n, slots=8, aux_timescales=2,
         use_perception=True, perception_state_dict=str(ROOT / "artifacts" / "perception-layer.pt"),
     ).to(resolved)
-    real_train_ppo(model, env, updates=updates, episodes_per_update=12,
+    real_train_ppo(model, env, updates=updates, episodes_per_update=episodes_per_update,
                    seed_start=10_000, device=resolved)
     model.eval()
 
@@ -105,12 +106,13 @@ def run(*, updates: int = 30, episodes: int = 16, experiment_seed: int = 41_123,
                 perc_total += 1
                 rt.observe_identity(unit, perceived)
             outputs = model.step(raw, torch.ones(1, dtype=torch.bool, device=resolved))
-            dist = Categorical(logits=outputs[0][0])
-            action = int(dist.sample().item())
+            # deterministic evaluation (matches the standard protocol:
+            # _evaluate uses argmax, not stochastic sampling)
+            action = int(outputs[0][0].argmax().item())
             # query frames: correct if the action matches the queried identity
             if frame % env.unit_len == env.unit_len - 1:
                 target_unit = max(0, unit - (env._query_types[unit] if hasattr(env, "_query_types") else 0))
-                truth_action = env._identities[target_unit]
+                truth_action = env.target_action(unit, target_unit)
                 query_correct += int(action == truth_action)
                 query_total += 1
                 random_correct += int(random.randrange(2) == truth_action)
@@ -153,9 +155,11 @@ def run(*, updates: int = 30, episodes: int = 16, experiment_seed: int = 41_123,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--device", default=None)
-    parser.add_argument("--updates", type=int, default=30)
+    parser.add_argument("--updates", type=int, default=100)
+    parser.add_argument("--episodes-per-update", type=int, default=24)
     parser.add_argument("--experiment-seed", type=int, default=41_123)
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
     print(json.dumps(run(updates=args.updates, experiment_seed=args.experiment_seed,
-                         device=args.device, artifact=args.artifact), indent=2))
+                         device=args.device, artifact=args.artifact,
+                         episodes_per_update=args.episodes_per_update), indent=2))
