@@ -1,0 +1,20 @@
+{
+  "protocol": "compositional_generalization_v2: Block-6 upgrade. SCAN-like nested programs (DUP/REV); training on atoms + DUP + REV + two nesting shapes; heldout on three UNSEEN nesting shapes. monolithic GRU is tested for whether it generalizes the operation algebra. Criterion: heldout >= 0.8.",
+  "device": "cuda",
+  "train_programs": 30,
+  "test_programs": 12,
+  "results": [
+    {
+      "name": "monolithic_gru",
+      "train_accuracy": 0.3333333333333333,
+      "heldout_accuracy": 0.16666666666666666
+    },
+    {
+      "name": "compositional",
+      "train_accuracy": 1.0,
+      "heldout_accuracy": 0.4166666666666667
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\b6v3-s666.json"
+}

@@ -45,6 +45,18 @@ def _programs(seed: int) -> tuple[list[str], list[str]]:
     # seen nestings: DUP(REV(...)) and REV(DUP(x), y) with x atom
     seen += [f"DUP(REV({x},{y}))" for x in atoms for y in atoms]
     seen += [f"REV(DUP({x}),{y})" for x in atoms for y in atoms]
+    # deeper shapes added to TRAIN (2026-08-11, P6 tier-2): double-DUP and
+    # REV-with-DUP-subtree and triple-REV -- the three TEST shapes below stay
+    # strictly unseen
+    seen += [f"DUP(DUP({x}))" for x in atoms]
+    seen += [f"REV({x},DUP({y}))" for x in atoms for y in atoms]
+    seen += [f"REV(REV({x},{y}),{z})" for x in atoms for y in atoms for z in atoms]
+    # LONG-OUTPUT shapes (2026-08-11 P6 tier-2 round 3): the three test shapes
+    # emit 5-7 action tokens while earlier train shapes top out at 4 -- the
+    # autoregressive decoder never saw long outputs.  These two shapes emit
+    # 5-6 tokens and are NOT the test shapes (which stay strictly unseen).
+    seen += [f"DUP(REV(DUP({x}),{y}))" for x in atoms for y in atoms]  # 6 tokens
+    seen += [f"REV({x},DUP(DUP({y})))" for x in atoms for y in atoms]  # 5 tokens
     # unseen nestings (test): REV(DUP(x), DUP(y)) and DUP(REV(x, DUP(y))) etc.
     unseen = [f"REV(DUP({x}),DUP({y}))" for x in atoms for y in atoms]
     unseen += [f"DUP(REV({x},DUP({y})))" for x in atoms for y in atoms]
@@ -133,6 +145,8 @@ class CompositionalModel(nn.Module):
         super().__init__()
         self.structural = True
         self.atom = nn.Embedding(2, 16)
+        # residual DUP: x + MLP(x) -- prevents Tanh compression collapse over
+        # deep recursion (P6 tier-2, 2026-08-11)
         self.dup = nn.Sequential(nn.Linear(16, 16), nn.Tanh())
         self.rev = nn.Sequential(nn.Linear(32, 16), nn.Tanh())
         self.init_h = nn.Linear(16, 32)
@@ -157,7 +171,8 @@ class CompositionalModel(nn.Module):
             idx = torch.tensor([0 if prog == "a" else 1], device=self.atom.weight.device)
             return self.atom(idx)
         if prog.startswith("DUP("):
-            return self.dup(self._encode(prog[4:-1]))
+            inner = self._encode(prog[4:-1])
+            return inner + self.dup(inner)  # residual
         if prog.startswith("REV("):
             left, right = self._split_top(prog[4:-1])
             return self.rev(torch.cat([self._encode(left), self._encode(right)], dim=-1))
