@@ -1,0 +1,15 @@
+{
+  "protocol": "phase2_m2a_p2_selfdrive_v1: M1 runtime + explicit gap mechanism; NO external task instruction; prior asymmetry (half domains known low-gap, half unknown high-gap). Criterion: self-driven coverage >= 0.7, goal->gap audit >= 0.9 (goal source traceable to internal gap), first goal is an UNKNOWN high-gap domain in >= 0.8 of episodes (Block-4 criterion), beating random's first-goal quality by >= 0.2.",
+  "seed": 666,
+  "domains": 6,
+  "episodes": 50,
+  "results": {
+    "self_coverage": 1.0,
+    "goal_gap_audit": 1.0,
+    "self_first_goal_unknown": 1.0,
+    "random_coverage": 1.0,
+    "random_first_goal_unknown": 0.48
+  },
+  "accepted": true,
+  "artifact": "artifacts\\m2a-s666.json"
+}
