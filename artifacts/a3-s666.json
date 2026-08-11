@@ -1,0 +1,15 @@
+{
+  "protocol": "phase2_a3_worldmodel_drive_v1: body learns a deterministic transition (s'=(s+k) mod N) with a prediction head; prediction error (surprise) drives exploration to high-error states (Block-2 drive + Block-7 world model in the body). Criterion: prediction >= 0.9, curiosity coverage >= random + 0.2.",
+  "seed": 666,
+  "results": {
+    "prediction_accuracy": 0.925,
+    "curiosity_coverage": 1.0,
+    "random_coverage": 1.0,
+    "curiosity_steps_to_full": 6,
+    "random_steps_to_full": 12,
+    "min_visits": 33,
+    "max_visits": 46
+  },
+  "accepted": true,
+  "artifact": "artifacts\\a3-s666.json"
+}
