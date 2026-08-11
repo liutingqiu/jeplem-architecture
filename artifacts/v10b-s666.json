@@ -1,0 +1,13 @@
+{
+  "protocol": "phase2_body_v10b_causality_v2: the body infers causality from its OWN event history (flip interventions + confounder-driven changes). CI test: do(flip) prediction error vs naive correlation (confounded). Criterion: do error <= 0.15 and corr error - do error >= 0.1.",
+  "seed": 666,
+  "results": {
+    "do_flip_error": 0.129,
+    "correlation_error": 0.401,
+    "p_change_given_flip": 0.871,
+    "p_change_given_noflip": 0.121,
+    "p_change_overall": 0.47
+  },
+  "accepted": true,
+  "artifact": "artifacts\\v10b-s666.json"
+}
