@@ -1,0 +1,11 @@
+{
+  "protocol": "phase2_body_v11b_executive_info_v2: budgeted attention driven by the body's OWN belief signal -- write frames that CONFIRM the current belief (reliable evidence), skip frames that contradict it (noise). No script confidence label. Controls: write-all, random-budget. Criterion: attention query acc >= 0.85 and >= controls + 0.15.",
+  "seed": 555,
+  "results": {
+    "attention_query_acc": 1.0,
+    "write_all_acc": 0.333,
+    "random_budget_acc": 0.333
+  },
+  "accepted": true,
+  "artifact": "artifacts\\v11b-c-s555.json"
+}
