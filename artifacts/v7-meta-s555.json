@@ -1,0 +1,16 @@
+{
+  "protocol": "phase2_body_v7: meta-controller with REAL source conflicts -- mid-stream identity flip, conflict queried EVERY STEP in the transition window (ledger flips in ~1 step, belief lags a few). Routing must beat both fixed sources. Criterion: routing >= 0.85, routed > best fixed, P4 >= 0.9, P1/P5 >= 0.9.",
+  "seed": 555,
+  "results": {
+    "routing_accuracy": 0.712,
+    "routed_answer_acc": 0.712,
+    "fixed_memory_acc": 0.689,
+    "fixed_belief_acc": 0.311,
+    "flip_detection_p4": 0.438,
+    "continuity_p1": 1.0,
+    "consistency_p5": 1.0,
+    "n_conflicts": 312
+  },
+  "accepted": false,
+  "artifact": "artifacts\\v7-meta-s555.json"
+}

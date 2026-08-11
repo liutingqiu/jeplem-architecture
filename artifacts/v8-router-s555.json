@@ -1,0 +1,14 @@
+{
+  "protocol": "phase2_body_v8: NATURAL emergence of meta-controller routing -- RL (REINFORCE contextual bandit) trains the router's source choice on body-internal state features, reward = correctness of the routed answer. No labels. Natural conflicts: fresh-noise (belief right / ledger wrong) + post-flip lag (ledger right / belief wrong). Held-out evaluation. Hypothesis: RL routing beats both fixed sources.",
+  "seed": 555,
+  "results": {
+    "routed_acc": 0.625,
+    "fixed_memory_acc": 0.643,
+    "fixed_belief_acc": 0.61,
+    "routed_beats_best_fixed": false,
+    "n_train_queries": 36,
+    "n_eval_queries": 4284
+  },
+  "accepted": false,
+  "artifact": "artifacts\\v8-router-s555.json"
+}
