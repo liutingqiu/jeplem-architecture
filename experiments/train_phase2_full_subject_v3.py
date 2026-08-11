@@ -130,7 +130,7 @@ def run(*, updates: int = 60, episodes: int = 12, experiment_seed: int = 41_123,
         max_gap = rt.max_gap_identity()
         max_ent = rt.max_entropy_identity()
         selfdrive.append(int(max_gap == max_ent))
-        ok = all(rt.query(i) is not None for i in observed) if observed else True
+        ok = all(rt.query(i) is not None for i in observed) if observed else False
         continuity.append(int(ok))
         idle_ok = all(
             ch["event"] != "idle" or ch["snapshot"] == prev["snapshot"]

@@ -145,7 +145,10 @@ def run(*, n_train: int = 300, experiment_seed: int = 41_123,
         mono_correct += int(mono(x.unsqueeze(0)).argmax(-1).item() == 2)
     mono_acc = mono_correct / 100
 
-    accepted = composed_acc >= 0.9 and atomic_acc >= 0.9
+    # criterion aligned with the docstring claim (was composed+atomic only, the
+    # docstring promised composed >= monolithic + 0.2 -- the claim outran the gate)
+    accepted = (composed_acc >= 0.9 and atomic_acc >= 0.9
+                and composed_acc >= mono_acc + 0.2)
     report = {
         "protocol": "phase2_body_v9_composition_v1: atomic skills learned from single examples; composed response on unseen 'both' runs A then B (symbolic order skeleton + learned atoms, P6 hybrid); monolithic single-output is a STRUCTURAL control (cannot express two-action composition). Criterion: composed >= 0.9 and atomic >= 0.9.",
         "seed": experiment_seed,

@@ -52,6 +52,11 @@ def _sample(rng: random.Random, n: int, task: int, mode: str) -> tuple[Tensor, T
             other = (label + 2) % (N_FEAT // 8)
             x[other * 8:(other + 1) * 8] = 2.0
             x = x + torch.randn(N_FEAT) * id_noise
+        elif mode == "blur":
+            # task B OOD regime: clean block + HIGH noise (x3) -- different
+            # failure mode than double-block (was claimed in the docstring but
+            # never implemented; task B silently used 'double')
+            x = x + torch.randn(N_FEAT) * (id_noise * 3.0)
         else:  # id
             x = x + torch.randn(N_FEAT) * id_noise
         xs.append(x)
@@ -117,7 +122,7 @@ def run(*, device: str | torch.device | None = None, n_train: int = 1200,
     idA, yA, tA = _sample(rng, 600, 0, "id")
     oodA, yoA, toA = _sample(rng, 600, 0, "double")
     idB, yB, tB = _sample(rng, 600, 1, "id")
-    oodB, yoB, toB = _sample(rng, 600, 1, "double")
+    oodB, yoB, toB = _sample(rng, 600, 1, "blur")
     X2 = torch.cat((idA, oodA, idB, oodB)).to(resolved)
     T2 = torch.cat((tA, toA, tB, toB)).to(resolved)
     Y2 = torch.cat((yA, yoA, yB, yoB)).to(resolved)
@@ -134,7 +139,7 @@ def run(*, device: str | torch.device | None = None, n_train: int = 1200,
 
     # evaluation per task: OOD ECE of self_head vs softmax
     result = {}
-    for task, ood_mode in ((0, "double"), (1, "double")):
+    for task, ood_mode in ((0, "double"), (1, "blur")):
         xs_o, yo, ts_o = _sample(rng, 600, task, ood_mode)
         logits, conf = model(xs_o.to(resolved), ts_o.to(resolved))
         sm_probs = torch.softmax(logits, -1)

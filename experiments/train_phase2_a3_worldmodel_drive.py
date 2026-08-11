@@ -115,7 +115,9 @@ def run(*, n_states: int = 6, transition_k: int = 2, steps: int = 240,
     coverage_r = len(visited_r) / n_states
     stc = steps_to_full_c if steps_to_full_c is not None else steps
     str_ = steps_to_full_r if steps_to_full_r is not None else steps
-    accepted = pred_acc >= 0.9 and stc < str_
+    # criterion aligned with the docstring claim (was only stc < str_; the
+    # docstring promised coverage >= random + 0.2)
+    accepted = pred_acc >= 0.9 and stc < str_ and coverage_c >= coverage_r + 0.2
     report = {
         "protocol": "phase2_a3_worldmodel_drive_v1: body learns a deterministic transition (s'=(s+k) mod N) with a prediction head; prediction error (surprise) drives exploration to high-error states (Block-2 drive + Block-7 world model in the body). Criterion: prediction >= 0.9, curiosity coverage >= random + 0.2.",
         "seed": experiment_seed,

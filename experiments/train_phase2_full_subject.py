@@ -129,8 +129,9 @@ def run(*, updates: int = 60, episodes: int = 12, experiment_seed: int = 41_123,
         max_gap = rt.max_gap_identity()
         max_ent = rt.max_entropy_identity()
         selfdrive.append(int(max_gap == max_ent))
-        # P1: observed facts retrievable (ledger)
-        ok = all(rt.query(i) == v for i, v in observed.items()) if observed else True
+        # P1: observed facts retrievable (ledger).  Empty-sample exemption removed:
+        # no observations = no evidence of continuity = FAIL, not True.
+        ok = all(rt.query(i) == v for i, v in observed.items()) if observed else False
         continuity.append(int(ok))
         # P5: idle snapshots unchanged
         idle_ok = all(

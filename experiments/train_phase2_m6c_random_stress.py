@@ -192,8 +192,9 @@ def run(*, n_domains: int = 6, episodes: int = 20, n_events: int = 120,
         consistency.append(int(idle_ok))
 
     cont = float(np.mean(continuity)) if continuity else 0.0
-    drive = float(np.mean(selfdrive)) if selfdrive else 1.0
-    rev = float(np.mean(revision)) if revision else 1.0
+    # empty-sample exemption removed: no samples = FAIL, not free pass
+    drive = float(np.mean(selfdrive)) if selfdrive else 0.0
+    rev = float(np.mean(revision)) if revision else 0.0
     cons = float(np.mean(consistency)) if consistency else 0.0
     accepted = min(cont, drive, rev, cons) >= 0.9
     report = {
