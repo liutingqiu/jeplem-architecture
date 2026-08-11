@@ -108,7 +108,7 @@ class IntegratedBody:
 
 
 def run(*, steps: int = 600, experiment_seed: int = 41_123,
-        artifact: Path | None = None) -> dict:
+        flip_domain: int = -1, artifact: Path | None = None) -> dict:
     np.random.seed(experiment_seed)
     random.seed(experiment_seed)
     rng = random.Random(experiment_seed)
@@ -131,11 +131,22 @@ def run(*, steps: int = 600, experiment_seed: int = 41_123,
     value_ok = gap_ok = 0
     value_n = gap_n = 0
     pred_c = pred_t = 0
-    # The flipped domain is fixed to the HIGHEST-VALUE domain: greedy value
-    # selection then keeps observing it (so the flip IS detectable), which
-    # dissolves the greedy-vs-revision tension.  A random flip domain could be
-    # starved by value-greedy (e.g. s444 flipped domain 2, observed 0 times).
-    flipped_domain = int(np.argmax(VALUES))
+    # The flipped domain is fixed to a value-ordered domain.  The DEFAULT is
+    # the HIGHEST-VALUE domain (value-greedy keeps observing it, so the flip is
+    # detectable -- this dissolves the greedy-vs-revision tension; a random
+    # flip domain could be starved, e.g. s444 flipped domain 2 got 0 obs).
+    #
+    # CONTRAST (2026-08-12, honest): --flip-domain <non-highest-value> shows
+    # value-greedy NEVER selects the flipped domain, so revision is undetectable
+    # on 2/3 seeds (s444/s666 revision 0.0; only s555's random flip timing gave
+    # it enough pre-flip observations).  This is a STRUCTURAL incompatibility
+    # between value-greedy selection and random-domain revision, not a seed
+    # artifact: a world-change in a low-value domain is invisible to a system
+    # that only looks at the highest-value domain.  Fixing the flipped domain
+    # to the highest-value domain is therefore a task-construction necessity,
+    # not a score-tuning move -- but it does mean v14 does NOT test
+    # "revision in an unselected domain", which is a genuine limitation.
+    flipped_domain = int(np.argmax(VALUES)) if flip_domain < 0 else flip_domain
     flip_at = rng.randrange(50, 120)
     p1_ok = 0
     observed_keys: set[tuple[int, int]] = set()
@@ -236,6 +247,9 @@ def run(*, steps: int = 600, experiment_seed: int = 41_123,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--experiment-seed", type=int, default=41_123)
+    parser.add_argument("--flip-domain", type=int, default=-1,
+                        help="-1 = highest-value domain (default); otherwise the domain to flip")
     parser.add_argument("--artifact", type=Path, default=None)
     args = parser.parse_args()
-    print(json.dumps(run(experiment_seed=args.experiment_seed, artifact=args.artifact), indent=2))
+    print(json.dumps(run(experiment_seed=args.experiment_seed, flip_domain=args.flip_domain,
+                         artifact=args.artifact), indent=2))

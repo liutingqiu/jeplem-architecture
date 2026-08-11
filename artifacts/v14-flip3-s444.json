@@ -1,0 +1,15 @@
+{
+  "protocol": "phase2_body_v14_final_integration_v1: ALL mounted mechanisms on one layered composite long task -- value ranking (domain), gap (state), memory+belief (observe), prediction (transition), revision (flip), snapshot chain. Criterion: value 1.0, gap 1.0, prediction >= 0.85, belief >= 0.7 (noise floor ~0.78-0.85 majority-of-5 upper bound at p=0.65; initial 0.85 line ignored the noise floor, revised as criterion-error triage), revision >= 0.85, P1/P5 >= 0.9.",
+  "seed": 444,
+  "results": {
+    "value_order": 1.0,
+    "gap_order": 1.0,
+    "prediction_accuracy": 0.945,
+    "belief_accuracy": 1.0,
+    "revision_detection": 0.0,
+    "continuity_p1": 1.0,
+    "consistency_p5": 1.0
+  },
+  "accepted": false,
+  "artifact": "artifacts\\v14-flip3-s444.json"
+}
