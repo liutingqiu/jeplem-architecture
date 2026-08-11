@@ -58,7 +58,7 @@ class AutonomousStressRuntime:
         self.marked: set[int] = set()
         self.chain: list[dict] = []
         self.interference_log: list[str] = []
-        self.failures_by_domain: dict[int, int] = {}
+        self.revision_window: dict[int, list[int]] = {}
         self.flipped: set[int] = set()  # domains whose world-rule changed
 
     def snapshot_digest(self) -> str:
@@ -75,15 +75,18 @@ class AutonomousStressRuntime:
         counts = self.counts.setdefault((domain, identity), [1.0] * N_ACTIONS)
         predicted = int(np.argmax(counts))
         counts[value] += 1.0
-        # AUTONOMOUS change detection: consecutive failures of the current argmax
-        # against the latest observation.  Reset on success.  This is the body
-        # deciding on its own that the world changed -- no script guarantees it.
-        if predicted != value:
-            self.failures_by_domain[domain] = self.failures_by_domain.get(domain, 0) + 1
-            if self.failures_by_domain[domain] >= FLIP_THRESHOLD:
-                self.marked.add(domain)
-        else:
-            self.failures_by_domain[domain] = 0
+        # AUTONOMOUS change detection via WINDOW MAJORITY (probe-verified 2026-08-12):
+        # mark a domain when >=3 of the last 4 observations of it contradict the
+        # current argmax.  The old consecutive-failure counter (>=3 in a row) was
+        # brittle -- a single old-value observation reset it and the argmax catching
+        # up cleared it permanently (44% miss rate).  A majority window tolerates
+        # isolated contradictions (noise/interference) and fires on sustained change.
+        w = self.revision_window.setdefault(domain, [])
+        w.append(int(predicted != value))
+        if len(w) > 4:
+            w.pop(0)
+        if sum(w) >= 3:
+            self.marked.add(domain)
 
     def learn(self, domain: int, identity: int) -> None:
         # the world now yields the flipped mapping for flipped domains -- the
