@@ -1,0 +1,10 @@
+{
+  "protocol": "phase2_p6_hybrid_v1: symbolic recursive executor (DUP/REV structure) + LEARNED atom->action mapping; training supervises only the atoms (a->A, b->B) from seen programs; evaluation on UNSEEN nesting. Criterion: unseen heldout >= 0.95 (completeness) AND atom mapping learned (not hard-coded).",
+  "seed": 555,
+  "results": {
+    "unseen_heldout": 1.0,
+    "atoms_learned": true
+  },
+  "accepted": true,
+  "artifact": "artifacts\\p6h-s555.json"
+}
