@@ -1,0 +1,12 @@
+{
+  "protocol": "phase2_body_v12_value_v1: value-anchored goal selection (Block-10) -- the body picks the highest-value remaining task first; controls random / natural order. Criterion: first-completed task is the top-value task in >= 0.7 of episodes and >= random + 0.2.",
+  "seed": 555,
+  "results": {
+    "value_first_top": 1.0,
+    "top_task": 1,
+    "random_first_top": 0.25,
+    "natural_first_top": 0.0
+  },
+  "accepted": true,
+  "artifact": "artifacts\\v12-s555.json"
+}
