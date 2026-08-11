@@ -1,0 +1,16 @@
+{
+  "protocol": "phase2_body_v9: meta-controller with BALANCED conflicts -- window-majority memory vs Bayesian belief. Window memory holds a stale wrong value after a single noisy frame (belief right), flips fast after a world change (memory right, belief lags) -- both directions present. REINFORCE no-label routing, held-out eval. Hypothesis: RL routing >> fixed sources, approaching oracle.",
+  "seed": 666,
+  "results": {
+    "routed_acc": 0.71,
+    "fixed_memory_acc": 0.687,
+    "fixed_belief_acc": 0.653,
+    "oracle_acc": 0.841,
+    "routed_beats_best_fixed": true,
+    "routed_vs_oracle_gap": 0.131,
+    "n_train_queries": 4320,
+    "n_eval_queries": 1440
+  },
+  "accepted": true,
+  "artifact": "artifacts\\v9-final-s666.json"
+}
