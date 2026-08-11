@@ -31,10 +31,11 @@ sys.path.insert(0, str(ROOT))
 from plwm.fact_ledger import FactRecord, VersionedFactLedger
 from experiments.train_evidence_seek_rl import (EvidenceSeekEnv, JEPLMEvidenceSeek,
                                                 N_ACTIONS, _train_ppo, _clue_valid,
+                                                _map_policy_action, _gap_argmax_request,
                                                 ACTION_REQUEST_0, ACTION_ANSWER_0, ACTION_ANSWER_1)
 
 N_IDENTITIES = 2
-N_ACTIONS = 2
+N_ACTIONS = 4
 
 
 class SubjectRuntime:
@@ -98,7 +99,7 @@ def run(*, updates: int = 60, episodes: int = 12, experiment_seed: int = 41_123,
     env = EvidenceSeekEnv(units=4, identity_count=N_IDENTITIES, reliability=0.65)
     model = JEPLMEvidenceSeek(env.input_dim, N_ACTIONS, goal_dim=N_IDENTITIES).to(resolved)
     _train_ppo(model, env, updates=updates, episodes_per_update=16,
-               seed_start=10_000, device=resolved)
+               seed_start=10_000, device=resolved, explicit_gap=True)
     model.eval()
 
     continuity, selfdrive, consistency = [], [], []
@@ -109,12 +110,24 @@ def run(*, updates: int = 60, episodes: int = 12, experiment_seed: int = 41_123,
         rt.idle()
         observed: dict[int, int] = {}
         for frame in range(env.total_steps):
+            unit = frame // env.unit_len
+            pos = frame % env.unit_len
             obs_t = torch.tensor(obs).unsqueeze(0).to(resolved)
             valid_t = torch.tensor([_clue_valid(env, frame)], dtype=torch.bool, device=resolved)
             outputs = model.step(obs_t, valid_t)
             from torch.distributions import Categorical
             dist = Categorical(logits=outputs[0][0])
-            action = int(dist.sample().item())
+            policy_action = int(dist.sample().item())
+            # The EvidenceSeek RL agent cannot learn 'request' (integration 9.3),
+            # so the runtime would get zero observations and continuity would
+            # collapse.  Requests are only honored on QUERY frames (env.step);
+            # we FORCE a gap-driven request (gap_goals picks the target) on each
+            # query frame except the last, so the runtime accumulates clues.  The
+            # model only answers (when it has evidence, via explicit_gap map).
+            if pos == env.unit_len - 1 and unit < env.units - 1:
+                action = _gap_argmax_request(env)  # explicit gap-driven request
+            else:
+                action = _map_policy_action(model, policy_action, env, explicit_gap=True)
             # runtime sees the clue the agent observed (attribution+value)
             if _clue_valid(env, frame) and env._clues[frame // env.unit_len] is not None:
                 identity, value = env._clues[frame // env.unit_len]
