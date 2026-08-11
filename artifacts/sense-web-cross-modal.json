@@ -1,0 +1,14 @@
+{
+  "protocol": "sense_web_cross_modal_v1: the SAME fact ('temperature 23') arrives via a real HTML page (text) and a real JSON API (struct); both project through one SemanticSpace and converge on the same ledger identity key + memory recall. C1 same key; C2 cross-modal memory recall. Criterion: C1>=1.0, C2>=0.9.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "same_identity_key": 1.0,
+    "cross_modal_recall": 1.0
+  },
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\sense-web-cross-modal.json"
+}

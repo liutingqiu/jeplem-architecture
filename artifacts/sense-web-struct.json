@@ -1,0 +1,16 @@
+{
+  "protocol": "sense_web_struct_v1: real JSON API -> declared-schema validation -> unified semantic space -> body ledger. C1 valid accepted; C2 extra-key/random JSON rejected; C3 inverted same-schema value ledger-isolated (not overwriting). Criterion: C1/C2/C3 per seed.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "accepted_valid": 1.0,
+    "rejected_extra": 1.0,
+    "value_kept": 1.0,
+    "conflict_isolated": 1.0
+  },
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\sense-web-struct.json"
+}

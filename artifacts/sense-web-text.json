@@ -1,0 +1,15 @@
+{
+  "protocol": "sense_web_text_v1: real HTTP page fetched by WebTextSensor -> factual features -> unified semantic space -> body ledger. C1 accepted (every fetch lands an observation), C2 ledger identity key, C3 belief (control arm implicit: no fetch -> no keys). Criterion: C1 and C2 per seed.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "fetched": 1.0,
+    "accepted_obs": 1.0,
+    "ledger_hit": 1.0
+  },
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\sense-web-text.json"
+}

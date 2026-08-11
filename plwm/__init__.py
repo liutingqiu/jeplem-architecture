@@ -21,6 +21,11 @@ try:
     from .language import JsonLanguagePort, LanguageEvidence, OllamaBackend
     from .events import EnvironmentEvent, EpisodeTrace, observation_payload
     from .minecraft import MinecraftFileBridge, MinecraftRuntimeSession, MinecraftStateEncoder
+    from .emotion import Effort, Emotion, EmotionalState, TimeSense
+    from .semantic_space import ModalityEncoder, SemanticSpace, cosine
+    from .multimodal_body import BodyObservation, MultimodalBody
+    from .web import JsonSchemaValidator, WebFetchBackend, WebFetchError, WebResource
+    from .web_sensors import WebStructSensor, WebTextSensor
 except ModuleNotFoundError:  # The dependency-free core remains importable.
     pass
 
@@ -59,4 +64,19 @@ __all__ = [
     "MinecraftFileBridge",
     "MinecraftRuntimeSession",
     "MinecraftStateEncoder",
+    "Effort",
+    "Emotion",
+    "EmotionalState",
+    "TimeSense",
+    "ModalityEncoder",
+    "SemanticSpace",
+    "cosine",
+    "BodyObservation",
+    "MultimodalBody",
+    "JsonSchemaValidator",
+    "WebFetchBackend",
+    "WebFetchError",
+    "WebResource",
+    "WebStructSensor",
+    "WebTextSensor",
 ]
