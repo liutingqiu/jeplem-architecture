@@ -1,0 +1,72 @@
+{
+  "protocol": "explore_real_web_v1: the body explores the REAL internet on its own (choose_targets explore=True), following links freely and routing each URL to its modality by content (sense_full). E1 modality diversity; E2 graph growth + new urls; E3 fact accumulation; E4 failure tolerance; E5 autonomous auto-choices. Network-dependent: failures are honest data. Criterion: E1-E5 across 3 seeds.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "e1_modality_diversity": 1.0,
+    "e2_graph_growth": 1.0,
+    "e3_facts_accumulated": 1.0,
+    "e4_failure_tolerant": 1.0,
+    "e5_autonomous_choice": 1.0,
+    "avg_urls": 10.0,
+    "avg_edges": 204.0
+  },
+  "per_seed": [
+    {
+      "round": 4,
+      "urls_sensed": 10,
+      "facts": 212,
+      "graph_edges": 204,
+      "modalities": {
+        "web-text": 8,
+        "web-link": 204
+      },
+      "trust_mean": 0.544,
+      "choice_log": 12,
+      "e1_modality": true,
+      "e2_graph": true,
+      "e3_facts": true,
+      "e4_tolerant": true,
+      "e5_auto": true
+    },
+    {
+      "round": 4,
+      "urls_sensed": 10,
+      "facts": 212,
+      "graph_edges": 204,
+      "modalities": {
+        "web-text": 8,
+        "web-link": 204
+      },
+      "trust_mean": 0.544,
+      "choice_log": 12,
+      "e1_modality": true,
+      "e2_graph": true,
+      "e3_facts": true,
+      "e4_tolerant": true,
+      "e5_auto": true
+    },
+    {
+      "round": 4,
+      "urls_sensed": 10,
+      "facts": 212,
+      "graph_edges": 204,
+      "modalities": {
+        "web-text": 8,
+        "web-link": 204
+      },
+      "trust_mean": 0.544,
+      "choice_log": 12,
+      "e1_modality": true,
+      "e2_graph": true,
+      "e3_facts": true,
+      "e4_tolerant": true,
+      "e5_auto": true
+    }
+  ],
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\explore-real-web.json"
+}

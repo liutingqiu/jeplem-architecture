@@ -44,6 +44,7 @@ class BodyRunner:
         social_subset: bool = False,
         struct_subset: bool = False,
         whitelist: Sequence[Mapping[str, Any]] | None = None,
+        max_urls: int = 1000,
     ) -> None:
         self.body = body
         self.backend = backend
@@ -53,9 +54,11 @@ class BodyRunner:
         self.social_subset = social_subset
         self.struct_subset = struct_subset
         self.whitelist = list(whitelist) if whitelist else []
+        self.max_urls = max_urls
         self.sensors = self._build_sensors()
         self.round_stats: list[dict] = []
         self.choice_log: list[dict] = []
+        self._explored: set[str] = set()
 
     def _build_sensors(self) -> dict[str, object]:
         """组装全部 10 种感官(复用各 sensor 的 register 模式,幂等)。"""
@@ -85,6 +88,45 @@ class BodyRunner:
         except Exception:  # noqa: BLE001 -- any web failure must not kill the body
             return False
 
+    def sense_full(self, url: str) -> dict:
+        """全模态路由:'尝一口才知道' URL 是什么内容。
+
+        先 probe Content-Type 决定模态;探针失败时顺序兜底(魔数判定)。
+        成功则把 URL 记入 _explored(去重),并尽量用 web-link 记录出链。
+        任何失败返回 {ok:False},绝不崩溃身体。
+        """
+        self._explored.add(url)
+        from .web import WebFetchError
+
+        # 1. probe-based routing
+        try:
+            content_type, _raw = self.backend.probe(url)
+            modality = None
+            if "text/html" in content_type or "text/plain" in content_type or "xml" in content_type:
+                modality = "web-text"
+            elif "json" in content_type:
+                modality = "web-json"
+            elif "image" in content_type:
+                modality = "web-image"
+            elif "audio" in content_type:
+                modality = "web-audio"
+            elif "video" in content_type:
+                modality = "web-video"
+            if modality is not None:
+                ok = self.sense_one(modality, url, override={"fact_value": url})
+                # HTML pages also feed web-link to grow the exploration graph
+                if ok and ("text/html" in content_type or modality == "web-text"):
+                    self.sense_one("web-link", url)
+                return {"url": url, "modality": modality, "ok": ok}
+        except WebFetchError:
+            pass
+        # 2. fallback: try each sensor's magic-number validation in order
+        for modality in ("web-text", "web-json", "web-image", "web-link", "web-audio", "web-video"):
+            override = {"fact_value": url} if modality in ("web-text", "web-json") else None
+            if self.sense_one(modality, url, override=override):
+                return {"url": url, "modality": modality, "ok": True}
+        return {"url": url, "modality": None, "ok": False}
+
     def _track_source(self, modality: str, url: str, ok: bool) -> None:
         """来源可信度演化:成功升分,失败降分。"""
         source = f"{modality}:{url}"
@@ -109,13 +151,12 @@ class BodyRunner:
                 "gap": float(gap), "recency": float(recency), "trust": float(trust)}
 
     def choose_targets(self, *, whitelist: Sequence[Mapping[str, Any]] | None = None,
-                       k: int | None = None) -> list[dict]:
+                       k: int | None = None, explore: bool = False) -> list[dict]:
         """自主选择下一轮感知目标。
 
-        候选 = 白名单 ∪ ledger 已知事实。决策(v14 式分层):
-        score = (-value, gap, -recency, trust) 字典序 argmax——
-        价值选"哪个 URL",gap+recency 选"感知什么",trust 破平。
-        每候选记入 choice_log 审计。
+        候选 = 白名单 ∪ ledger 已知事实 ∪ (explore=True 时)LinkGraph 发现
+        的新 URL。决策(v14 式分层):gap 优先(好奇未知),value 次级,
+        recency/trust 破平。每候选记入 choice_log 审计。
         """
         wl = list(whitelist) if whitelist is not None else self.whitelist
         candidates: list[dict] = []
@@ -140,6 +181,14 @@ class BodyRunner:
                     continue
                 seen.add((modality, url))
                 candidates.append(self._candidate_signals(modality, url, 1.0))
+        if explore:
+            # graph branch: discover NEW URLs from LinkGraph (unperceived targets)
+            already = {url for (_m, url) in seen}
+            for source, target in self.link_graph.edges():
+                if target in already or target in self._explored:
+                    continue
+                seen.add(("auto", target))
+                candidates.append(self._candidate_signals("auto", target, 1.0))
         # layered ranking: unexplored (high gap) first -- the body is curious
         # about the unknown; within same gap, higher value; then older
         # (low recency); trust breaks ties.  This keeps value as a preference
@@ -161,8 +210,9 @@ class BodyRunner:
         """一轮感知:对每个 target(含 modality/url/可选 override)感知 + 演化。
 
         targets=None 时自主选择(self.choose_targets)。显式传 targets 保持
-        旧行为(向后兼容)。感知结果同时驱动情绪:outcome(效价)+ surprise
-        (失败=意外/高唤起),使 arousal 有内部信号。
+        旧行为(向后兼容)。modality="auto" 的 target 走全模态路由
+        (sense_full,尝一口才知道)。感知结果同时驱动情绪:outcome(效价)+
+        surprise(失败=意外/高唤起),使 arousal 有内部信号。
         """
         if targets is None:
             targets = self.choose_targets()
@@ -170,8 +220,15 @@ class BodyRunner:
         for target in targets:
             modality = target["modality"]
             url = target["url"]
-            ok = self.sense_one(modality, url, override=target.get("override"))
-            self._track_source(modality, url, ok)
+            if modality == "auto":
+                # full-modal routing: the body "tastes" the URL to learn its type
+                result = self.sense_full(url)
+                ok = bool(result["ok"])
+                actual = result.get("modality")
+                self._track_source(actual or "auto", url, ok)
+            else:
+                ok = self.sense_one(modality, url, override=target.get("override"))
+                self._track_source(modality, url, ok)
             if ok:
                 stats["ok"] += 1
             else:

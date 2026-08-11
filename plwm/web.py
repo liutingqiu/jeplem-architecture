@@ -66,6 +66,37 @@ class WebFetchBackend:
         except (URLError, OSError, ValueError) as error:
             raise WebFetchError(f"failed to fetch {url}: {error}") from error
 
+    def probe(self, url: str) -> tuple[str, bytes]:
+        """探测一个 URL 的内容类型与原始字节(全模态路由用)。
+
+        返回 (content_type, raw)。Content-Type 缺失时用魔数尽力推断;
+        拉取失败抛 WebFetchError。
+        """
+        request = urllib.request.Request(
+            url,
+            headers={"User-Agent": self.user_agent, "Accept": "*/*"},
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                raw = response.read(self.max_bytes + 1)
+                if len(raw) > self.max_bytes:
+                    raise WebFetchError(f"response exceeds max_bytes={self.max_bytes}")
+                content_type = response.headers.get("Content-Type", "") or ""
+        except (URLError, OSError, ValueError) as error:
+            raise WebFetchError(f"failed to probe {url}: {error}") from error
+        if content_type:
+            return content_type.lower(), raw
+        # no Content-Type: infer from magic bytes
+        if raw[:8] == b"\x89PNG\r\n\x1a\n":
+            return "image/png", raw
+        if raw[:4] == b"RIFF" and raw[8:12] == b"WAVE":
+            return "audio/wav", raw
+        if _is_video(raw):
+            return "video/mp4", raw
+        if raw[:1] in (b"{", b"["):
+            return "application/json", raw
+        return "text/html", raw
+
     def fetch_text(self, url: str) -> WebResource:
         raw = self._open(url, "text/html,text/plain")
         text = _strip_html(raw.decode("utf-8", errors="replace"))

@@ -102,6 +102,7 @@ class MultimodalBody:
         payload: Mapping[str, Any] | None = None,
         fact_value: str | int | bool | None = None,
         confidence: float | None = None,
+        skip_ledger: bool = False,
     ) -> RuntimeTick:
         """一次多模态观测。semantic 是该模态的预训练语义向量(非原始感官)。
 
@@ -109,6 +110,7 @@ class MultimodalBody:
         修订),使同一事实的不同模态呈现汇聚到同一事实键。
         confidence 可选:由来源可信度(TrustRegistry)调制 FactRecord
         confidence;None 时沿用 log_likelihood 推导(向后兼容)。
+        skip_ledger:图发现/去重场景不写账本(可选)。
         """
         self.tick += 1
         evidence = VersionedEvidence(
@@ -125,7 +127,7 @@ class MultimodalBody:
         projected = self.space(modality, semantic)  # 统一 D 维语义向量
         tick_result = self.runtime.ingest(projected.tolist(), log_likelihood)
         fact_key: str | None = None
-        if self.ledger is not None and fact_value is not None:
+        if self.ledger is not None and fact_value is not None and not skip_ledger:
             # shared semantic identity key (NOT modality-prefixed): the same
             # fact presented in vision or text converges to the same ledger
             # key (Blueprint §3.3 "no bridging head"). Source stays the

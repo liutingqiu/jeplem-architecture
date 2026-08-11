@@ -14,6 +14,10 @@ class _Handler(BaseHTTPRequestHandler):
     def do_GET(self):  # noqa: N802
         if self.path in ("/page", "/a", "/b"):
             body = b"<html><body>The temperature is 23.</body></html>"
+        elif self.path == "/page_with_link":
+            body = b'<html><body>temp <a href="/other">x</a></body></html>'
+        elif self.path == "/other":
+            body = b"<html><body>other page 99</body></html>"
         elif self.path == "/api":
             body = json.dumps({"temperature": 23, "unit": "c", "city": "bj", "extra": 1}).encode()
         else:
@@ -162,6 +166,25 @@ class BodyRunnerTests(unittest.TestCase):
         # which fails, but the call itself works without crashing)
         stats = runner.run_round()
         self.assertEqual(stats["fail"], 1)
+
+    def test_sense_full_routes_to_text_and_discovers_link(self):
+        runner = self._runner(9)
+        with LocalServer() as base:
+            result = runner.sense_full(f"{base}/page_with_link")
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["modality"], "web-text")
+        self.assertIn(f"{base}/page_with_link", runner._explored)
+        self.assertTrue(runner.link_graph.has_edge(f"{base}/page_with_link", f"{base}/other"))
+
+    def test_choose_targets_explore_discovers_graph_urls(self):
+        runner = self._runner(10)
+        with LocalServer() as base:
+            # sense a page that links to /other -> graph has the edge
+            runner.sense_full(f"{base}/page_with_link")
+            # explore should surface the unperceived /other as an auto candidate
+            chosen = runner.choose_targets(k=1, explore=True)
+            auto_targets = [c for c in chosen if c["modality"] == "auto"]
+        self.assertTrue(any(t["url"].endswith("/other") for t in auto_targets))
 
 
 if __name__ == "__main__":
