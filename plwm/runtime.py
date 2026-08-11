@@ -34,10 +34,13 @@ class PersistentRuntime:
     claim that an external goal has completed.
     """
 
-    def __init__(self, input_dim: int, belief_states: int, *, latent_dim: int = 16):
+    def __init__(self, input_dim: int, belief_states: int, *, latent_dim: int = 16,
+                 emotion: "Emotion | None" = None, time_sense: "TimeSense | None" = None):
         self.core = PLWM(PLWMConfig(input_dim=input_dim, latent_dim=latent_dim))
         self.belief = CategoricalBelief.uniform(1, belief_states)
         self.ledger = CommitmentLedger()
+        self.emotion = emotion
+        self.time_sense = time_sense
 
     SNAPSHOT_VERSION = 1
 
@@ -54,6 +57,12 @@ class PersistentRuntime:
         selected = self.ledger.select(probs)
         entropy = float(self.belief.entropy().item())
         confidence = float(self.belief.confidence().item())
+        # internal-feeling layer (optional): time ticks on every ingest; the
+        # belief gap drives arousal when an Emotion is attached.
+        if self.time_sense is not None:
+            self.time_sense.tick()
+        if self.emotion is not None:
+            self.emotion.observe(gap=1.0 - confidence)
         if observation is None and selected is not None and entropy > 0.2:
             action = CognitiveAction.OBSERVE
         elif selected is not None and entropy > 0.2:
@@ -129,11 +138,14 @@ class TrainablePersistentRuntime:
 
     SNAPSHOT_VERSION = 1
 
-    def __init__(self, model: EndToEndPersistentPLWM, belief_states: int):
+    def __init__(self, model: EndToEndPersistentPLWM, belief_states: int,
+                 emotion: "Emotion | None" = None, time_sense: "TimeSense | None" = None):
         self.model = model
         self.latent = model.core.initial_state(1, "cpu")
         self.belief = CategoricalBelief.uniform(1, belief_states)
         self.ledger = CommitmentLedger()
+        self.emotion = emotion
+        self.time_sense = time_sense
 
     def add_commitment(self, commitment: Commitment) -> None:
         self.ledger.add(commitment)
@@ -148,9 +160,17 @@ class TrainablePersistentRuntime:
         selected = self.ledger.select(probs)
         entropy = float(self.belief.entropy().item())
         confidence = float(self.belief.confidence().item())
+        # internal-feeling layer (optional)
+        if self.time_sense is not None:
+            self.time_sense.tick()
+        if self.emotion is not None:
+            self.emotion.observe(gap=1.0 - confidence)
         action = CognitiveAction.THINK if selected is not None and entropy > 0.2 else CognitiveAction.SLEEP
         event = torch.tensor([list(observation)], dtype=torch.float32)
         self.latent, surprise = self.model.core.step(event, self.latent, think=action == CognitiveAction.THINK)
+        # surprise drives arousal once it is known this tick
+        if self.emotion is not None:
+            self.emotion.observe(surprise=float(surprise.item()))
         completed = sum(item.status == CommitmentStatus.COMPLETED for item in self.ledger.commitments)
         return TrainableRuntimeTick(action, entropy, confidence, selected.id if selected else None, completed, float(surprise.item()))
 

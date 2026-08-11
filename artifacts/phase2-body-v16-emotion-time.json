@@ -1,0 +1,18 @@
+{
+  "protocol": "phase2_body_v16_emotion_time_v1: emotion (valence from outcome, arousal from surprise/gap/effort) + interoception (Effort) + time sense (elapsed+recency) on the v14 layered composite task. J1 valence~outcome; J2 high-arousal memory confidence exceeds low (vs flat control gap~0); J3 time sense. Criterion: J1>=0.8, J2 gap>=0.05 and > control, J3>=0.9.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "j1_valence_outcome": 1.0,
+    "j2_high_survive": 1.0,
+    "j2_low_survive": 0.95,
+    "j2_on_gap": 0.05,
+    "j2_control_gap": 0.0,
+    "j3_time_ok": 1.0
+  },
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\phase2-body-v16-emotion-time.json"
+}
