@@ -1,0 +1,11 @@
+{
+  "protocol": "phase2_body_v9_composition_v1: atomic skills learned from single examples; composed response on unseen 'both' runs A then B (symbolic order skeleton + learned atoms, P6 hybrid); monolithic single-output is a STRUCTURAL control (cannot express two-action composition). Criterion: composed >= 0.9 and atomic >= 0.9.",
+  "seed": 444,
+  "results": {
+    "atomic_skill_acc": 1.0,
+    "composed_acc": 1.0,
+    "monolithic_acc": 0.27
+  },
+  "accepted": true,
+  "artifact": "artifacts\\v9-s444.json"
+}
