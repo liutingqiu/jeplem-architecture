@@ -1,0 +1,58 @@
+{
+  "protocol": "evidence_seek_v1: composite task for the integration layer -- K identities, noisy clue frames (p=reliability), query frames ask 'what is identity X' (X uniform in observation); agent answers X's value (+1 correct, ends) or requests a clue for a self-chosen identity (-0.01, next unit shows it); timeout at units units. PPO on-policy, no teacher/oracle. Controls: mlp_no_memory (memoryless, capped at reliability), gru_policy (compressed state), jeplem_policy (explicit slots). Probes: answer accuracy/rate, episode reward, request-vs-oracle-max-gap match.",
+  "device": "cuda",
+  "units": 8,
+  "gap": 2,
+  "identity_count": 4,
+  "reliability": 0.65,
+  "updates": 150,
+  "episodes_per_update": 24,
+  "results": [
+    {
+      "name": "mlp_no_memory",
+      "parameters": 5637,
+      "answer_accuracy": 0.0,
+      "answer_rate": 0.0,
+      "episode_reward": -0.030000000000000023,
+      "mean_steps": 8.0,
+      "gap_match_rate": 0.12109375,
+      "request_gap_mean": 0.32658679589864903,
+      "max_gap_mean": 0.5
+    },
+    {
+      "name": "gru_policy",
+      "parameters": 16346,
+      "answer_accuracy": 0.1111111111111111,
+      "answer_rate": 0.28125,
+      "episode_reward": -0.24093749999999972,
+      "mean_steps": 6.4375,
+      "gap_match_rate": 0.10638297872340426,
+      "request_gap_mean": 0.33284773316569854,
+      "max_gap_mean": 0.5
+    },
+    {
+      "name": "jeplem_policy",
+      "parameters": 51718,
+      "answer_accuracy": 0.3,
+      "answer_rate": 0.625,
+      "episode_reward": -0.26718749999999974,
+      "mean_steps": 5.4375,
+      "gap_match_rate": 0.03731343283582089,
+      "request_gap_mean": 0.3031078264676042,
+      "max_gap_mean": 0.5
+    },
+    {
+      "name": "explicit_key_policy",
+      "parameters": 1157,
+      "answer_accuracy": 0.29545454545454547,
+      "answer_rate": 0.6875,
+      "episode_reward": -0.2935937499999998,
+      "mean_steps": 4.46875,
+      "gap_match_rate": 0.10101010101010101,
+      "request_gap_mean": 0.3279813230185259,
+      "max_gap_mean": 0.5
+    }
+  ],
+  "accepted": false,
+  "artifact": "artifacts\\es-k4-hier-s555.json"
+}

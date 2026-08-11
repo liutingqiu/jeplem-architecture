@@ -1,0 +1,39 @@
+{
+  "protocol": "phase2_addressing_probe: supervised multi-slot content-addressing probe over K in {2,4,8}, goal-modulated vs plain read. Bayes-posterior-supervised answer logits on query frames. reliability 0.9, slots 16, 400-800 train steps.",
+  "date": "2026-08-12",
+  "results": {
+    "K2": {
+      "goal": {
+        "444": 0.938,
+        "555": 0.859,
+        "666": 0.945
+      },
+      "off": {
+        "444": 0.68,
+        "555": 0.664,
+        "666": 0.75
+      }
+    },
+    "K4": {
+      "goal": {
+        "444": 0.883,
+        "555": 0.918,
+        "666": 0.902
+      },
+      "off": {
+        "444": 0.668,
+        "555": 0.633,
+        "666": 0.641
+      }
+    },
+    "K8": {
+      "goal": {
+        "444": 0.902
+      },
+      "off": {
+        "444": 0.605
+      }
+    }
+  },
+  "conclusion": "Goal-modulated content addressing (query X one-hot modulates the read query) is measurably more precise than a plain read: gap goal-off ~0.22-0.30 across K. The gap does NOT close as K grows (K8 gap 0.297). This is the first direct evidence that JEPLMMemory can address a specific slot among many when the query names the target -- DecideStream only ever exercised most-recent recall."
+}
