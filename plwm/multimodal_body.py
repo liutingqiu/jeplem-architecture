@@ -101,11 +101,14 @@ class MultimodalBody:
         log_likelihood: Sequence[float] | None = None,
         payload: Mapping[str, Any] | None = None,
         fact_value: str | int | bool | None = None,
+        confidence: float | None = None,
     ) -> RuntimeTick:
         """一次多模态观测。semantic 是该模态的预训练语义向量(非原始感官)。
 
         fact_value 非 None 时,以 ``{modality}:{value}`` 为键写入账本(强证据
         修订),使同一事实的不同模态呈现汇聚到同一事实键。
+        confidence 可选:由来源可信度(TrustRegistry)调制 FactRecord
+        confidence;None 时沿用 log_likelihood 推导(向后兼容)。
         """
         self.tick += 1
         evidence = VersionedEvidence(
@@ -128,13 +131,20 @@ class MultimodalBody:
             # key (Blueprint §3.3 "no bridging head"). Source stays the
             # modality, so ownership/audit is preserved.
             fact_key = f"identity:{fact_value}"
+            if confidence is None:
+                if log_likelihood is None:
+                    conf = 1.0
+                else:
+                    conf = min(1.0, max(0.0, float(sum(log_likelihood)) * 2 + 0.5))
+            else:
+                conf = max(0.0, min(1.0, confidence))
             self.ledger.observe(
                 FactRecord(
                     key=fact_key,
                     value=fact_value,
                     source=modality,
                     tick=self.tick,
-                    confidence=1.0 if log_likelihood is None else min(1.0, max(0.0, float(sum(log_likelihood)) * 2 + 0.5)),
+                    confidence=conf,
                     version=1,
                 )
             )

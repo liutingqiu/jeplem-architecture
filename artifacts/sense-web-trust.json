@@ -1,0 +1,17 @@
+{
+  "protocol": "sense_web_trust_v1: TrustRegistry with a correct source (rises) vs an always-wrong source (falls); score modulates FactRecord.confidence -> ledger weak/strong isolation becomes continuous trust. C1 divergence (good>0.8, bad<0.3); C2 good facts in current, bad isolated; C3 confidence trend. Criterion: C1-C3 per seed.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "good_trust": 1.0,
+    "bad_trust": 0.0,
+    "good_in_current": 1.0,
+    "bad_isolated": 1.0,
+    "confidence_trend": 1.0
+  },
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\sense-web-trust.json"
+}

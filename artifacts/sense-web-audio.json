@@ -1,0 +1,16 @@
+{
+  "protocol": "sense_web_audio_v1: real WAV (sine/square/noise) over HTTP -> WebAudioSensor (stdlib decode + waveform features) -> unified semantic space -> body ledger. C1 fetched/decoded; C2 accepted; C3 ledger key; C4 waveforms distinct. Criterion: C1-C4 per seed.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "fetched_decoded": 1.0,
+    "accepted_obs": 1.0,
+    "ledger_hit": 1.0,
+    "min_waveform_dist": 0.967
+  },
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\sense-web-audio.json"
+}

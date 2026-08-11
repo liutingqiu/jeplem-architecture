@@ -90,14 +90,18 @@ class WebTextSensor:
         if "web-text" not in self.space.encoders:
             self.space.register("web-text", encoder)
 
-    def sense(self, url: str) -> bool:
-        """fetch 一页 → 提取 → 进身体。返回是否成功进身体。"""
+    def sense(self, url: str, *, fact_value_override: str | None = None) -> bool:
+        """fetch 一页 → 提取 → 进身体。返回是否成功进身体。
+
+        fact_value_override:跨模态汇聚时强制用同一事实键(如 URL),默认
+        None 沿用网页数字提取值(旧行为)。
+        """
         try:
             resource = self.backend.fetch_text(url)
         except WebFetchError:
             return False
         semantic = self.extractor.extract(resource.content)
-        fact_value = self.extractor.extract_value(resource.content)
+        fact_value = fact_value_override or self.extractor.extract_value(resource.content)
         self.body.observe(
             "web-text",
             semantic.squeeze(0),
@@ -221,3 +225,102 @@ class WebLinkSensor:
                 fact_value=f"{url}->{target}",
             )
         return bool(links)
+
+
+class WebAudioSensor:
+    """音频感官:真实 WAV → 波形特征 → 统一语义空间 → 身体。
+
+    fact_value = url,账本键 identity:{url}(与文本/图像同 URL 汇聚)。
+    """
+
+    def __init__(self, backend: WebFetchBackend, body, space,
+                 *, dim: int = DEFAULT_DIM, extractor=None) -> None:
+        from .audio_features import WaveFeatureExtractor, decode_wav
+
+        self.backend = backend
+        self.body = body
+        self.space = space
+        self.decode_wav = decode_wav
+        self.extractor = extractor or WaveFeatureExtractor()
+        encoder = ModalityEncoder(self.extractor.dim, dim=dim, state_dim=self.extractor.dim)
+        if "web-audio" not in self.space.encoders:
+            self.space.register("web-audio", encoder)
+
+    def sense(self, url: str) -> bool:
+        try:
+            resource = self.backend.fetch_audio(url)
+        except WebFetchError:
+            return False
+        try:
+            samples, rate = self.decode_wav(resource.content)
+        except WebFetchError:
+            return False
+        semantic = self.extractor.extract(samples, rate)
+        self.body.observe(
+            "web-audio",
+            semantic.squeeze(0),
+            payload={"url": resource.url, "hash": resource.content_hash, "sr": rate, "n": len(samples)},
+            fact_value=url,
+        )
+        return True
+
+
+class SocialEngagementEncoder:
+    """社交 engagement 特征:[like, comment, view] 归一化 + 互动率。"""
+
+    def encode(self, data: Mapping[str, Any]) -> Tensor:
+        like = float(data.get("like_count", 0))
+        comment = float(data.get("comment_count", 0))
+        view = float(data.get("view_count", 0))
+        interaction = (like + comment) / max(1.0, view)
+        return torch.tensor([[
+            like / 10000.0,
+            comment / 1000.0,
+            view / 1000000.0,
+            interaction,
+            1.0,
+        ]], dtype=torch.float32)
+
+    @property
+    def dim(self) -> int:
+        return 5
+
+
+class WebSocialSensor:
+    """社交信号感官:真实 JSON API → schema 校验 → engagement 特征 → 身体。
+
+    复用 JsonSchemaValidator 精确键集,多余键/凭据拒之门外。
+    fact_value = content_url,账本键 identity:{content_url}。
+    """
+
+    SOCIAL_SCHEMA = {"content_url": str, "like_count": int, "comment_count": int, "view_count": int}
+
+    def __init__(self, backend: WebFetchBackend, body, space,
+                 *, dim: int = DEFAULT_DIM, encoder: SocialEngagementEncoder | None = None) -> None:
+        self.backend = backend
+        self.body = body
+        self.space = space
+        self.validator = JsonSchemaValidator({"engagement": self.SOCIAL_SCHEMA})
+        self.encoder = encoder or SocialEngagementEncoder()
+        mod = ModalityEncoder(self.encoder.dim, dim=dim, state_dim=self.encoder.dim)
+        if "web-social" not in self.space.encoders:
+            self.space.register("web-social", mod)
+
+    def sense(self, url: str) -> bool:
+        try:
+            resource = self.backend.fetch_json(url)
+        except WebFetchError:
+            return False
+        try:
+            validated = self.validator.validate("engagement", resource.content)
+        except ValueError:
+            return False
+        semantic = self.encoder.encode(validated)
+        self.body.observe(
+            "web-social",
+            semantic.squeeze(0),
+            payload={"url": resource.url, "hash": resource.content_hash,
+                     "content_url": validated["content_url"]},
+            fact_value=validated["content_url"],
+        )
+        return True

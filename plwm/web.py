@@ -77,6 +77,13 @@ class WebFetchBackend:
             raise WebFetchError(f"{url} is not a PNG image")
         return WebResource(url, "web-image", raw, _sha256(raw.hex()))
 
+    def fetch_audio(self, url: str) -> WebResource:
+        """拉取音频字节,校验 RIFF/WAVE 魔数。返回 WebResource(content=bytes)。"""
+        raw = self._open(url, "audio/wav")
+        if raw[:4] != b"RIFF" or raw[8:12] != b"WAVE":
+            raise WebFetchError(f"{url} is not a WAV audio file")
+        return WebResource(url, "web-audio", raw, _sha256(raw.hex()))
+
     def fetch_links(self, url: str) -> list[tuple[str, str]]:
         """从 HTML 提取 (target_url, anchor_text) 对。用 html.parser 而非正则。
 

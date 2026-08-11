@@ -1,0 +1,16 @@
+{
+  "protocol": "sense_web_social_v1: real engagement JSON over HTTP -> WebSocialSensor (schema validate + engagement features) -> unified semantic space -> body ledger. C1 valid accepted; C2 extra-key rejected; C3 ledger content_url key; C4 high/low engagement distinct. Criterion: C1-C4 per seed.",
+  "seeds": [
+    444,
+    555,
+    666
+  ],
+  "results": {
+    "accepted_valid": 1.0,
+    "rejected_extra": 1.0,
+    "ledger_hit": 1.0,
+    "high_low_dist": 1.546
+  },
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\sense-web-social.json"
+}
