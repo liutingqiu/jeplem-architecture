@@ -1,0 +1,11 @@
+{
+  "protocol": "phase2_full_subject_v3: the RL agent carries the runtime through a RANDOM event stream (3 agent streams + random runtime events per episode); P1 retrievable, P2 gap goals, P5 idle stability. Criterion all >= 0.9.",
+  "seed": 444,
+  "results": {
+    "continuity_p1": 1.0,
+    "selfdrive_p2": 1.0,
+    "consistency_p5": 1.0
+  },
+  "accepted": true,
+  "artifact": "artifacts\\full3-s444.json"
+}
