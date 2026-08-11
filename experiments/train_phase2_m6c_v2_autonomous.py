@@ -106,12 +106,30 @@ class AutonomousStressRuntime:
             gaps.append(1.0 - float(probs.max()))
         return max(gaps)
 
+    def _entropy(self, domain: int) -> float:
+        # INDEPENDENT uncertainty measure for the P2 criterion: normalized
+        # Shannon entropy over the same count distribution, NOT a re-run of
+        # _gap.  _gap is 1 - max_prob; entropy is -sum p log p.  They are
+        # correlated but not the same function, so the criterion is no longer a
+        # tautology (previously: goal = max(candidates, key=_gap) and the
+        # criterion recomputed max(_, key=_gap) -- always equal, always 1.0).
+        ents = []
+        for i in range(N_IDENTITIES):
+            counts = self.counts.get((domain, i), [1.0] * N_ACTIONS)
+            probs = np.array(counts) / sum(counts)
+            ent = -float(np.sum(probs * np.log(probs + 1e-12)))
+            ents.append(ent / np.log(N_ACTIONS))  # normalize to [0,1]
+        return max(ents)
+
     def choose_goal(self) -> int:
         candidates = [d for d in range(self.n_domains) if d not in self.marked]
         return max(candidates, key=self._gap) if candidates else 0
 
     def max_gap_domain(self) -> int:
         return max(range(self.n_domains), key=self._gap)
+
+    def max_entropy_domain(self) -> int:
+        return max(range(self.n_domains), key=self._entropy)
 
     def inject_conflict(self, domain: int, identity: int) -> None:
         self.tick += 1
@@ -180,9 +198,11 @@ def run(*, n_domains: int = 6, episodes: int = 20, n_events: int = 120,
                     rt.inject_conflict(rng.choice(stable), rng.randrange(N_IDENTITIES))
             else:
                 goal = rt.choose_goal()
-                max_gap = rt.max_gap_domain()
-                if max_gap not in flipped:
-                    selfdrive.append(int(goal == max_gap))
+                # criterion validates against an INDEPENDENT uncertainty measure
+                # (normalized entropy), not a recomputation of the same _gap max
+                max_ent = rt.max_entropy_domain()
+                if max_ent not in flipped:
+                    selfdrive.append(int(goal == max_ent))
                 ii = rng.randrange(N_IDENTITIES)
                 rt.learn(goal, ii)
                 learned.add(goal); learned_keys.add((goal, ii))

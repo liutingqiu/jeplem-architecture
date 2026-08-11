@@ -160,10 +160,18 @@ def run(*, steps: int = 600, experiment_seed: int = 41_123,
         best_available = max(available, key=lambda d: VALUES[d])
         value_ok += int(domain == best_available)
         value_n += 1
-        # GAP: pick the state in the domain with highest belief uncertainty
+        # GAP: pick the state in the domain with highest belief uncertainty.
+        # The selection uses belief_gap (1 - confidence, the mechanism's own
+        # drive signal); the CRITERION validates the pick against an INDEPENDENT
+        # uncertainty measure (Shannon entropy) -- not a re-computation of the
+        # same max() expression (that was a tautology, always 1.0).
         state_gaps = {s: body.belief_gap(domain, identity_of[s]) for s in range(N_STATES)}
         state = max(state_gaps, key=state_gaps.get)
-        gap_ok += int(state == max(state_gaps, key=state_gaps.get))
+        state_ent = {s: float(body.beliefs[(domain, identity_of[s])].entropy().item())
+                     if (domain, identity_of[s]) in body.beliefs else 1.0
+                     for s in range(N_STATES)}
+        max_ent_state = max(state_ent, key=state_ent.get)
+        gap_ok += int(state == max_ent_state)
         gap_n += 1
         # observe + predict
         identity = identity_of[state]

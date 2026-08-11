@@ -82,6 +82,17 @@ class SelfDrivenRuntime:
             gaps.append(1.0 - float(probs.max()))
         return max(gaps)
 
+    def _entropy(self, domain: int) -> float:
+        # INDEPENDENT uncertainty measure for the goal-gap audit (not a re-run
+        # of _gap): normalized Shannon entropy over the same count distribution.
+        ents = []
+        for identity in range(N_IDENTITIES):
+            counts = self.counts.get((domain, identity), [1.0] * N_ACTIONS)
+            probs = np.array(counts) / sum(counts)
+            ent = -float(np.sum(probs * np.log(probs + 1e-12)))
+            ents.append(ent / np.log(N_ACTIONS))
+        return max(ents)
+
     def confidence(self, domain: int) -> float:
         return 1.0 - self._gap(domain)
 
@@ -91,15 +102,18 @@ class SelfDrivenRuntime:
     # -- goal generation (no external instruction) --------------------------
 
     def choose_goal(self) -> tuple[int, int]:
-        """Return (chosen_goal, current_max_gap_goal) -- the second value is
-        the audit reference: the goal that internal gaps actually point at."""
+        """Return (chosen_goal, current_max_ENTROPY_goal) -- the second value is
+        the audit reference computed with an INDEPENDENT uncertainty measure
+        (normalized entropy), NOT a recomputation of the same _gap max (that
+        was a tautology: non-random chosen == max(_gap) == the audit ref,
+        always 1.0)."""
         candidates = [d for d in range(self.domains) if d not in self.done]
         if self.random_goals:
             chosen = random.choice(candidates)
         else:
             chosen = max(candidates, key=self._gap)
-        max_gap_goal = max(candidates, key=self._gap)
-        return chosen, max_gap_goal
+        max_entropy_goal = max(candidates, key=self._entropy)
+        return chosen, max_entropy_goal
 
     # -- acting on the goal -------------------------------------------------
 
@@ -129,9 +143,9 @@ class SelfDrivenRuntime:
         for step in range(GOAL_STEPS):
             if self.all_confident():
                 return step, self.goal_log
-            goal, max_gap_goal = self.choose_goal()
+            goal, max_entropy_goal = self.choose_goal()
             gap = self._gap(goal)
-            self.goal_log.append({"goal": goal, "gap": round(gap, 4), "max_gap_goal": max_gap_goal, "tick": self.tick})
+            self.goal_log.append({"goal": goal, "gap": round(gap, 4), "max_entropy_goal": max_entropy_goal, "tick": self.tick})
             self.learn_domain(goal, rng)
         return GOAL_STEPS, self.goal_log
 
@@ -149,7 +163,7 @@ class SelfDrivenRuntime:
         coincidentally picking the max-gap domain."""
         if not self.goal_log:
             return 1.0
-        return sum(1 for e in self.goal_log if e["goal"] == e["max_gap_goal"]) / len(self.goal_log)
+        return sum(1 for e in self.goal_log if e["goal"] == e["max_entropy_goal"]) / len(self.goal_log)
 
 
 def run(*, domains: int = 6, episodes: int = 50, experiment_seed: int = 41_123,

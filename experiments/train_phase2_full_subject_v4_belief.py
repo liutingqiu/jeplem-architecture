@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import random
 import sys
 from pathlib import Path
@@ -72,8 +73,18 @@ class BeliefSubjectRuntime:
         """Confidence gap of the BAYESIAN belief (1 - max posterior)."""
         return float(1.0 - self._belief(identity).confidence())
 
+    def _entropy(self, identity: int) -> float:
+        # INDEPENDENT uncertainty measure for the P2 criterion (not a re-run of
+        # gap): Shannon entropy of the belief posterior, normalized to [0,1].
+        b = self._belief(identity)
+        ent = float(-(b.probs * b.log_probs).sum(-1).item())
+        return ent / math.log(2.0)
+
     def max_gap_identity(self) -> int:
         return max(range(N_IDENTITIES), key=self.gap)
+
+    def max_entropy_identity(self) -> int:
+        return max(range(N_IDENTITIES), key=self._entropy)
 
     def query(self, identity: int) -> int | None:
         record = self.ledger.current.get(f"id{identity}")
@@ -127,8 +138,8 @@ def run(*, updates: int = 60, episodes: int = 12, experiment_seed: int = 41_123,
                 rt.observe_identity(rng.randrange(N_IDENTITIES), rng.randrange(2))
                 rt.idle()
         max_gap = rt.max_gap_identity()
-        gaps = [rt.gap(i) for i in range(N_IDENTITIES)]
-        selfdrive.append(int(max_gap == max(range(N_IDENTITIES), key=lambda i: gaps[i])))
+        max_ent = rt.max_entropy_identity()
+        selfdrive.append(int(max_gap == max_ent))
         ok = all(rt.query(i) is not None for i in observed) if observed else True
         continuity.append(int(ok))
         idle_ok = all(

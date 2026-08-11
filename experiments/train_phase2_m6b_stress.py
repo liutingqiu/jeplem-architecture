@@ -73,6 +73,20 @@ class StressRuntime:
             gaps.append(1.0 - float(probs.max()))
         return max(gaps)
 
+    def _entropy(self, domain: int) -> float:
+        # INDEPENDENT uncertainty measure for the P2 criterion (not a re-run of
+        # _gap): normalized Shannon entropy over the same count distribution.
+        ents = []
+        for i in range(N_IDENTITIES):
+            counts = self.counts.get((domain, i), [1.0] * N_ACTIONS)
+            probs = np.array(counts) / sum(counts)
+            ent = -float(np.sum(probs * np.log(probs + 1e-12)))
+            ents.append(ent / np.log(N_ACTIONS))
+        return max(ents)
+
+    def max_entropy_domain(self) -> int:
+        return max(range(self.n_domains), key=self._entropy)
+
     def choose_goal(self) -> int:
         candidates = [d for d in range(self.n_domains) if d not in self.done]
         return max(candidates, key=self._gap)
@@ -131,8 +145,9 @@ def run(*, n_domains: int = 6, episodes: int = 20, experiment_seed: int = 41_123
         rt.idle(); rt.idle()
         # phase 2: gap-driven goal (P2) -> learn it
         goal = rt.choose_goal()
-        max_gap = max(range(n_domains), key=rt._gap)
-        selfdrive.append(int(goal == max_gap and goal not in (0, 1)))
+        # criterion: validate against an INDEPENDENT uncertainty measure
+        max_ent = rt.max_entropy_domain()
+        selfdrive.append(int(goal == max_ent and goal not in (0, 1)))
         for i in range(N_IDENTITIES):
             for _ in range(3):
                 rt.learn(goal, i)
