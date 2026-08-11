@@ -1,0 +1,21 @@
+{
+  "protocol": "arc_p6_tier3_v1: grid perception -> rule induction (template search over train pairs) -> apply to unseen test instance. Train families = subset; test = fresh instances of ALL families (unseen params). Criterion: heldout acc > 2x memory-replay and > 0.5.",
+  "seed": 666,
+  "results": {
+    "heldout_acc": 1.0,
+    "covered_frac": 1.0,
+    "covered_acc": 1.0,
+    "random_baseline": 0.0,
+    "memory_baseline": 0.0,
+    "n_test": 42,
+    "n_covered": 42,
+    "train_families": [
+      "hmirror",
+      "vmirror",
+      "rot90",
+      "map_color"
+    ]
+  },
+  "accepted": true,
+  "artifact": "artifacts\\arc-p6-s666.json"
+}
