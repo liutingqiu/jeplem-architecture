@@ -1,0 +1,12 @@
+{
+  "protocol": "phase2_body_v8_multimech_v1: Bayesian belief (Block-1) + transition prediction (Block-7) + combined-gap exploration (Block-2/4) cooperate on a state stream with identity clues. Criterion: prediction >= 0.9, belief >= 0.85, curiosity covers all states faster than random.",
+  "seed": 666,
+  "results": {
+    "prediction_accuracy": 0.931,
+    "belief_accuracy": 0.857,
+    "curiosity_steps_to_full": 9,
+    "random_steps_to_full": 31
+  },
+  "accepted": true,
+  "artifact": "artifacts\\v8-s666.json"
+}
