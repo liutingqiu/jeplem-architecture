@@ -1,0 +1,91 @@
+{
+  "current": {
+    "surprise/energy/delta": [
+      {
+        "signature": "surprise/energy/delta",
+        "rule": {
+          "kind": "surprise_rule",
+          "field": "energy",
+          "delta": -0.05000000000000071
+        },
+        "relation_key": "surprise/rule",
+        "n_confirm": 0,
+        "tick_compiled": 1,
+        "tick_last_used": 1,
+        "version": 1
+      }
+    ],
+    "surprise/x/delta": [
+      {
+        "signature": "surprise/x/delta",
+        "rule": {
+          "kind": "surprise_rule",
+          "field": "x",
+          "delta": null
+        },
+        "relation_key": "surprise/rule",
+        "n_confirm": 0,
+        "tick_compiled": 2,
+        "tick_last_used": 2,
+        "version": 1
+      }
+    ],
+    "surprise/z/delta": [
+      {
+        "signature": "surprise/z/delta",
+        "rule": {
+          "kind": "surprise_rule",
+          "field": "z",
+          "delta": null
+        },
+        "relation_key": "surprise/rule",
+        "n_confirm": 0,
+        "tick_compiled": 3,
+        "tick_last_used": 3,
+        "version": 1
+      }
+    ]
+  },
+  "history": [
+    {
+      "signature": "surprise/energy/delta",
+      "rule": {
+        "kind": "surprise_rule",
+        "field": "energy",
+        "delta": -0.05000000000000071
+      },
+      "relation_key": "surprise/rule",
+      "n_confirm": 0,
+      "tick_compiled": 1,
+      "tick_last_used": 1,
+      "version": 1
+    },
+    {
+      "signature": "surprise/x/delta",
+      "rule": {
+        "kind": "surprise_rule",
+        "field": "x",
+        "delta": null
+      },
+      "relation_key": "surprise/rule",
+      "n_confirm": 0,
+      "tick_compiled": 2,
+      "tick_last_used": 2,
+      "version": 1
+    },
+    {
+      "signature": "surprise/z/delta",
+      "rule": {
+        "kind": "surprise_rule",
+        "field": "z",
+        "delta": null
+      },
+      "relation_key": "surprise/rule",
+      "n_confirm": 0,
+      "tick_compiled": 3,
+      "tick_last_used": 3,
+      "version": 1
+    }
+  ],
+  "marked_stale": []
+}
