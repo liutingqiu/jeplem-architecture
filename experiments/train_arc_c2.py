@@ -84,7 +84,8 @@ def run(*, data_path: Path, seed: int = 41_123, limit: int | None = None,
         if ok:
             correct += 1
         else:
-            wrong_ids.append((t["id"], rule.ops))
+            # MetaRule has no .ops; Candidate has .ops.  Never crash the run.
+            wrong_ids.append((t["id"], getattr(rule, "ops", str(rule))))
 
     coverage = covered / total if total else 0.0
     covered_acc = correct / covered if covered else 0.0
