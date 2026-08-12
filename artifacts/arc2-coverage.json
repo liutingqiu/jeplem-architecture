@@ -1,0 +1,40 @@
+{
+  "arc2_train.json": {
+    "split": "arc2_train",
+    "n_tasks": 1000,
+    "train_fit": 14,
+    "train_fit_rate": 0.014,
+    "test_correct": 14,
+    "test_correct_rate": 0.014,
+    "memory_replay_baseline": 0.0,
+    "depth1": 14,
+    "depth2": 0,
+    "top_programs": {
+      "transpose": 2,
+      "rotate180": 2,
+      "scale(2)": 2,
+      "rotate270": 1,
+      "flip_v": 1,
+      "recolor(7,5)": 1,
+      "flip_h": 1,
+      "recolor(6,2)": 1,
+      "swap(5,8)": 1,
+      "scale(3)": 1,
+      "crop(4)(scale(2))": 1
+    },
+    "n_unsolved": 986
+  },
+  "arc2_test.json": {
+    "split": "arc2_test",
+    "n_tasks": 120,
+    "train_fit": 0,
+    "train_fit_rate": 0.0,
+    "test_correct": 0,
+    "test_correct_rate": 0.0,
+    "memory_replay_baseline": 0.0,
+    "depth1": 0,
+    "depth2": 0,
+    "top_programs": {},
+    "n_unsolved": 120
+  }
+}

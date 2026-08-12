@@ -1,0 +1,77 @@
+{
+  "protocol": "arc1_p6_d3_controlled_v1: P6 \u68633 -- composition families (recolor->scale, scale->recolor, flip->recolor, rotate->recolor, crop->scale); combos split 60/40 seen/unseen by parameter value; explicit-symbolic inducer searches demos; criterion unseen success > 2x memory-replay and > 0.5.",
+  "seed": 41123,
+  "results": {
+    "unseen_success_rate": 1.0,
+    "memory_replay_baseline": 0.0,
+    "per_family": {
+      "recolor_scale": {
+        "seen": [
+          7,
+          7
+        ],
+        "unseen": [
+          5,
+          5
+        ],
+        "replay": 0,
+        "seen_rate": 1.0,
+        "unseen_rate": 1.0
+      },
+      "scale_recolor": {
+        "seen": [
+          7,
+          7
+        ],
+        "unseen": [
+          5,
+          5
+        ],
+        "replay": 0,
+        "seen_rate": 1.0,
+        "unseen_rate": 1.0
+      },
+      "flip_recolor": {
+        "seen": [
+          3,
+          3
+        ],
+        "unseen": [
+          3,
+          3
+        ],
+        "replay": 0,
+        "seen_rate": 1.0,
+        "unseen_rate": 1.0
+      },
+      "rotate_recolor": {
+        "seen": [
+          3,
+          3
+        ],
+        "unseen": [
+          3,
+          3
+        ],
+        "replay": 0,
+        "seen_rate": 1.0,
+        "unseen_rate": 1.0
+      },
+      "crop_scale": {
+        "seen": [
+          2,
+          3
+        ],
+        "unseen": [
+          3,
+          3
+        ],
+        "replay": 0,
+        "seen_rate": 0.667,
+        "unseen_rate": 1.0
+      }
+    }
+  },
+  "accepted": true,
+  "artifact": "artifacts\\arc1-p6d3-controlled.json"
+}
