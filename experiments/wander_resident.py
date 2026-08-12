@@ -33,6 +33,7 @@ from plwm.web_failover import FailoverBackend
 from plwm.modal_surprise_engine import ModalSurpriseEngine
 from plwm.modality_identify import route
 from plwm.perception_hub import PerceptionHub
+from plwm.self_knowledge import SelfKnowledge
 
 SEEDS = [
     "https://en.wikipedia.org/wiki/Artificial_intelligence",
@@ -69,6 +70,8 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
                         max_urls=10_000_000, struct_subset=True)
     engine = ModalSurpriseEngine(window=6)
     hub = PerceptionHub()
+    self_know = SelfKnowledge(engine)
+    _last_confidence: dict = {}
     seen_facts: set = set()
     prev_by_mod: dict = {}
     narrative = {"what_it_saw": [], "what_it_learned": [], "network": {}, "body": []}
@@ -84,6 +87,8 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
             return
         if mod in prev_by_mod:
             engine.observe(prev_by_mod[mod], feats, modality=mod)
+            # I3: self-knowledge -- how confident is it in this content?
+            self_know.confidence(feats, mod)
             k = engine.knowledge()
             inv = [f for f in k["invariants"] if f.startswith(f"{mod}::")
                    and f not in _seen_inv]
@@ -181,6 +186,7 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
                 "invariants": [f for f in k["invariants"]][:12],
                 "hidden_vars": [f for f in k["hidden_vars"]][:8],
                 "compiled_rules": ledger_rules[:10],
+                "self_confidence_modalities": self_know.engine_state(),
                 "belief_confidence": conf,
                 "network_routes": runner.backend.route_report()
                 if hasattr(runner.backend, "route_report") else {},
