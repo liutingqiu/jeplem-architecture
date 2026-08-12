@@ -10,17 +10,20 @@ from __future__ import annotations
 class LinkGraph:
     """有向图:node -> set[target]。anchor 存映射 (source,target)->anchor。
 
-    LRU-bounded: when over max_nodes, evict the LEAST-RECENTLY-USED source
-    (not the oldest-added).  Frequently re-visited hubs (important sites) are
-    kept; one-off pages are evicted.  This preserves the important
-    exploration topology while bounding memory.
+    Bounded by BOTH node count and total edge count (LRU eviction):
+    - over max_nodes, evict the LEAST-RECENTLY-USED source
+    - over max_edges, evict LRU sources' edges until under the edge cap
+    This prevents the real explosion: a hub page can emit thousands of links,
+    so node-count alone does not bound serialized size.  Frequently re-visited
+    hubs are kept; one-off pages are evicted first.
     """
 
-    def __init__(self, max_nodes: int = 200_000) -> None:
+    def __init__(self, max_nodes: int = 200_000, max_edges: int = 300_000) -> None:
         self._adj: dict[str, set[str]] = {}
         self._anchors: dict[tuple[str, str], str] = {}
         self._order: list[str] = []       # LRU order: front = least recently used
         self.max_nodes = max_nodes
+        self.max_edges = max_edges
 
     def add_edge(self, source: str, target: str, anchor: str | None = None) -> None:
         if not source or not target:
@@ -40,13 +43,19 @@ class LinkGraph:
         self._evict_if_needed()
 
     def _evict_if_needed(self) -> None:
-        """Bound the graph: evict LEAST-recently-used sources when over cap.
-        Keeps frequently-explored hubs, drops one-off pages."""
-        while len(self._order) > self.max_nodes:
+        """Bound by node count AND total edge count.  Evict LRU sources until
+        both constraints hold.  Keeps frequently-explored hubs, drops one-off
+        pages and their (potentially huge) edge sets."""
+        while len(self._order) > self.max_nodes or self._edge_total() > self.max_edges:
+            if not self._order:
+                break
             lru = self._order.pop(0)  # front = least recently used
             targets = self._adj.pop(lru, set())
             for t in targets:
                 self._anchors.pop((lru, t), None)
+
+    def _edge_total(self) -> int:
+        return sum(len(ts) for ts in self._adj.values())
 
     def query_neighbors(self, node: str) -> list[str]:
         return sorted(self._adj.get(node, set()))
