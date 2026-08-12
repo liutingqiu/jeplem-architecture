@@ -45,7 +45,7 @@ def run(*, rollout_path: Path, ledger_path: Path | None = None,
         ledger.save(ledger_path)
 
     report = {
-        "protocol": "trajectory_meta_rules_v1: causality (action->effect causal maps) + interaction (agent-goal -> outcome) learned from REAL Luanti episodes through ONE shared RuleLedger. Compile-once-reuse-many across episodes; world changes (new causal signature) compiled as new rules.",
+        "protocol": "trajectory_meta_rules_v1: causality (action->effect), interaction (agent-goal -> outcome), social (object-value classification) learned from REAL Luanti episodes through ONE shared RuleLedger. Compile-once-reuse-many across episodes; world changes (new signature) compiled as new rules.",
         "n_episodes": len(episodes),
         "results": total,
         "ledger": ledger.stats(),

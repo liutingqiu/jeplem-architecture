@@ -165,6 +165,9 @@ def trajectory_relations() -> list[TrajectoryRelation]:
         TrajectoryRelation("interaction", "interact",
                            _interaction_fit, _interaction_signature,
                            _interaction_serialize, _interaction_verify),
+        TrajectoryRelation("social", "social_outcome",
+                           _social_fit, _social_signature,
+                           _social_serialize, _social_verify),
     ]
 
 
@@ -203,4 +206,58 @@ def _verify_stored(rel: TrajectoryRelation, stored, episode: dict) -> bool:
         r = raw.get("interaction", {})
         rule = InteractionRule(r.get("success_radius", 0), r.get("fail_radius", 0))
         return _interaction_verify(rule, episode)
+    if rel.family == "social":
+        rule = SocialObjectRule(raw.get("preferred", "key"))
+        return _social_verify(rule, episode)
     return False
+
+
+# --- social (family 5): object-value classification --------------------------
+
+@dataclass(frozen=True)
+class SocialObjectRule:
+    """Which object type (key/decoy) is the preferred interaction target."""
+    preferred: str          # "key" | "decoy"
+
+
+def _social_fit(episode: dict) -> SocialObjectRule | None:
+    """From a composite episode (with key/decoy + goal), learn the value
+    classification: the object CLOSER to the goal is the preferred (correct)
+    interaction target (the key); the other is the decoy to avoid.
+
+    Confirmed by the episode OUTCOME (last state): the key should be the one
+    collected when the key is the closer object."""
+    st = episode["states"][0]
+    last = episode["states"][-1]
+    if not all(k in st for k in ("key_x", "key_z", "decoy_x", "decoy_z",
+                                 "goal_x", "goal_z")):
+        return None
+    key_dist = abs(st["key_x"] - st["goal_x"]) + abs(st["key_z"] - st["goal_z"])
+    decoy_dist = abs(st["decoy_x"] - st["goal_x"]) + abs(st["decoy_z"] - st["goal_z"])
+    key_collected = bool(last.get("key_collected", False))
+    decoy_collected = bool(last.get("decoy_collected", False))
+    if key_dist < decoy_dist and key_collected and not decoy_collected:
+        return SocialObjectRule("key")
+    if decoy_dist < key_dist and decoy_collected and not key_collected:
+        return SocialObjectRule("decoy")
+    return None
+
+
+def _social_signature(rule: SocialObjectRule) -> str:
+    return f"prefer={rule.preferred}"
+
+
+def _social_serialize(rule: SocialObjectRule) -> dict:
+    return {"kind": "social", "preferred": rule.preferred}
+
+
+def _social_verify(rule: SocialObjectRule, episode: dict) -> bool:
+    st = episode["states"][0]
+    if not all(k in st for k in ("key_x", "key_z", "decoy_x", "decoy_z",
+                                 "goal_x", "goal_z")):
+        return False
+    key_dist = abs(st["key_x"] - st["goal_x"]) + abs(st["key_z"] - st["goal_z"])
+    decoy_dist = abs(st["decoy_x"] - st["goal_x"]) + abs(st["decoy_z"] - st["goal_z"])
+    # the rule's preferred object must be the closer one
+    closer = "key" if key_dist < decoy_dist else "decoy"
+    return closer == rule.preferred
