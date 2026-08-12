@@ -95,6 +95,12 @@ def fit_exact(name: str, g: np.ndarray, target: np.ndarray) -> list[tuple]:
             if np.array_equal(OPS[name](g, c), target):
                 out.append((c,))
         return out
+    if name in ("fill_gap_same_color_h", "fill_gap_same_color_v"):
+        out = []
+        for c in range(1, 10):
+            if np.array_equal(OPS[name](g, c), target):
+                out.append((c,))
+        return out
     if name == "expand_to_edge":
         out = []
         for direction in ("left", "right", "up", "down"):

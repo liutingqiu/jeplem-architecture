@@ -138,6 +138,12 @@ def op_crop_to_content(g: np.ndarray) -> np.ndarray:
     return g[r0:r1, c0:c1].copy()
 
 
+def op_extract_subgrid(g: np.ndarray, r0: int, c0: int, h: int, w: int) -> np.ndarray:
+    """Extract the h x w subgrid at (r0, c0).  Absolute-position op (used only
+    when the same position extracts the output across all pairs)."""
+    return g[r0:r0 + h, c0:c0 + w].copy()
+
+
 def op_crop_colors(g: np.ndarray, keep: set[int]) -> np.ndarray:
     """Remove every cell whose color is not in `keep`."""
     out = g.copy()
@@ -221,11 +227,11 @@ def op_fill_row_runs_all(g: np.ndarray) -> np.ndarray:
 
 
 def op_fill_gap_same_color(g: np.ndarray, gap_color: int) -> np.ndarray:
-    """For each INPUT row/col, for each pair of adjacent cells of the SAME color
+    """For each INPUT row, for each pair of adjacent cells of the SAME color
     (with only background between them), fill the cells strictly between the two
-    with `gap_color`.  Catches 'connect same-colored dots' patterns."""
+    with `gap_color`.  HORIZONTAL-ONLY: the vertical variant is a separate op
+    (fill_gap_same_color_v), so the synthesizer can pick exactly one axis."""
     out = g.copy()
-    # horizontal: same-color pairs in a row
     for r in range(out.shape[0]):
         positions: dict[int, list[int]] = {}
         for c in range(out.shape[1]):
@@ -233,12 +239,20 @@ def op_fill_gap_same_color(g: np.ndarray, gap_color: int) -> np.ndarray:
             if v != 0:
                 positions.setdefault(int(v), []).append(c)
         for color, cols in positions.items():
-            # consecutive pairs (sorted positions, fill between)
             for i in range(len(cols) - 1):
                 a, b = cols[i], cols[i + 1]
-                if b - a > 1:  # gap to fill
+                if b - a > 1:
                     out[r, a + 1:b] = gap_color
-    # vertical: same-color pairs in a col
+    return out
+
+
+def op_fill_gap_same_color_h(g: np.ndarray, gap_color: int) -> np.ndarray:
+    return op_fill_gap_same_color(g, gap_color)
+
+
+def op_fill_gap_same_color_v(g: np.ndarray, gap_color: int) -> np.ndarray:
+    """Vertical-only version: same-color pairs within a column."""
+    out = g.copy()
     for c in range(out.shape[1]):
         positions: dict[int, list[int]] = {}
         for r in range(out.shape[0]):
@@ -315,6 +329,18 @@ def op_fill_col_color(g: np.ndarray, col_color: dict[int, int]) -> np.ndarray:
     return out
 
 
+def op_fill_row_by_feature(g: np.ndarray, feat_map: dict[tuple, int]) -> np.ndarray:
+    """For each input row, look up its occupied-column feature in feat_map and
+    fill the whole row with the mapped color.  Relative op: keys are structural,
+    so it generalizes across layouts."""
+    out = g.copy()
+    for r in range(out.shape[0]):
+        cols = tuple(int(c) for c in np.argwhere(g[r] != 0).flatten())
+        if cols in feat_map:
+            out[r, :] = feat_map[cols]
+    return out
+
+
 # --- rule representation -----------------------------------------------------
 
 @dataclass
@@ -341,6 +367,8 @@ OPS = {
     "fill_row_runs": op_fill_row_runs,
     "fill_row_runs_all": op_fill_row_runs_all,
     "fill_gap_same_color": op_fill_gap_same_color,
+    "fill_gap_same_color_h": op_fill_gap_same_color_h,
+    "fill_gap_same_color_v": op_fill_gap_same_color_v,
     "expand_to_edge": op_expand_to_edge,
     "crop_to_content": op_crop_to_content,
     "crop_colors": op_crop_colors,
@@ -353,6 +381,7 @@ OPS = {
     "fill_solid_majority": op_fill_solid_majority,
     "fill_row_color": op_fill_row_color,
     "fill_col_color": op_fill_col_color,
+    "fill_row_by_feature": op_fill_row_by_feature,
 }
 
 OP_COST = {
@@ -367,6 +396,8 @@ OP_COST = {
     "fill_row_runs": 3,
     "fill_row_runs_all": 2,
     "fill_gap_same_color": 3,
+    "fill_gap_same_color_h": 3,
+    "fill_gap_same_color_v": 3,
     "expand_to_edge": 2,
     "fill_row": 2, "fill_col": 2, "fill_bbox": 2,
     "crop_colors": 2,
@@ -376,6 +407,7 @@ OP_COST = {
     "fill_solid_majority": 3,
     "fill_row_color": 3,
     "fill_col_color": 3,
+    "fill_row_by_feature": 4,
 }
 
 
@@ -556,6 +588,42 @@ def synth_stack(in_g: np.ndarray, out_g: np.ndarray, train_pairs: list) -> list[
     return cands
 
 
+def synth_row_feature_to_color(in_g: np.ndarray, out_g: np.ndarray,
+                               train_pairs: list[tuple[np.ndarray, np.ndarray]]) -> list[Candidate]:
+    """Output where each ROW is a solid color determined by the input row's
+    structural feature (e.g. the set of columns occupied).  The feature->color
+    map is derived from the FIRST pair's input, then the map is RE-DERIVED per
+    pair at apply time (relative op: 'the color for a row = f(row's feature)').
+
+    Covers a85d4709-class: each input row's pattern determines that row's output
+    color.  We synthesize f as: for each row, color = out_g[r,0] (the solid
+    color of that output row), and the KEY is the row's input feature (its
+    occupied-column signature).  At apply time, for each input row, look up its
+    signature in the map."""
+    cands: list[Candidate] = []
+    if in_g.shape != out_g.shape:
+        return cands
+    h = out_g.shape[0]
+    # rows solid in output?
+    if not all(len(set(out_g[r].tolist())) == 1 and out_g[r, 0] != 0 for r in range(h)):
+        return cands
+    # build feature->color map from first pair
+    feat_map: dict[tuple, int] = {}
+    for r in range(h):
+        feat = _row_feature(in_g[r])
+        feat_map[feat] = int(out_g[r, 0])
+    cand = Candidate([("fill_row_by_feature", (feat_map,))], 3 + len(feat_map))
+    if _covers(cand, train_pairs):
+        cands.append(cand)
+    return cands
+
+
+def _row_feature(row: np.ndarray) -> tuple:
+    """Structural signature of a row: occupied columns (sorted)."""
+    cols = tuple(int(c) for c in np.argwhere(row != 0).flatten())
+    return cols
+
+
 def synth_position_to_color(in_g: np.ndarray, out_g: np.ndarray,
                             train_pairs: list[tuple[np.ndarray, np.ndarray]]) -> list[Candidate]:
     """Output grid where each ROW (or COL) is a solid color determined by its
@@ -663,6 +731,7 @@ def induce_rule_c2(train_pairs: list[tuple[np.ndarray, np.ndarray]]) -> Candidat
                 candidates.append(cand)
         # position->color maps and solid fills
         candidates += synth_position_to_color(in_g, out_g, train_pairs)
+        candidates += synth_row_feature_to_color(in_g, out_g, train_pairs)
         candidates += synth_fill_solid(in_g, out_g, train_pairs)
         candidates += synth_extend_objects(in_g, out_g, train_pairs)
     else:
