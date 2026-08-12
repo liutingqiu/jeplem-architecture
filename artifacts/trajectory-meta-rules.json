@@ -1,0 +1,68 @@
+{
+  "protocol": "trajectory_meta_rules_v1: causality (action->effect causal maps) + interaction (agent-goal -> outcome) learned from REAL Luanti episodes through ONE shared RuleLedger. Compile-once-reuse-many across episodes; world changes (new causal signature) compiled as new rules.",
+  "n_episodes": 48,
+  "results": {
+    "compiled": 8,
+    "reused": 62,
+    "gaps": 26,
+    "world_changes": 0
+  },
+  "ledger": {
+    "n_signatures": 8,
+    "n_rules": 8,
+    "n_history": 8,
+    "n_marked_stale": 0
+  },
+  "distinct_signatures": 8,
+  "rules": [
+    {
+      "family": "causality/cause_effect",
+      "signature": "east->(-1, 0)|north->(0, 1)",
+      "version": 1,
+      "confirms": 5
+    },
+    {
+      "family": "causality/cause_effect",
+      "signature": "east->(-1, 0)|north->(0, 1)|south->(0, -1)|west->(1, 0)",
+      "version": 1,
+      "confirms": 10
+    },
+    {
+      "family": "causality/cause_effect",
+      "signature": "east->(-1, 0)|north->(0, 1)|west->(1, 0)",
+      "version": 1,
+      "confirms": 5
+    },
+    {
+      "family": "causality/cause_effect",
+      "signature": "east->(1, 0)|north->(0, -1)|south->(0, 1)",
+      "version": 1,
+      "confirms": 0
+    },
+    {
+      "family": "causality/cause_effect",
+      "signature": "east->(1, 0)|north->(0, -1)|south->(0, 1)|west->(-1, 0)",
+      "version": 1,
+      "confirms": 6
+    },
+    {
+      "family": "causality/cause_effect",
+      "signature": "east->(1, 0)|south->(0, 1)",
+      "version": 1,
+      "confirms": 5
+    },
+    {
+      "family": "causality/cause_effect",
+      "signature": "east->(1, 0)|south->(0, 1)|west->(-1, 0)",
+      "version": 1,
+      "confirms": 8
+    },
+    {
+      "family": "interaction/interact",
+      "signature": "succ<=1|fail>=2",
+      "version": 1,
+      "confirms": 23
+    }
+  ],
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\zealous-lamport-398898\\artifacts\\trajectory-meta-rules.json"
+}
