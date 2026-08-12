@@ -1,0 +1,28 @@
+{
+  "protocol": "arc_c2_v1: grid perception -> differential analysis -> means-ends program synthesis over C2 primitives -> symbolic-execution verify vs ALL train pairs -> Occam pick -> apply to test. Replaces the pre-installed template library (arc_rule_induction). Criterion: covered-accuracy > 0.5 and > 2x random; overall = honest generalization boundary.",
+  "seed": 41123,
+  "n_tasks": 400,
+  "results": {
+    "coverage": 0.04,
+    "covered_accuracy": 1.0,
+    "overall_accuracy": 0.04,
+    "random_baseline": 0.003,
+    "n_covered": 16,
+    "n_correct": 16
+  },
+  "uncovered_examples": [
+    "a85d4709",
+    "c8cbb738",
+    "8e1813be",
+    "a699fb00",
+    "5c2c9af4",
+    "44f52bb0",
+    "23581191",
+    "94f9d214",
+    "f9012d9b",
+    "4258a5f9"
+  ],
+  "wrong_examples": [],
+  "accepted": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\zealous-lamport-398898\\artifacts\\arc-c2.json"
+}
