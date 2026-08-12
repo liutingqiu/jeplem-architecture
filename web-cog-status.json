@@ -1,0 +1,916 @@
+{
+  "what_it_saw": [
+    {
+      "round": 0,
+      "source": "web-text",
+      "content": "This domain is for use in documentation examples without needing permission."
+    },
+    {
+      "round": 0,
+      "source": "web-text",
+      "content": "https://example.com"
+    },
+    {
+      "round": 0,
+      "source": "web-text",
+      "content": ", a number of domains such as example.com and example.org are maintained for documentation purposes."
+    },
+    {
+      "round": 0,
+      "source": "web-text",
+      "content": "They are not available for registration or transfer."
+    },
+    {
+      "round": 0,
+      "source": "web-text",
+      "content": "These web services are provided as best effort, but are not designed to support production applications."
+    },
+    {
+      "round": 0,
+      "source": "web-text",
+      "content": "While incidental traffic for incorrectly configured applications is expected, please do not design applications that require the example domains to have operati"
+    },
+    {
+      "round": 0,
+      "source": "web-text",
+      "content": "The IANA functions coordinate the Internet’s globally unique identifiers, and are provided by"
+    },
+    {
+      "round": 0,
+      "source": "web-text",
+      "content": "Instructions and Guides"
+    },
+    {
+      "round": 0,
+      "source": "web-text",
+      "content": "IANA-managed Reserved Domains"
+    },
+    {
+      "round": 0,
+      "source": "web-text",
+      "content": "Root Zone Registry"
+    },
+    {
+      "round": 0,
+      "source": "web-text",
+      "content": "https://iana.org/domains/example"
+    },
+    {
+      "round": 0,
+      "source": "web-text",
+      "content": "60"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "The global coordination of the DNS Root, IP addressing, and other Internet protocol resources is performed as the Internet Assigned Numbers Authority (IANA) fun"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Internet Assigned Numbers Authority"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Database of Top Level Domains"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IP Addresses & AS Numbers"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Apply for an assignment"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Root Zone Management"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IDN Practices Repository"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Although the Internet is decentralized by design, a limited set of its technical elements require this globally coordinated administration."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "The registries we maintain are openly published, our services are provided without charge, and we act as a neutral steward implementing policies developed by th"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "How we are performing against our service level commitments, at a glance and in monthly reports."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "How the IANA functions are governed, overseen, planned, and continuously improved."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "The IANA role is a public service."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Today, the functions are performed by"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "News Announcements, publications and consultations from across the IANA functions."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/about"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Oversight The communities that develop the policies we implement, and the bodies that monitor our performance."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Strategy & Planning Our mission, the five-year IANA strategic plan, and the annual operating plan and budget process."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Continuous Improvement How we listen to our customers, measure our performance, and act on what we learn."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Audits Independent annual audits of the security and operational controls underpinning the IANA functions."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Strategy & Planning"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "RIR Allocation Data"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/about/organization"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "These are archived documents from prior services, projects or oversight mechanism that are no longer active."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "These documents should not be relied upon for up-to-date information on operations and are provided for historical purposes only."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "is also available for perusal; individual reports are linked from the registries and pages to which they relate."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Internet Monthly Reports 1991–1998 — Monthly status reports on Internet research and engineering activities, including IANA's reports to the research community."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "ccTLD News 1997–2003 — Memos sent to country-code top-level domain managers on policies, procedures and consultations of the day."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "NTIA Contract 2000–2016 — Documents relating to the United States Government contract for performance of the IANA functions, prior to the IANA stewardship trans"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Initial Root DNSSEC Design and Launch 2008–2010 — Design documents, consultations and deployment materials from the project to first sign the DNS root zone."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/archive"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Contact Us If you have questions regarding abuse, please see our Abuse Issues and IP Addresses Page"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "General email contact"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Time Zone Database"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Public Technical Identifiers"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/contact"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "The root is the upper-most part of the DNS hierarchy, and involves delegating administrative responsibility of “top-level domains”, which are the last segment o"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "domain is used internally by Internet protocols for purposes not designed to be directly accessed, as defined in various technical standards."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Specially designated domains that are held to serve specialized purposes, such as avoiding conflicts with potential real-world usage."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": ".INT The .int top-level domain, designed for the sole use of cross-national organisations, such as treaty organisations, that do not naturally fit into a specif"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": ".ARPA The .arpa domain is used internally by Internet protocols for purposes not designed to be directly accessed, as defined in various technical standards."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IDN Practices Repository A repository of permissible characters for different languages and writing systems provided for registration by different domain regist"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Root Key Signing Key (DNSSEC) The Root Key Signing Key provides verification of the DNSSEC-signed root zone, administered through public key signing ceremonies "
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/domains"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "The .arpa domain is the “Address and Routing Parameter Area” domain and is designated to be used exclusively for Internet-infrastructure purposes."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Root Key Signing Key (DNSSEC)"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "coordinated manually with us"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Register/modify an .INT domain"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Trust Anchors and Rollovers"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": ".ARPA Zone Management"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/domains/arpa"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "The .int domain is a specialized domain offering no-cost registrations solely to:"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "organizations that were established by an international treaty between or among national governments, are widely considered to have independent international le"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "These domains are strictly limited to eligible intergovernmental treaty organizations in accordance with our published criteria."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Register or Modify a .int Domain Eligible organizations may apply for a new .int domain, and existing registrants can update their registry details."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Eligibility Criteria for a .int Domain"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Register or Modify a .int Domain"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Intergovernmental Treaty (.INT) Domains"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/domains/int"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Certain domains are set aside, and nominally registered to “IANA”, for specific policy or technical purposes."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "These domains were temporarily delegated by IANA for the"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "These exclusions are typically indicated in either technical standards (RFC documents), or"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Domains which are described as registered to IANA or ICANN on policy grounds are not available for registration or transfer, with the exception of"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "These domains are available for release by the ICANN Governmental Advisory Committee Secretariat."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IANA-managed Reserved Domains Certain domains are set aside, and nominally registered to “IANA”, for specific policy or technical purposes. Example domains As d"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/domains/reserved"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "The Domain Name System (DNS) root zone is the highest-level of the naming hierarchy, principally composed of delegations of top-level domains (such as"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": ") is the authoritative record of top-level domains, including the organization that manages the domains, technical details and contact information."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "The root zone DNS data is available for download as a DNS zone file along with associated trust information, and in other formats."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Articles covering the rules governing what top-level domains are permissible, the procedures to register and update top-level domains, and other related topics."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Files and Downloads The root zone DNS data is available for download as a DNS zone file along with associated trust information, and in other formats."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Delegation Management Existing TLD managers can maintain their delegation details through our online interface."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Instructions and Guides Articles covering the rules governing what top-level domains are permissible, the procedures to register and update top-level domains, a"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/domains/root"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Abstract To reduce the likelihood of conflict and confusion, a few top level domain names are reserved for use in private testing, as examples in documentation,"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "In addition, a few second level domain names reserved for use as examples are documented."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "The global Internet Domain Name System is documented in [RFC 1034, 1035, 1591] and numerous additional Requests for Comment."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "It defines a tree of names starting with root, \".\", immediately below which are top level domain names such as \".com\" and \".us\"."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Below top level domain names there are normally additional levels of names."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "To safely satisfy these needs, four domain names are reserved as listed and described below."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": ".test .example .invalid .localhost \".test\" is recommended for use in testing of current or new DNS related code."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "\".example\" is recommended for use in documentation or as examples."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/go/rfc2606"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Status of This Memo This is an Internet Standards Track document."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "This document is a product of the Internet Engineering Task Force (IETF)."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Further information on Internet Standards is available in"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Certain individual IP addresses and IP address ranges are treated specially by network implementations and, consequently, are not suitable for use as unicast ad"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "For example, IPv4 addresses 224.0.0.0 to 239.255.255.255 are multicast addresses ["
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Another example is 127.0.0.1, the IPv4 \"local host\" address ["
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "] does not state whether implementations are expected to treat such names differently, and if so, in what way."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "This document specifies under what circumstances special treatment is appropriate, and in what ways."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/go/rfc6761"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Instructions and Guides Root Zone Management Root Zone Change Request Process"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Technical Requirements for Requests to Change TLD Nameservers in the Root Zone"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Requirements for RDAP Servers providing Domain Name Data"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Root Zone Management System API and Testing Environment User Guide"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Questions and Answers on ccTLD Delegation and Transfers"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Making Internet Number Resource Allocations to Regional Internet Registries"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Common Questions on the Next-Generation Root Zone Management System"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/help"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "The Internet Assigned Numbers Authority, or IANA, is responsible for the global coordination of IP addresses."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Most of the used numbers are allocated via a regional allocation system to your ISP, which then automatically assigns one or more to you."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "There are, however, special sets of numbers that are designed not to be assigned to any particular person."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Instead, they are general allocations that are either used in special ways, or designed for people to use internally within local networks."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "These numbers are primarily in the following ranges:"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "There are additional ranges of numbers that are also marked as \"IANA Reserved\" and similarly are not operated by IANA, although these are the most common ones w"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "If you are seeing unexplained Internet traffic to your computer from these numbers, it is important to remember the following things:"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "As the authority for IP addresses, we have simply reserved these numbers in our databases, but we do not use or operate them, and we are not the source of the t"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/help/abuse"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Comment is invited on the proposal for a DNS Root Key Signing Key (Root KSK) algorithm rollover."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Comment is invited on the draft operating plan and budget for the IANA functions for Fiscal Year 2026."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Comment is invited on the draft strategic plan for the IANA functions for 2026-2030."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "This update adds a new key that is planned to be used to sign the DNS root zone starting in 2026."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Our mailing list platform is undergoing major upgrades."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "A draft study on how to select a new cryptographic algorithm for the root zone, and how a rollover to that algorith, has been produced and we are now seeking co"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "This study is the product of a community design team."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "This section on the website is now available to aggregate operational updates and other updates of interest that we have historically published in different loc"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/news"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "We are responsible for global coordination of the Internet Protocol addressing systems, as well as the Autonomous System Numbers used for routing Internet traff"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Currently there are two types of Internet Protocol (IP) addresses in active use: IP version 4 (IPv4) and IP version 6 (IPv6)."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IPv4 was initially deployed on 1 January 1983 and is still the most commonly used version."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IPv4 addresses are 32-bit numbers often expressed as 4 octets in “dotted decimal” notation (for example,"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IPv6 addresses are 128-bit numbers and are conventionally expressed using hexadecimal strings (for example,"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Both IPv4 and IPv6 addresses are generally assigned in a hierarchical manner."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Users are assigned IP addresses by Internet service providers (ISPs)."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Our primary role for IP addresses is to allocate pools of unallocated addresses to the RIRs according to their needs as described by"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/numbers"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "is to provide pools of unallocated IP addresses and AS numbers to Regional Internet Registries (RIRs) according to their needs as described by"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "These policies contain allocation algorithms that are based on the level of resource utilization of prior allocations."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IPv4 is not represented as IANA's supply has been exhausted and our allocation method for recovered address space does not factor in utilization."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Detailed information is available for each RIR by clicking the chart."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Number of IPv6 Address Allocations in /32s"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Number Resource Allocation Data Our primary role in managing Internet number resources"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Number Resource Allocation Data"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/numbers/allocations/"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "These are the registries we maintain for the three core number resource types: IPv4 addresses, IPv6 addresses, and Autonomous System Numbers."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IPv6 Global Unicast Address Space"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "RDAP Bootstrap for AS Numbers"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IPv4 Multicast Address Space"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IPv4 Special-Purpose Address Space"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IPv4 Recovered Address Space"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "RDAP Bootstrap for IPv4"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/numbers/registries"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "A third-party survey is conducted annually to assess sentiment and areas of focus from our key stakeholders."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Engagement Surveys A third-party survey is conducted annually to assess sentiment and areas of focus from our key stakeholders."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Naming Performance Monthly reporting against the service level agreements for the IANA Naming Functions, including root zone management."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Number Resource Performance Monthly reporting on performance against requirements under the Number Resource SLAs."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "IETF Statistics Report Monthly documentation of the performance of the protocol assignments roles performed for the IETF community."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Internet Draft Status Information on pending Internet Draft actions being evaluated by us."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Root Zone Maintainer Performance Performance by the contractor of the Root Zone Maintainer function."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/performance"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "It is updated periodically to reflect changes made by political bodies to time zone boundaries, UTC offsets, and daylight-saving rules."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "The database is primarily intended for software implementers."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Its data is expressed as machine-readable rules that, together with the reference implementation, allow software to automatically calculate local time with the "
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Release History An index of all past releases of the Time Zone Database, with a summary of what changed and downloads for each."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Contributing How to propose changes to the database, subscribe to the mailing lists, and who coordinates the project."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Sources and Links An overview of the database with links to software, precompiled distributions, and related civil time resources."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Theory and Pragmatics The scope, principles and design decisions that guide how the database models civil time around the world."
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://iana.org/time-zones"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "site is not available without javascript"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "Public Technical Identifiers (PTI)"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "https://pti.icann.org"
+    },
+    {
+      "round": 1,
+      "source": "web-text",
+      "content": "2606"
+    }
+  ],
+  "what_surprised_it": [],
+  "what_it_learned": [
+    {
+      "round": 0,
+      "what": "discovered invariant",
+      "detail": "in text content: bigram_ratio is STABLE (this kind of content has consistent structure)"
+    },
+    {
+      "round": 1,
+      "what": "discovered invariant",
+      "detail": "in code content: bracket_balance, ident_density, max_indent, n_blocks, n_lines is STABLE (this kind of content has consistent structure)"
+    }
+  ],
+  "body_state": [
+    {
+      "round": 0,
+      "ok": 2,
+      "fail": 0,
+      "belief_confidence": 0.25,
+      "trust_top": [
+        "web-text:https://example.com=0.68",
+        "web-text:https://iana.org/domains/example=0.6",
+        "auto:https://en.wikipedia.org/wiki/Artificial_intelligence=0.4"
+      ]
+    },
+    {
+      "round": 1,
+      "ok": 23,
+      "fail": 6,
+      "belief_confidence": 0.25,
+      "trust_top": [
+        "web-text:https://example.com=0.74",
+        "web-text:https://iana.org/domains/example=0.68",
+        "web-text:https://iana.org/=0.6"
+      ]
+    }
+  ]
+}
