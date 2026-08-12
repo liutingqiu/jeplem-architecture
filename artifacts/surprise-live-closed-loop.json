@@ -1,0 +1,14 @@
+{
+  "protocol": "surprise_closed_loop_live_v1: SurpriseEngine on LIVE Luanti. Naive stream (no action) marks x/z hidden; the engine observes its own action; causality explainer explains x/z as action-conditional. Validates 'hidden var -> seek missing observation -> explained'.",
+  "n_steps": 30,
+  "naive_hidden_vars": [],
+  "naive_invariants": [
+    "goal_x",
+    "goal_z",
+    "health",
+    "task_seed"
+  ],
+  "x_z_explained_with_action_observation": true,
+  "closed_loop_complete": true,
+  "artifact": "D:\\Documents\\探索新架构\\.claude\\worktrees\\zealous-lamport-398898\\artifacts\\surprise-live-closed-loop.json"
+}
