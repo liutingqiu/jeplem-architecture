@@ -18,3 +18,9 @@ artifacts/*.log
 artifacts/*-status.json
 artifacts/*-checkpoint.json
 artifacts/STOP
+
+# Root-level runtime state (resident writes here if run with bare paths)
+web-resident-status.json
+web-resident-checkpoint.json
+web-resident-STOP
+resident-*.log

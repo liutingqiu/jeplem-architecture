@@ -236,8 +236,12 @@ def _modality_counts(runner) -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--checkpoint", type=Path, default=None)
-    parser.add_argument("--status", type=Path, default=None)
+    # default to artifacts/ (gitignored runtime state, not committed)
+    _artifacts = ROOT / "artifacts"
+    parser.add_argument("--checkpoint", type=Path,
+                        default=_artifacts / "resident-checkpoint.json")
+    parser.add_argument("--status", type=Path,
+                        default=_artifacts / "resident-status.json")
     parser.add_argument("--max-rounds", type=int, default=None)
     args = parser.parse_args()
     report = run(checkpoint_path=args.checkpoint, status_path=args.status,
