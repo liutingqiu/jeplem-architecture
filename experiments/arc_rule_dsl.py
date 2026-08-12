@@ -138,6 +138,77 @@ def op_crop_to_content(g: np.ndarray) -> np.ndarray:
     return g[r0:r1, c0:c1].copy()
 
 
+def op_cross_rays_interact(g: np.ndarray, meet_color: int) -> np.ndarray:
+    """The 'cross of light from seeds' transform with interaction:
+    - from every input cell of a non-background color, cast rays in 4 directions
+      filled with that cell's own color;
+    - a ray stops when it hits a non-background cell of a DIFFERENT color
+      (its own color passes through, since that's itself);
+    - rays cast horizontally and vertically are both written; where a
+      horizontal ray of one color would cross a vertical ray of another color,
+      the crossing cell is filled with `meet_color`.
+
+    Implementation: cast horizontal and vertical rays separately onto two
+    layers, then overlay; where both layers are non-zero and differ, place
+    meet_color.  Obstacles for a ray are the INPUT's non-background cells of a
+    different color (rays do not self-block)."""
+    out = g.copy()
+    h, w = out.shape
+    # horizontal layer: for each row, for each cell, extend left/right to the
+    # nearest input cell of a DIFFERENT color (or boundary)
+    h_layer = g.copy()
+    for r in range(h):
+        # precompute positions of different-color obstacles per row
+        for c in range(w):
+            col = g[r, c]
+            if col == 0:
+                continue
+            # right ray
+            for cc in range(c + 1, w):
+                if g[r, cc] != 0 and g[r, cc] != col:
+                    break
+                if h_layer[r, cc] == 0:
+                    h_layer[r, cc] = col
+            # left ray
+            for cc in range(c - 1, -1, -1):
+                if g[r, cc] != 0 and g[r, cc] != col:
+                    break
+                if h_layer[r, cc] == 0:
+                    h_layer[r, cc] = col
+    # vertical layer
+    v_layer = g.copy()
+    for c in range(w):
+        for r in range(h):
+            col = g[r, c]
+            if col == 0:
+                continue
+            for rr in range(r + 1, h):
+                if g[rr, c] != 0 and g[rr, c] != col:
+                    break
+                if v_layer[rr, c] == 0:
+                    v_layer[rr, c] = col
+            for rr in range(r - 1, -1, -1):
+                if g[rr, c] != 0 and g[rr, c] != col:
+                    break
+                if v_layer[rr, c] == 0:
+                    v_layer[rr, c] = col
+    # overlay: same -> that color; different -> meet_color
+    out = g.copy()
+    for r in range(h):
+        for c in range(w):
+            hv = h_layer[r, c]
+            vv = v_layer[r, c]
+            if hv == 0 and vv == 0:
+                continue
+            if hv == vv:
+                out[r, c] = hv if hv != 0 else vv
+            elif hv != 0 and vv != 0:
+                out[r, c] = meet_color
+            else:
+                out[r, c] = hv if hv != 0 else vv
+    return out
+
+
 def op_extract_subgrid(g: np.ndarray, r0: int, c0: int, h: int, w: int) -> np.ndarray:
     """Extract the h x w subgrid at (r0, c0).  Absolute-position op (used only
     when the same position extracts the output across all pairs)."""
@@ -371,6 +442,7 @@ OPS = {
     "fill_gap_same_color_v": op_fill_gap_same_color_v,
     "expand_to_edge": op_expand_to_edge,
     "crop_to_content": op_crop_to_content,
+    "cross_rays_interact": op_cross_rays_interact,
     "crop_colors": op_crop_colors,
     "stack": op_stack,
     "hmirror": op_hmirror,
@@ -388,6 +460,7 @@ OP_COST = {
     "identity": 0,
     "map_color": 1,
     "crop_to_content": 1,
+    "cross_rays_interact": 4,
     "fill_gap_marks": 2,
     "fill_span": 2,
     "fill_col_span": 2,

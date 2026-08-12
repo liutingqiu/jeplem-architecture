@@ -3,24 +3,24 @@
   "seed": 41123,
   "n_tasks": 400,
   "results": {
-    "coverage": 0.037,
+    "coverage": 0.04,
     "covered_accuracy": 1.0,
-    "overall_accuracy": 0.037,
+    "overall_accuracy": 0.04,
     "random_baseline": 0.003,
-    "n_covered": 15,
-    "n_correct": 15
+    "n_covered": 16,
+    "n_correct": 16
   },
   "uncovered_examples": [
     "c8cbb738",
     "8e1813be",
     "5c2c9af4",
     "44f52bb0",
-    "23581191",
     "94f9d214",
     "f9012d9b",
     "4258a5f9",
     "bdad9b1f",
-    "d06dbe63"
+    "d06dbe63",
+    "8403a5d5"
   ],
   "wrong_examples": [],
   "accepted": true,
