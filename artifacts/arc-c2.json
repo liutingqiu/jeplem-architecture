@@ -3,12 +3,12 @@
   "seed": 41123,
   "n_tasks": 400,
   "results": {
-    "coverage": 0.04,
+    "coverage": 0.048,
     "covered_accuracy": 1.0,
-    "overall_accuracy": 0.04,
+    "overall_accuracy": 0.048,
     "random_baseline": 0.003,
-    "n_covered": 16,
-    "n_correct": 16
+    "n_covered": 19,
+    "n_correct": 19
   },
   "uncovered_examples": [
     "c8cbb738",

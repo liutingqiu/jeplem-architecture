@@ -29,6 +29,7 @@ sys.path.insert(0, str(ROOT / "experiments"))
 
 from arc_rule_dsl import induce_rule_c2
 from arc_synth import synth_program
+from arc_meta_rule import induce_meta_rule, apply_meta_rule
 
 
 def load_tasks(path: Path) -> list[dict]:
@@ -37,7 +38,11 @@ def load_tasks(path: Path) -> list[dict]:
 
 
 def induce_any(train_pairs) -> object | None:
-    """Hand-DSL first, then means-ends synthesis.  Both symbolic-verify."""
+    """Meta-rule first (conservation-driven function synthesis), then hand-DSL,
+    then means-ends synthesis.  All symbolic-verify."""
+    rule = induce_meta_rule(train_pairs)
+    if rule is not None:
+        return rule
     rule = induce_rule_c2(train_pairs)
     if rule is not None:
         return rule
