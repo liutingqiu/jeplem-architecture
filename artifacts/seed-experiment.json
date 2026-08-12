@@ -1,0 +1,90 @@
+{
+  "protocol": "seed_experiment_v1: test minimal cognitive seeds on a RAW numeric state stream. NO dimension/object/conservation detectors are provided. The seed must DISCOVER structure (invariant fields, action->effect associations, constant-delta rules) from repeated application alone. Ground truth used only for scoring, never as input to candidates.",
+  "n_state_pairs": 672,
+  "n_action_deltas": 624,
+  "candidate_retain": {
+    "invariance": {
+      "energy": 0.07738095238095238,
+      "goal_x": 1.0,
+      "goal_z": 1.0,
+      "health": 1.0,
+      "task_seed": 1.0,
+      "x": 0.5431547619047619,
+      "z": 0.46279761904761907
+    },
+    "discovered_invariants": [
+      "goal_x",
+      "goal_z",
+      "health",
+      "task_seed"
+    ],
+    "discovered_variables": [
+      "energy",
+      "z"
+    ],
+    "score": {
+      "invariants_correct": true,
+      "variables_correct": false,
+      "false_positives": [
+        "energy"
+      ]
+    }
+  },
+  "candidate_correlate": {
+    "learned_action_effects": {
+      "east": {
+        "delta": [
+          -1,
+          0
+        ],
+        "confidence": 0.506
+      },
+      "north": {
+        "delta": [
+          0,
+          1
+        ],
+        "confidence": 0.874
+      },
+      "west": {
+        "delta": [
+          -1,
+          0
+        ],
+        "confidence": 0.544
+      },
+      "south": {
+        "delta": [
+          0,
+          1
+        ],
+        "confidence": 0.826
+      }
+    }
+  },
+  "candidate_reduce": {
+    "rules": {
+      "east": {
+        "constant_delta": false,
+        "delta": null,
+        "distinct_deltas": 2
+      },
+      "north": {
+        "constant_delta": false,
+        "delta": null,
+        "distinct_deltas": 3
+      },
+      "west": {
+        "constant_delta": false,
+        "delta": null,
+        "distinct_deltas": 2
+      },
+      "south": {
+        "constant_delta": false,
+        "delta": null,
+        "distinct_deltas": 3
+      }
+    }
+  },
+  "artifact": "D:\\Documents\\探索新架构\\.claude\\worktrees\\zealous-lamport-398898\\artifacts\\seed-experiment.json"
+}
