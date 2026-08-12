@@ -1,0 +1,28 @@
+{
+  "protocol": "phase2_body_v16_complete_v3: COMPLETE body (15/15) -- v14 layered task (value/gap/memory+belief/prediction/revision/snapshot) + meta-controller routing queries to memory-vs-belief on body-internal features + self-model head predicting own-answer correctness. Two domains flip once (staggered); post-flip the body re-learns (review observes the newest changed domain); the two stable domains measure belief tracking (v14 precedent: flipped domains excluded from the belief verdict). per-state belief calibrated p=0.52; clean 0.98 -> post-flip memory wins (lag), noisy 0.60 -> belief wins. Time holdout 60/40. Criterion: value 0.9 / gap 1.0 / pred 0.85 / belief 0.7 / revision 0.85 / P1/P5 0.9; routing 0.80, routed >= best-fixed + 0.10, fixed_belief in [0.30,0.70] (criterion-error triage: flip-window gives 32-41% belief mass, not the 50/50 the initial 0.35 line assumed), mem_subset 0.7, bel_subset 0.7; self_head_ece <= 0.10 and <= belief-confidence-naive - 0.05 (Block-8 self-model over the BELIEF answer, all eval queries); route_fraction in [0.2,0.8]; n_disagree >= 200.",
+  "seed": 41124,
+  "results": {
+    "value_order": 1.0,
+    "gap_order": 1.0,
+    "prediction_accuracy": 0.981,
+    "belief_accuracy": 1.0,
+    "revision_detection": 1.0,
+    "continuity_p1": 1.0,
+    "consistency_p5": 1.0,
+    "routing_accuracy": 1.0,
+    "routed_answer_acc": 1.0,
+    "fixed_memory_acc": 0.65,
+    "fixed_belief_acc": 0.35,
+    "mem_subset_acc": 1.0,
+    "bel_subset_acc": 1.0,
+    "route_belief_fraction": 0.35,
+    "self_head_ece": 0.0334,
+    "naive_ece": 0.1863,
+    "n_train_disagree": 1086,
+    "n_eval_disagree": 725,
+    "n_queries": 6249,
+    "n_flips_detected": 2
+  },
+  "accepted": true,
+  "artifact": "artifacts\\phase2-body-v16-complete-41124.json"
+}

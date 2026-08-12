@@ -1,0 +1,27 @@
+{
+  "protocol": "phase2_body_v16_complete_v1: COMPLETE body (15/15) -- v14 layered task (value/gap/memory+belief/prediction/revision/snapshot) + meta-controller routing queries to memory-vs-belief on body-internal features (source quality varies by state: clean 0.97 -> memory, noisy 0.62 -> belief, flip -> belief) + self-model head predicting own-answer correctness. Time holdout 60/40 for honest eval. Criterion: value 0.9 / gap 1.0 / pred 0.85 / belief 0.7 / revision 0.85 / P1/P5 0.9; routing 0.80, routed >= best-fixed + 0.10, fixed_belief in [0.35,0.65], mem_subset 0.7, bel_subset 0.7; self_head_ece <= 0.10 and <= naive - 0.05; route_fraction in [0.2,0.8]; n_disagree >= 200.",
+  "seed": 41123,
+  "results": {
+    "value_order": 0.981,
+    "gap_order": 1.0,
+    "prediction_accuracy": 0.976,
+    "belief_accuracy": 0.667,
+    "revision_detection": 1.0,
+    "continuity_p1": 1.0,
+    "consistency_p5": 1.0,
+    "routing_accuracy": 0.693,
+    "routed_answer_acc": 0.693,
+    "fixed_memory_acc": 0.595,
+    "fixed_belief_acc": 0.405,
+    "mem_subset_acc": 0.0,
+    "bel_subset_acc": 0.693,
+    "route_belief_fraction": 0.097,
+    "self_head_ece": 0.0316,
+    "naive_ece": 0.3074,
+    "n_train_disagree": 385,
+    "n_eval_disagree": 257,
+    "n_queries": 2999
+  },
+  "accepted": false,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\sweet-wilbur-f3b366\\artifacts\\phase2-body-v16-complete.json"
+}
