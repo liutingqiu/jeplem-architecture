@@ -1,0 +1,371 @@
+{
+  "current": {
+    "east->(-1, 0)|north->(0, 1)": [
+      {
+        "signature": "east->(-1, 0)|north->(0, 1)",
+        "rule": {
+          "kind": "causal",
+          "mapping": {
+            "east": [
+              -1,
+              0
+            ],
+            "north": [
+              0,
+              1
+            ]
+          }
+        },
+        "relation_key": "causality/cause_effect",
+        "n_confirm": 5,
+        "tick_compiled": 7,
+        "tick_last_used": 7,
+        "version": 1
+      }
+    ],
+    "east->(-1, 0)|north->(0, 1)|south->(0, -1)|west->(1, 0)": [
+      {
+        "signature": "east->(-1, 0)|north->(0, 1)|south->(0, -1)|west->(1, 0)",
+        "rule": {
+          "kind": "causal",
+          "mapping": {
+            "east": [
+              -1,
+              0
+            ],
+            "north": [
+              0,
+              1
+            ],
+            "west": [
+              1,
+              0
+            ],
+            "south": [
+              0,
+              -1
+            ]
+          }
+        },
+        "relation_key": "causality/cause_effect",
+        "n_confirm": 10,
+        "tick_compiled": 1,
+        "tick_last_used": 4,
+        "version": 1
+      }
+    ],
+    "east->(-1, 0)|north->(0, 1)|west->(1, 0)": [
+      {
+        "signature": "east->(-1, 0)|north->(0, 1)|west->(1, 0)",
+        "rule": {
+          "kind": "causal",
+          "mapping": {
+            "east": [
+              -1,
+              0
+            ],
+            "north": [
+              0,
+              1
+            ],
+            "west": [
+              1,
+              0
+            ]
+          }
+        },
+        "relation_key": "causality/cause_effect",
+        "n_confirm": 5,
+        "tick_compiled": 5,
+        "tick_last_used": 7,
+        "version": 1
+      }
+    ],
+    "east->(1, 0)|north->(0, -1)|south->(0, 1)": [
+      {
+        "signature": "east->(1, 0)|north->(0, -1)|south->(0, 1)",
+        "rule": {
+          "kind": "causal",
+          "mapping": {
+            "east": [
+              1,
+              0
+            ],
+            "south": [
+              0,
+              1
+            ],
+            "north": [
+              0,
+              -1
+            ]
+          }
+        },
+        "relation_key": "causality/cause_effect",
+        "n_confirm": 0,
+        "tick_compiled": 4,
+        "tick_last_used": 4,
+        "version": 1
+      }
+    ],
+    "east->(1, 0)|north->(0, -1)|south->(0, 1)|west->(-1, 0)": [
+      {
+        "signature": "east->(1, 0)|north->(0, -1)|south->(0, 1)|west->(-1, 0)",
+        "rule": {
+          "kind": "causal",
+          "mapping": {
+            "east": [
+              1,
+              0
+            ],
+            "north": [
+              0,
+              -1
+            ],
+            "south": [
+              0,
+              1
+            ],
+            "west": [
+              -1,
+              0
+            ]
+          }
+        },
+        "relation_key": "causality/cause_effect",
+        "n_confirm": 6,
+        "tick_compiled": 3,
+        "tick_last_used": 4,
+        "version": 1
+      }
+    ],
+    "east->(1, 0)|south->(0, 1)": [
+      {
+        "signature": "east->(1, 0)|south->(0, 1)",
+        "rule": {
+          "kind": "causal",
+          "mapping": {
+            "east": [
+              1,
+              0
+            ],
+            "south": [
+              0,
+              1
+            ]
+          }
+        },
+        "relation_key": "causality/cause_effect",
+        "n_confirm": 5,
+        "tick_compiled": 6,
+        "tick_last_used": 7,
+        "version": 1
+      }
+    ],
+    "east->(1, 0)|south->(0, 1)|west->(-1, 0)": [
+      {
+        "signature": "east->(1, 0)|south->(0, 1)|west->(-1, 0)",
+        "rule": {
+          "kind": "causal",
+          "mapping": {
+            "east": [
+              1,
+              0
+            ],
+            "west": [
+              -1,
+              0
+            ],
+            "south": [
+              0,
+              1
+            ]
+          }
+        },
+        "relation_key": "causality/cause_effect",
+        "n_confirm": 8,
+        "tick_compiled": 2,
+        "tick_last_used": 7,
+        "version": 1
+      }
+    ]
+  },
+  "history": [
+    {
+      "signature": "east->(-1, 0)|north->(0, 1)|south->(0, -1)|west->(1, 0)",
+      "rule": {
+        "kind": "causal",
+        "mapping": {
+          "east": [
+            -1,
+            0
+          ],
+          "north": [
+            0,
+            1
+          ],
+          "west": [
+            1,
+            0
+          ],
+          "south": [
+            0,
+            -1
+          ]
+        }
+      },
+      "relation_key": "causality/cause_effect",
+      "n_confirm": 0,
+      "tick_compiled": 1,
+      "tick_last_used": 1,
+      "version": 1
+    },
+    {
+      "signature": "east->(1, 0)|south->(0, 1)|west->(-1, 0)",
+      "rule": {
+        "kind": "causal",
+        "mapping": {
+          "east": [
+            1,
+            0
+          ],
+          "west": [
+            -1,
+            0
+          ],
+          "south": [
+            0,
+            1
+          ]
+        }
+      },
+      "relation_key": "causality/cause_effect",
+      "n_confirm": 0,
+      "tick_compiled": 2,
+      "tick_last_used": 2,
+      "version": 1
+    },
+    {
+      "signature": "east->(1, 0)|north->(0, -1)|south->(0, 1)|west->(-1, 0)",
+      "rule": {
+        "kind": "causal",
+        "mapping": {
+          "east": [
+            1,
+            0
+          ],
+          "north": [
+            0,
+            -1
+          ],
+          "south": [
+            0,
+            1
+          ],
+          "west": [
+            -1,
+            0
+          ]
+        }
+      },
+      "relation_key": "causality/cause_effect",
+      "n_confirm": 0,
+      "tick_compiled": 3,
+      "tick_last_used": 3,
+      "version": 1
+    },
+    {
+      "signature": "east->(1, 0)|north->(0, -1)|south->(0, 1)",
+      "rule": {
+        "kind": "causal",
+        "mapping": {
+          "east": [
+            1,
+            0
+          ],
+          "south": [
+            0,
+            1
+          ],
+          "north": [
+            0,
+            -1
+          ]
+        }
+      },
+      "relation_key": "causality/cause_effect",
+      "n_confirm": 0,
+      "tick_compiled": 4,
+      "tick_last_used": 4,
+      "version": 1
+    },
+    {
+      "signature": "east->(-1, 0)|north->(0, 1)|west->(1, 0)",
+      "rule": {
+        "kind": "causal",
+        "mapping": {
+          "east": [
+            -1,
+            0
+          ],
+          "north": [
+            0,
+            1
+          ],
+          "west": [
+            1,
+            0
+          ]
+        }
+      },
+      "relation_key": "causality/cause_effect",
+      "n_confirm": 0,
+      "tick_compiled": 5,
+      "tick_last_used": 5,
+      "version": 1
+    },
+    {
+      "signature": "east->(1, 0)|south->(0, 1)",
+      "rule": {
+        "kind": "causal",
+        "mapping": {
+          "east": [
+            1,
+            0
+          ],
+          "south": [
+            0,
+            1
+          ]
+        }
+      },
+      "relation_key": "causality/cause_effect",
+      "n_confirm": 0,
+      "tick_compiled": 6,
+      "tick_last_used": 6,
+      "version": 1
+    },
+    {
+      "signature": "east->(-1, 0)|north->(0, 1)",
+      "rule": {
+        "kind": "causal",
+        "mapping": {
+          "east": [
+            -1,
+            0
+          ],
+          "north": [
+            0,
+            1
+          ]
+        }
+      },
+      "relation_key": "causality/cause_effect",
+      "n_confirm": 0,
+      "tick_compiled": 7,
+      "tick_last_used": 7,
+      "version": 1
+    }
+  ],
+  "marked_stale": []
+}
