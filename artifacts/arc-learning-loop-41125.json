@@ -1,0 +1,54 @@
+{
+  "protocol": "phase3_openq_learning_loop_v1: the architecture learns -- processes ARC-1 training tasks, synthesizes compound primitives (depth-2 skeletons) into its memory library, then solves held-out tasks with base + learned library. Answer to 'is rule induction our disadvantage once we have a memory library': coverage rising with experience = learning does rule induction; flat at the fixed-library ceiling = the ceiling is the expressive vocabulary.",
+  "seed": 41125,
+  "results": {
+    "fixed_library_heldout_baseline": 0.05,
+    "learned_library_heldout": 0.06,
+    "learned_library_arc1_eval": 0.005,
+    "learned_library_arc2_test": 0.0,
+    "n_compounds_learned": 2,
+    "top_compounds": {
+      "recolor>recolor_small": 1,
+      "recolor>crop_to_objects": 1
+    },
+    "learning_curve": [
+      {
+        "seen": 50,
+        "compounds": 0,
+        "heldout_solved": 5,
+        "coverage": 0.05
+      },
+      {
+        "seen": 100,
+        "compounds": 0,
+        "heldout_solved": 5,
+        "coverage": 0.05
+      },
+      {
+        "seen": 150,
+        "compounds": 0,
+        "heldout_solved": 5,
+        "coverage": 0.05
+      },
+      {
+        "seen": 200,
+        "compounds": 1,
+        "heldout_solved": 6,
+        "coverage": 0.06
+      },
+      {
+        "seen": 250,
+        "compounds": 1,
+        "heldout_solved": 6,
+        "coverage": 0.06
+      },
+      {
+        "seen": 300,
+        "compounds": 2,
+        "heldout_solved": 6,
+        "coverage": 0.06
+      }
+    ]
+  },
+  "artifact": "artifacts\\arc-learning-loop-41125.json"
+}

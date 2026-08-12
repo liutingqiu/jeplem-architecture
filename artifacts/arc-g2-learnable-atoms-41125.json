@@ -1,0 +1,12 @@
+{
+  "protocol": "phase3_g2_learnable_atoms_v1: AtomMapper network learns recolor->scale parameters (old,new,k) from demo-pair features; trained on old=1/new in {5,6}, tested on UNSEEN old=2 / new=7 combos. Baselines: brute-force search (1.0 on expressible), param-accuracy. Gate: learnable >= search x 0.9 AND > 0.6.",
+  "seed": 41125,
+  "results": {
+    "learnable_output_acc": 0.025,
+    "learnable_param_acc": 0.0,
+    "search_baseline": 1.0,
+    "n_test": 40
+  },
+  "accepted": false,
+  "artifact": "artifacts\\arc-g2-learnable-atoms-41125.json"
+}

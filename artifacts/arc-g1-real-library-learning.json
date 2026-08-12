@@ -1,0 +1,48 @@
+{
+  "protocol": "phase3_g1_real_library_learning_v1: library learning on REAL ARC-1 training -- discover depth-2 skill skeletons from train tasks, reuse on held-out/eval/arc2. Gate: held-out >= 10% AND >= 2x depth-1 AND rises with training. Baselines: depth-1, memory replay; static-library full-depth-2 = the training ceiling.",
+  "seed": 41123,
+  "results": {
+    "heldout_depth1_baseline": 0.04,
+    "heldout_replay_baseline": 0.0,
+    "heldout_static_ceiling": 0.05,
+    "learned_heldout": 0.0,
+    "learned_arc1_eval": 0.0,
+    "learned_arc2_test": 0.0,
+    "n_skills": 0,
+    "top_skills": {},
+    "learning_curve": [
+      {
+        "seen": 50,
+        "skills": 0,
+        "heldout_solved": 0
+      },
+      {
+        "seen": 100,
+        "skills": 0,
+        "heldout_solved": 0
+      },
+      {
+        "seen": 150,
+        "skills": 0,
+        "heldout_solved": 0
+      },
+      {
+        "seen": 200,
+        "skills": 0,
+        "heldout_solved": 0
+      },
+      {
+        "seen": 250,
+        "skills": 0,
+        "heldout_solved": 0
+      },
+      {
+        "seen": 300,
+        "skills": 0,
+        "heldout_solved": 0
+      }
+    ]
+  },
+  "gate_pass": false,
+  "artifact": "artifacts\\arc-g1-real-library-learning.json"
+}

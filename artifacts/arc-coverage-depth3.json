@@ -1,0 +1,31 @@
+{
+  "arc1_training.json": {
+    "split": "arc1_training",
+    "n_tasks": 400,
+    "train_fit": 21,
+    "train_fit_rate": 0.052,
+    "test_correct": 21,
+    "test_correct_rate": 0.052,
+    "memory_replay_baseline": 0.0,
+    "depth1": 21,
+    "depth2": 0,
+    "top_programs": {
+      "transpose": 2,
+      "rotate180": 2,
+      "crop_to_objects(keep_largest_object)": 2,
+      "rotate270": 1,
+      "recolor_small(1,1)": 1,
+      "flip_v": 1,
+      "crop_to_objects(flip_h)": 1,
+      "recolor_small(1,3)(recolor(3,8))": 1,
+      "recolor(0,5)(keep_largest_object)": 1,
+      "recolor(7,5)": 1,
+      "flip_h": 1,
+      "crop_to_objects(recolor(1,0))": 1,
+      "recolor(6,2)": 1,
+      "crop_to_objects": 1,
+      "scale(2)": 1
+    },
+    "n_unsolved": 379
+  }
+}

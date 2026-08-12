@@ -1,0 +1,38 @@
+{
+  "protocol": "phase3_g4_ledger_knowledge_base_v1: synthetic factual world (E entities x 12 attributes, 30-value vocab); facts ingested into VersionedFactLedger; recall on ingested (exact), unknown-detection on uningested, scaling 1k/10k/50k facts, revision on conflict. Gate: recall >= 0.99, unknown >= 0.95, revision works, ledger scales without recall loss.",
+  "seed": 41123,
+  "results": {
+    "n1000": {
+      "n_facts": 1000,
+      "n_entities": 83,
+      "recall": 1.0,
+      "unknown_detection": 1.0,
+      "ingest_ms": 1.3,
+      "query_ms_5k": 3.3,
+      "revision_ok": 1,
+      "other_intact_after_revision": 1
+    },
+    "n10000": {
+      "n_facts": 10000,
+      "n_entities": 833,
+      "recall": 1.0,
+      "unknown_detection": 1.0,
+      "ingest_ms": 74.5,
+      "query_ms_5k": 6.6,
+      "revision_ok": 1,
+      "other_intact_after_revision": 1
+    },
+    "n50000": {
+      "n_facts": 50000,
+      "n_entities": 4166,
+      "recall": 1.0,
+      "unknown_detection": 1.0,
+      "ingest_ms": 86.0,
+      "query_ms_5k": 6.5,
+      "revision_ok": 1,
+      "other_intact_after_revision": 1
+    }
+  },
+  "gate_pass": true,
+  "artifact": "artifacts\\arc-g4-ledger-knowledge-41123.json"
+}
