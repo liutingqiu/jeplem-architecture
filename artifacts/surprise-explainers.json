@@ -1,0 +1,690 @@
+{
+  "protocol": "surprise_explainer_v1: the six families as a surprise-driven EXPLAINER POOL. When surprise flags a hidden variable (x/z unpredictable in the raw stream), the pool is asked to explain it. Causality finds conditional-delta rules within a single world (episode). Verifies the shift from pre-selected families to surprise-invoked explainers.",
+  "n_episodes": 48,
+  "x_explained_episodes": 48,
+  "z_explained_episodes": 48,
+  "episodes": [
+    {
+      "episode": 1000,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0,
+          "west": 1,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1017,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "west": -1,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1034,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "north": 0,
+          "south": 0,
+          "west": -1
+        }
+      }
+    },
+    {
+      "episode": 1051,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "south": 0,
+          "north": 0,
+          "west": 1
+        }
+      }
+    },
+    {
+      "episode": 1068,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "west": -1,
+          "north": 0
+        }
+      }
+    },
+    {
+      "episode": 1085,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "north": 0,
+          "south": 0,
+          "west": -1
+        }
+      }
+    },
+    {
+      "episode": 1102,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0,
+          "south": 0,
+          "west": 1
+        }
+      }
+    },
+    {
+      "episode": 1119,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0,
+          "west": 1,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1136,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "west": -1,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1153,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "west": -1
+        }
+      }
+    },
+    {
+      "episode": 1170,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "west": 1,
+          "north": 0,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1187,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0,
+          "south": 0,
+          "west": 1
+        }
+      }
+    },
+    {
+      "episode": 1204,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "north": 0
+        }
+      }
+    },
+    {
+      "episode": 1221,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "west": -1,
+          "north": 0,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1238,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "west": 1,
+          "north": 0,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1255,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "west": 1,
+          "south": 0,
+          "north": 0
+        }
+      }
+    },
+    {
+      "episode": 1272,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "west": -1,
+          "north": 0
+        }
+      }
+    },
+    {
+      "episode": 1289,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "north": 0,
+          "west": -1
+        }
+      }
+    },
+    {
+      "episode": 1306,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "south": 0,
+          "north": 0,
+          "west": 1
+        }
+      }
+    },
+    {
+      "episode": 1323,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "west": 1,
+          "south": 0,
+          "north": 0
+        }
+      }
+    },
+    {
+      "episode": 1340,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "west": -1,
+          "north": 0
+        }
+      }
+    },
+    {
+      "episode": 1357,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "north": 0,
+          "west": -1
+        }
+      }
+    },
+    {
+      "episode": 1374,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0,
+          "west": 1,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1391,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0,
+          "west": 1,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1000,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0,
+          "west": 1
+        }
+      }
+    },
+    {
+      "episode": 1017,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "west": -1
+        }
+      }
+    },
+    {
+      "episode": 1034,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1051,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0
+        }
+      }
+    },
+    {
+      "episode": 1068,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1085,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "west": -1
+        }
+      }
+    },
+    {
+      "episode": 1102,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0,
+          "west": 1
+        }
+      }
+    },
+    {
+      "episode": 1119,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0
+        }
+      }
+    },
+    {
+      "episode": 1136,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1153,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "west": -1
+        }
+      }
+    },
+    {
+      "episode": 1170,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0,
+          "west": 1
+        }
+      }
+    },
+    {
+      "episode": 1187,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0
+        }
+      }
+    },
+    {
+      "episode": 1204,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1221,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "west": -1
+        }
+      }
+    },
+    {
+      "episode": 1238,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0,
+          "west": 1
+        }
+      }
+    },
+    {
+      "episode": 1255,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0
+        }
+      }
+    },
+    {
+      "episode": 1272,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1289,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "west": -1
+        }
+      }
+    },
+    {
+      "episode": 1306,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0,
+          "west": 1
+        }
+      }
+    },
+    {
+      "episode": 1323,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0
+        }
+      }
+    },
+    {
+      "episode": 1340,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0
+        }
+      }
+    },
+    {
+      "episode": 1357,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": 1,
+          "south": 0,
+          "west": -1
+        }
+      }
+    },
+    {
+      "episode": 1374,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0,
+          "west": 1
+        }
+      }
+    },
+    {
+      "episode": 1391,
+      "x_explained": true,
+      "z_explained": true,
+      "x_rule": {
+        "kind": "causal",
+        "condition": "_action",
+        "deltas": {
+          "east": -1,
+          "north": 0
+        }
+      }
+    }
+  ],
+  "finding": "hidden variable (world switch) requires the RIGHT OBSERVATION GRAIN: the causality explainer fails on the mixed stream (action->delta non-constant across worlds) but succeeds within one episode. Surprise + explainer pool together drive the search for correct observation segmentation.",
+  "artifact": "D:\\Documents\\探索新架构\\.claude\\worktrees\\zealous-lamport-398898\\artifacts\\surprise-explainers.json"
+}
