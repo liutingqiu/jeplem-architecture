@@ -1,0 +1,22 @@
+{
+  "protocol": "C1_metacontroller_control: learned routing (with) vs gap-first heuristic (without) over 4 sources with different reliability (0.8/0.5/0.3/0.05). Isolated toy isolating the routing decision. If metacontroller cannot beat heuristic HERE, it adds no value to the web pipeline.",
+  "steps": 100,
+  "results": {
+    "with": [
+      77.2,
+      84.4,
+      84.4
+    ],
+    "without": [
+      23.2,
+      32.8,
+      26.8
+    ]
+  },
+  "mean_with": 82.0,
+  "mean_without": 27.6,
+  "gain": 54.4,
+  "conclusion": "metacontroller ADDS value",
+  "honest_boundary": "This toy has REPEATABLE sources (reliable/mid/noisy/dead) with fixed reliability, so learned routing wins by preferring the reliable source. The real web has NO repeatable source structure (each URL is one-shot content) -- the advantage may not transfer. Metacontroller value on the real web remains UNVERIFIED; this controls only the toy routing decision.",
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\recursing-panini-fb85fb\\artifacts\\c1-metacontroller.json"
+}
