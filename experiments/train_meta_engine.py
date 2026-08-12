@@ -40,6 +40,8 @@ def build_engine(rule_path: Path | None = None) -> MetaEngine:
     adapter = ArcAdapter()
     rels = relation_catalog()
     register_family1(rels, adapter.family1_relations())
+    # family 6 (logic/composition) via means-ends op-sequence search
+    register_family1(rels, adapter.logic_relations())
     engine = MetaEngine(adapter, rels, rule_path=rule_path)
 
     def _pipeline_fallback(train_pairs):

@@ -79,7 +79,12 @@ def register_family1(catalog: list[RelationFunc],
 
     `relations` maps relation name -> (family, fired_by, fit, apply).  The
     adapter wraps its arc_meta_rule bodies so this module stays arc-free.
+    A real relation REPLACES a stub with the same name (if any), so a family
+    never has both a stub and a live implementation.
     """
     for name, (family, fired_by, fit, apply) in relations.items():
-        catalog.append(RelationFunc(family, name, tuple(fired_by), fit, apply))
+        real = RelationFunc(family, name, tuple(fired_by), fit, apply)
+        # drop any stub with the same name
+        catalog[:] = [r for r in catalog if not (r.family == family and r.name == name)]
+        catalog.append(real)
     return catalog

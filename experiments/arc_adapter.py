@@ -196,3 +196,35 @@ class ArcAdapter:
             "subgrid": ("geometry", ("size",), _fit(rel_subgrid), _apply_subgrid()),
             "stack": ("geometry", ("size",), _fit(rel_stack), _apply_stack()),
         }
+
+    def logic_relations(self) -> dict:
+        """Family 6: logic -- conditional COMPOSITION of operations.  The fit is
+        the means-ends program search (arc_synth): compose primitive ops into a
+        sequence reproducing the output.  Only fires for GENUINE composition
+        (>=2 ops): a single-op rule is a quantity/geometry concern, not logic.
+        This keeps logic as the composition family, not a duplicate of the
+        simple relations."""
+        def _fit(g, og):
+            from arc_synth import synth_program
+            g = np.asarray(g, dtype=int)
+            og = np.asarray(og, dtype=int)
+            try:
+                cands = synth_program(g, og, [(g, og)])
+            except Exception:
+                return None
+            if not cands:
+                return None
+            best = min(cands, key=lambda c: c.complexity)
+            # genuine composition only: a single-op rule belongs to the
+            # quantity/geometry families; logic composes >=2 ops
+            if len(best.ops) < 2:
+                return None
+            return {"ops": best.ops}
+
+        def _apply(params, g):
+            return self.apply_ops(params["ops"], g)
+
+        return {
+            "compose": ("logic", ("size", "colors", "count", "shapes"),
+                        _fit, _apply),
+        }

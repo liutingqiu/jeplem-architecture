@@ -138,7 +138,11 @@ def _apply_compiled(compiled, adapter, raw):
     kind = compiled.rule.get("kind")
     if kind in ("meta",):
         params = _unjsonable(compiled.rule.get("params", {}))
-        return adapter.apply_meta(compiled.rule["relation"], params, raw)
+        relation = compiled.rule.get("relation")
+        # logic/compose rules carry an op sequence under params["ops"]
+        if relation == "compose" and isinstance(params, dict) and "ops" in params:
+            return adapter.apply_ops(params["ops"], raw)
+        return adapter.apply_meta(relation, params, raw)
     if kind in ("candidate", "synth", "custom"):
         # custom rules serialize their ops under the same shape as candidate
         ops = _unjsonable(compiled.rule.get("ops", []))
@@ -147,6 +151,8 @@ def _apply_compiled(compiled, adapter, raw):
         params = _unjsonable(compiled.rule.get("params", {}))
         relation = compiled.rule.get("relation")
         if relation:
+            if isinstance(params, dict) and "ops" in params:
+                return adapter.apply_ops(params["ops"], raw)
             return adapter.apply_meta(relation, params, raw)
     raise ValueError(f"unknown compiled rule kind: {kind}")
 
