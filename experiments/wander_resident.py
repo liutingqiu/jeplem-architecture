@@ -36,6 +36,7 @@ from plwm.perception_hub import PerceptionHub
 from plwm.self_knowledge import SelfKnowledge
 from plwm.world_model_drive import WorldModelDrive
 from plwm.tool_prior import ToolPrior, Tool
+from plwm.digest import digest_observations, digest_link_graph
 
 SEEDS = [
     "https://en.wikipedia.org/wiki/Artificial_intelligence",
@@ -173,6 +174,15 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
 
         # checkpoint + status
         if checkpoint_path is not None and (r % checkpoint_every == 0):
+            # digestion: distill raw exploration into durable ledger facts
+            # BEFORE checkpoint, so eviction of raw streams loses no knowledge
+            try:
+                digest_observations(runner.body.observations,
+                                    runner.body.ledger, tick=r, source="digest")
+                digest_link_graph(runner.link_graph, runner.body.ledger,
+                                  tick=r, source="digest")
+            except Exception:
+                pass
             try:
                 Path(checkpoint_path).write_text(
                     json.dumps(runner.snapshot()), encoding="utf-8")
