@@ -1,0 +1,123 @@
+{
+  "protocol": "arc_library_learning_v2 (controlled curriculum): the body discovers compositional skills (depth-2 skeletons) from training instances of task families; held-out coverage should RISE with experience and beat the depth-1 untrained baseline. Skills are skeletons re-parameterised per task (P6 hybrid semantics). Verdict: coverage rises with training instances and beats the baseline.",
+  "seed": 41123,
+  "results": {
+    "depth1_baseline": 0.0,
+    "final_coverage": 0.857,
+    "n_skills": 3,
+    "arc2_solved_with_skills": 0.0,
+    "skills": [
+      "recolor>scale",
+      "scale>crop",
+      "recolor>flip_h"
+    ],
+    "learning_curve": [
+      {
+        "seen": 1,
+        "skills": 1,
+        "coverage": 0.571
+      },
+      {
+        "seen": 2,
+        "skills": 1,
+        "coverage": 0.571
+      },
+      {
+        "seen": 3,
+        "skills": 1,
+        "coverage": 0.571
+      },
+      {
+        "seen": 4,
+        "skills": 1,
+        "coverage": 0.571
+      },
+      {
+        "seen": 5,
+        "skills": 1,
+        "coverage": 0.571
+      },
+      {
+        "seen": 6,
+        "skills": 1,
+        "coverage": 0.571
+      },
+      {
+        "seen": 7,
+        "skills": 1,
+        "coverage": 0.571
+      },
+      {
+        "seen": 8,
+        "skills": 2,
+        "coverage": 0.714
+      },
+      {
+        "seen": 9,
+        "skills": 2,
+        "coverage": 0.714
+      },
+      {
+        "seen": 10,
+        "skills": 3,
+        "coverage": 0.857
+      },
+      {
+        "seen": 11,
+        "skills": 3,
+        "coverage": 0.857
+      },
+      {
+        "seen": 12,
+        "skills": 3,
+        "coverage": 0.857
+      },
+      {
+        "seen": 13,
+        "skills": 3,
+        "coverage": 0.857
+      },
+      {
+        "seen": 14,
+        "skills": 3,
+        "coverage": 0.857
+      },
+      {
+        "seen": 15,
+        "skills": 3,
+        "coverage": 0.857
+      },
+      {
+        "seen": 16,
+        "skills": 3,
+        "coverage": 0.857
+      },
+      {
+        "seen": 17,
+        "skills": 3,
+        "coverage": 0.857
+      },
+      {
+        "seen": 18,
+        "skills": 3,
+        "coverage": 0.857
+      },
+      {
+        "seen": 19,
+        "skills": 3,
+        "coverage": 0.857
+      },
+      {
+        "seen": 20,
+        "skills": 3,
+        "coverage": 0.857
+      },
+      {
+        "seen": 21,
+        "skills": 3,
+        "coverage": 0.857
+      }
+    ]
+  },
+  "artifact": "artifacts\\arc-library-learning.json"
+}
