@@ -32,6 +32,7 @@ from plwm.emotion import Emotion, Effort, TimeSense
 from plwm.web_failover import FailoverBackend
 from plwm.modal_surprise_engine import ModalSurpriseEngine
 from plwm.modality_identify import route
+from plwm.perception_hub import PerceptionHub
 
 SEEDS = [
     "https://en.wikipedia.org/wiki/Artificial_intelligence",
@@ -67,6 +68,7 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
                         trust=TrustRegistry(), whitelist=_seed_targets(),
                         max_urls=10_000_000, struct_subset=True)
     engine = ModalSurpriseEngine(window=6)
+    hub = PerceptionHub()
     seen_facts: set = set()
     prev_by_mod: dict = {}
     narrative = {"what_it_saw": [], "what_it_learned": [], "network": {}, "body": []}
@@ -74,7 +76,10 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
 
     def feed(text: str, round_no: int) -> None:
         nonlocal prev_by_mod, _seen_inv
-        mod, feats = route(text)
+        # PerceptionHub is the unified prior front-end; route() only identifies
+        # the modality name so we namespace the engine's fields per modality.
+        mod, _ = route(text)
+        feats = hub.perceive({"text": text})
         if not feats:
             return
         if mod in prev_by_mod:
@@ -158,6 +163,15 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
                 conf = round(float(runner.body.runtime.belief.confidence().item()), 3)
             except Exception:
                 pass
+            # I2: expose compiled rules from the ledger (System-1 reuse store)
+            ledger_rules = []
+            for sig, bucket in engine.ledger.current.items():
+                for rule in bucket:
+                    ledger_rules.append({
+                        "signature": sig[:60],
+                        "kind": rule.rule.get("kind", "?"),
+                        "confirms": rule.n_confirm,
+                    })
             status = {
                 "round": r,
                 "urls_sensed": len(runner._explored),
@@ -166,6 +180,7 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
                 "what_it_learned": narrative["what_it_learned"][-5:],
                 "invariants": [f for f in k["invariants"]][:12],
                 "hidden_vars": [f for f in k["hidden_vars"]][:8],
+                "compiled_rules": ledger_rules[:10],
                 "belief_confidence": conf,
                 "network_routes": runner.backend.route_report()
                 if hasattr(runner.backend, "route_report") else {},
