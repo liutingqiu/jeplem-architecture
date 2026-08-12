@@ -51,6 +51,7 @@ class SurpriseEngine:
         self.stats = SurpriseStats()
         # per-field identity counters
         self._id_correct: dict[str, int] = defaultdict(int)
+        self._id_only_correct: dict[str, int] = defaultdict(int)  # identity WITHOUT rule help
         self._id_total: dict[str, int] = defaultdict(int)
         # sustained surprise windows per field (for rule-learning trigger)
         self._surprise_window: dict[str, list[bool]] = defaultdict(list)
@@ -93,6 +94,8 @@ class SurpriseEngine:
             # predict: identity (next=prev) or a learned rule
             predicted = self._predict(f, s0, v0)
             surprise = (predicted is None or predicted != v1)
+            # identity-only hit: v1 == v0 regardless of any rule
+            id_only_hit = (v0 is not None and v0 == v1)
             if surprise:
                 self.stats.surprise_events += 1
             else:
@@ -100,6 +103,8 @@ class SurpriseEngine:
             self._id_total[f] += 1
             if not surprise:
                 self._id_correct[f] += 1
+            if id_only_hit:
+                self._id_only_correct[f] += 1
             report[f] = 1.0 if surprise else 0.0
             # verify a learned rule: does it actually eliminate surprise?
             if f in self._rule_learners:
@@ -139,7 +144,10 @@ class SurpriseEngine:
             if f not in self._rule_learners and f not in self._hidden_vars:
                 self._learn_field_rule(f, w)
         elif frac_surprise <= 0.05:
-            acc = self._id_correct[f] / self._id_total[f] if self._id_total[f] else 0.0
+            # invariant requires PURE identity success (a field explained by a
+            # learned rule is a RULE, not an invariant -- even if it now
+            # predicts perfectly).  Track identity-only hits separately.
+            acc = self._id_only_correct[f] / self._id_total[f] if self._id_total[f] else 0.0
             if acc >= self._invariant_threshold:
                 self._invariants.add(f)
 
