@@ -175,6 +175,8 @@ class SurpriseEngine:
             groups = {}
             for s0, s1 in transitions:
                 cv = s0.get(cf)
+                if f not in s1 or f not in s0:
+                    continue  # field absent in one frame (multimodal)
                 d = s1[f] - s0[f]
                 groups.setdefault(cv, []).append(d)
             if groups and all(len(set(round(g, 6) for g in gs)) == 1 for gs in groups.values()):

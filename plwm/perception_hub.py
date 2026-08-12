@@ -37,6 +37,7 @@ from plwm.image_prior import visual_features
 from plwm.agent_prior import AgentPrior
 from plwm.safety_prior import SafetyPrior
 from plwm.curiosity_prior import CuriosityPrior
+from plwm.language_prior import language_features, bigram_features
 from plwm.surprise_engine import SurpriseEngine
 
 
@@ -75,6 +76,9 @@ class PerceptionHub:
             danger = self.safety.observe(raw["signals"])
             for ch, score in danger.items():
                 feats[f"danger_{ch}"] = round(score, 3)
+        if "text" in raw:
+            feats.update(language_features(raw["text"]))
+            feats.update(bigram_features(raw["text"]))
         return feats
 
     def note_explained(self, field: str) -> None:
