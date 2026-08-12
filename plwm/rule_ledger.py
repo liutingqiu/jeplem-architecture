@@ -178,12 +178,15 @@ class RuleLedger:
                 parsed.append(r)
             current[sig] = parsed
         history = [CompiledRule(**raw) for raw in data.get("history", [])]
-        # version monotonicity across history
-        prev = 0
+        # version monotonicity PER SIGNATURE (each signature's revisions are
+        # independent; a global check would false-fail on interleaved sigs)
+        prev_by_sig: dict[str, int] = {}
         for r in history:
+            prev = prev_by_sig.get(r.signature, 0)
             if r.version < prev:
-                raise ValueError(f"non-monotonic version in history: {r.version} < {prev}")
-            prev = r.version
+                raise ValueError(
+                    f"non-monotonic version for {r.signature}: {r.version} < {prev}")
+            prev_by_sig[r.signature] = r.version
         self.current = current
         self.history = history
         self.marked_stale = set(data.get("marked_stale", []))
