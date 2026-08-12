@@ -1,0 +1,39 @@
+{
+  "current": {
+    "succ<=1|fail>=2": [
+      {
+        "signature": "succ<=1|fail>=2",
+        "rule": {
+          "kind": "interaction",
+          "interaction": {
+            "success_radius": 1,
+            "fail_radius": 2
+          }
+        },
+        "relation_key": "interaction/interact",
+        "n_confirm": 23,
+        "tick_compiled": 1,
+        "tick_last_used": 1,
+        "version": 1
+      }
+    ]
+  },
+  "history": [
+    {
+      "signature": "succ<=1|fail>=2",
+      "rule": {
+        "kind": "interaction",
+        "interaction": {
+          "success_radius": 1,
+          "fail_radius": 2
+        }
+      },
+      "relation_key": "interaction/interact",
+      "n_confirm": 0,
+      "tick_compiled": 1,
+      "tick_last_used": 1,
+      "version": 1
+    }
+  ],
+  "marked_stale": []
+}
