@@ -61,6 +61,9 @@ class MultimodalBody:
         self.gate = gate if gate is not None else EvidenceFreshnessGate(world_id)
         self.tick = tick
         self.observations: list[BodyObservation] = []
+        # audit observations are bounded: keep the most recent MAX_OBSERVATIONS
+        # (unbounded growth = memory leak on long autonomous runs)
+        self.max_observations: int = 50_000
         # internal-feeling layer (optional, back-compat): emotion / effort /
         # time-sense give the body interoception + time awareness.
         self.emotion = emotion
@@ -124,6 +127,7 @@ class MultimodalBody:
         decision = self.gate.accept(evidence)
         if not decision.accepted:
             self.observations.append(BodyObservation(self.tick, modality, semantic.shape[-1], 0.0, False))
+            self._trim_observations()
             return self._noop_tick()
         projected = self.space(modality, semantic)  # 统一 D 维语义向量
         tick_result = self.runtime.ingest(projected.tolist(), log_likelihood)
@@ -160,7 +164,13 @@ class MultimodalBody:
                 float(projected.norm(dim=-1).mean().item()), True, fact_key,
             )
         )
+        self._trim_observations()
         return tick_result
+
+    def _trim_observations(self) -> None:
+        """Keep observations bounded (audit trail, not unbounded memory)."""
+        if len(self.observations) > self.max_observations:
+            self.observations = self.observations[-self.max_observations:]
 
     def _noop_tick(self) -> RuntimeTick:
         return self.runtime.ingest(None, None)
