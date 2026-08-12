@@ -32,7 +32,8 @@ class EngineStats:
 
 
 class MetaEngine:
-    def __init__(self, adapter, relations: Sequence, *, rule_path: Path | None = None):
+    def __init__(self, adapter, relations: Sequence, *, rule_path: Path | None = None,
+                 streaming: bool = False):
         self.adapter = adapter
         self.relations = list(relations)
         self.inducer = Inducer(relations)
@@ -41,6 +42,8 @@ class MetaEngine:
         self.rule_path = rule_path
         self._last_compiled: object | None = None
         self._fallback_induce: object | None = None
+        self.streaming = streaming
+        self._stream_pairs: list[tuple] = []
 
     def set_fallback(self, fn) -> None:
         """Install a full-pipeline inducer (meta->hand-DSL->synth) as a last
@@ -71,6 +74,8 @@ class MetaEngine:
         task_pairs = list(pairs)
         rule_out = None
         for in_raw, out_raw in task_pairs:
+            if self.streaming:
+                self._stream_pairs.append((in_raw, out_raw))
             sig = self.adapter.conserve_raw(in_raw, out_raw).signature
 
             def _verify(rule):
@@ -84,9 +89,12 @@ class MetaEngine:
                     rule_out = cached
                 continue
 
-            # System-2: slow constructive path over THIS task's pairs
+            # System-2: slow constructive path.  Non-streaming: induce over the
+            # whole task; streaming: induce over pairs seen SO FAR (the rule
+            # may be changing over time -- later pairs must not pollute it).
             was_stale = self.ledger.is_stale(sig)
-            rule = self.inducer.induce(self.adapter, task_pairs)
+            induce_pairs = self._stream_pairs if self.streaming else task_pairs
+            rule = self.inducer.induce(self.adapter, induce_pairs)
             kind = "meta"
             if rule is None and self._fallback_induce is not None:
                 fb = self._fallback_induce(task_pairs)
