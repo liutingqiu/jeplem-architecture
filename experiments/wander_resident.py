@@ -34,6 +34,7 @@ from plwm.modal_surprise_engine import ModalSurpriseEngine
 from plwm.modality_identify import route
 from plwm.perception_hub import PerceptionHub
 from plwm.self_knowledge import SelfKnowledge
+from plwm.world_model_drive import WorldModelDrive
 
 SEEDS = [
     "https://en.wikipedia.org/wiki/Artificial_intelligence",
@@ -71,6 +72,7 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
     engine = ModalSurpriseEngine(window=6)
     hub = PerceptionHub()
     self_know = SelfKnowledge(engine)
+    world_model = WorldModelDrive()
     _last_confidence: dict = {}
     seen_facts: set = set()
     prev_by_mod: dict = {}
@@ -89,6 +91,8 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
             engine.observe(prev_by_mod[mod], feats, modality=mod)
             # I3: self-knowledge -- how confident is it in this content?
             self_know.confidence(feats, mod)
+            # I4: world-model drive -- update learned structure per modality
+            world_model.observe(feats, mod)
             k = engine.knowledge()
             inv = [f for f in k["invariants"] if f.startswith(f"{mod}::")
                    and f not in _seen_inv]
@@ -187,6 +191,11 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
                 "hidden_vars": [f for f in k["hidden_vars"]][:8],
                 "compiled_rules": ledger_rules[:10],
                 "self_confidence_modalities": self_know.engine_state(),
+                "world_model_modalities": {
+                    m: {"learned_features": mm.n,
+                        "curiosity_state": "learning"}
+                    for m, mm in world_model.models.items()
+                },
                 "belief_confidence": conf,
                 "network_routes": runner.backend.route_report()
                 if hasattr(runner.backend, "route_report") else {},
