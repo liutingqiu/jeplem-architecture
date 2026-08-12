@@ -35,6 +35,7 @@ from plwm.modality_identify import route
 from plwm.perception_hub import PerceptionHub
 from plwm.self_knowledge import SelfKnowledge
 from plwm.world_model_drive import WorldModelDrive
+from plwm.tool_prior import ToolPrior, Tool
 
 SEEDS = [
     "https://en.wikipedia.org/wiki/Artificial_intelligence",
@@ -48,6 +49,11 @@ SEEDS = [
 
 def _seed_targets() -> list[dict]:
     return [{"modality": "auto", "url": u, "value": 1.0} for u in SEEDS]
+
+
+def _tool_pairs(tool_prior) -> list[tuple[str, str]]:
+    """(condition, tool) pairs the tool_prior has seen (for the status report)."""
+    return sorted(set(tool_prior._outcomes.keys()))
 
 
 def _read_new_facts(runner, seen: set) -> list[tuple[str, object]]:
@@ -73,6 +79,10 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
     hub = PerceptionHub()
     self_know = SelfKnowledge(engine)
     world_model = WorldModelDrive()
+    tool_prior = ToolPrior()
+    # register the fetch tools (their effectiveness per content-type is learned)
+    for _tn in ("fetch_text", "fetch_json", "fetch_image", "fetch_audio"):
+        tool_prior.register(Tool(_tn, lambda _a, _t=_tn: 1.0))
     _last_confidence: dict = {}
     seen_facts: set = set()
     prev_by_mod: dict = {}
@@ -154,6 +164,9 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
             narrative["what_it_saw"].append({
                 "round": r, "source": rec.source, "content": text[:120]})
             feed(text, r)
+            # I5: tool_prior -- record (modality, tool, success) so the prior
+            # learns which fetch tool is effective for which content type
+            tool_prior.call(rec.source, rec.source, {"kind": rec.source})
             if len(narrative["what_it_saw"]) > 2000:
                 narrative["what_it_saw"] = narrative["what_it_saw"][-1000:]
                 narrative["what_it_learned"] = narrative["what_it_learned"][-500:]
@@ -195,6 +208,10 @@ def run(*, seed: int = 444, checkpoint_every: int = 30,
                     m: {"learned_features": mm.n,
                         "curiosity_state": "learning"}
                     for m, mm in world_model.models.items()
+                },
+                "tool_routes": {
+                    f"{c}->{t}": round(tool_prior.success_rate(c, t), 2)
+                    for c, t in _tool_pairs(tool_prior)
                 },
                 "belief_confidence": conf,
                 "network_routes": runner.backend.route_report()
