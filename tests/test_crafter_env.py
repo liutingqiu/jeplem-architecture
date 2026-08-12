@@ -1,8 +1,15 @@
 import unittest
 
+try:
+    import crafter  # noqa: F401
+    _CRAFTER_AVAILABLE = True
+except ImportError:
+    _CRAFTER_AVAILABLE = False
+
 from plwm.crafter_env import GymPixelsOnlyCrafter, PixelsOnlyCrafter
 
 
+@unittest.skipUnless(_CRAFTER_AVAILABLE, "crafter not installed (build fails on Python 3.13)")
 class CrafterEnvironmentTests(unittest.TestCase):
     def test_exposes_only_rgb_transition_values(self):
         environment = PixelsOnlyCrafter(seed=7, length=2)

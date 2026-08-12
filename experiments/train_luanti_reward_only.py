@@ -130,6 +130,7 @@ class PLWMActorCritic(ActorCritic):
                 torch.where(active, candidate.workspace, state.workspace),
                 torch.where(active.unsqueeze(-1), candidate.keys, state.keys),
                 torch.where(active.unsqueeze(-1), candidate.values, state.values),
+                torch.where(active.unsqueeze(-1), candidate.confidences, state.confidences),
             )
             outputs.append(self.core.classify(state))
         output = torch.stack(outputs, dim=1)

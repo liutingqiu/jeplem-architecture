@@ -178,6 +178,7 @@ class TrainablePersistentRuntime:
                 "workspace": self.latent.workspace.detach().cpu().tolist(),
                 "keys": self.latent.keys.detach().cpu().tolist(),
                 "values": self.latent.values.detach().cpu().tolist(),
+                "confidences": self.latent.confidences.detach().cpu().tolist(),
             },
             "belief_log_probs": self.belief.log_probs.tolist(),
             "ledger": self.ledger.to_dict(),
@@ -198,6 +199,7 @@ class TrainablePersistentRuntime:
             workspace=torch.tensor(latent["workspace"], dtype=torch.float32),
             keys=torch.tensor(latent["keys"], dtype=torch.float32),
             values=torch.tensor(latent["values"], dtype=torch.float32),
+            confidences=torch.tensor(latent["confidences"], dtype=torch.float32),
         )
         runtime.belief = CategoricalBelief(torch.tensor(snapshot["belief_log_probs"], dtype=torch.float32))
         ledger_data = snapshot["ledger"]

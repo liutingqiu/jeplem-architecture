@@ -270,6 +270,7 @@ class PLWMActorCritic(ActorCritic):
                 torch.where(event_mask, event_candidate.workspace, state.workspace),
                 torch.where(event_mask.unsqueeze(-1), event_candidate.keys, state.keys),
                 torch.where(event_mask.unsqueeze(-1), event_candidate.values, state.values),
+                torch.where(event_mask.unsqueeze(-1), event_candidate.confidences, state.confidences),
             )
         candidate, _surprise = self.core.step(sensory, state, think=True)
         active_mask = active.view(-1, 1)
@@ -327,6 +328,7 @@ class PLWMActorCritic(ActorCritic):
                     torch.where(event_mask, event_candidate.workspace, state.workspace),
                     torch.where(event_mask.unsqueeze(-1), event_candidate.keys, state.keys),
                     torch.where(event_mask.unsqueeze(-1), event_candidate.values, state.values),
+                    torch.where(event_mask.unsqueeze(-1), event_candidate.confidences, state.confidences),
                 )
                 target = sensory
             prediction = self.core.predictor(state.belief)
