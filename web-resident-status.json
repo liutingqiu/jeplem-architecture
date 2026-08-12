@@ -1,0 +1,72 @@
+{
+  "round": 2,
+  "urls_sensed": 30,
+  "facts": 126,
+  "modalities": {
+    "web-text": 126,
+    "web-link": 3582
+  },
+  "what_it_learned": [
+    {
+      "round": 0,
+      "what": "discovered invariant",
+      "detail": "in text content: bigram_ratio is STABLE (this content kind has consistent structure)"
+    },
+    {
+      "round": 0,
+      "what": "discovered invariant",
+      "detail": "in code content: bracket_balance, ident_density, max_indent, n_blocks, n_lines is STABLE (this content kind has consistent structure)"
+    }
+  ],
+  "invariants": [
+    "code::bracket_balance",
+    "code::ident_density",
+    "code::max_indent",
+    "code::n_blocks",
+    "code::n_lines",
+    "text::bigram_ratio"
+  ],
+  "hidden_vars": [
+    "code::keyword_density",
+    "text::n_bigrams",
+    "text::n_distinct_bigrams",
+    "text::n_words",
+    "text::symbol_density",
+    "text::top_freq",
+    "text::unique_ratio"
+  ],
+  "belief_confidence": 0.25,
+  "network_routes": {
+    "en.wikipedia.org": {
+      "proxy": 3,
+      "direct": 0
+    },
+    "example.com": {
+      "proxy": 3
+    },
+    "www.baidu.com": {
+      "proxy": 3
+    },
+    "news.sina.com.cn": {
+      "proxy": 3
+    },
+    "cobra-language.com": {
+      "proxy": 3
+    },
+    "mypy-lang.org": {
+      "proxy": 3
+    },
+    "neopythonic.blogspot.be": {
+      "proxy": 3
+    },
+    "nondot.org": {
+      "proxy": 3
+    },
+    "physics.wku.edu": {
+      "proxy": 3
+    },
+    "repositorio.inesctec.pt": {
+      "proxy": 3
+    }
+  }
+}
