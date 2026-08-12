@@ -1,0 +1,66 @@
+{
+  "protocol": "surprise_engine_multiworld_v1: identity+surprise bootstrap on continuous state streams (synthetic + Luanti). ARC task-pairs are NOT a state stream -- they are handled by MetaEngine (per-task induction). Measures invariants discovered (recall/precision vs ground truth), rules auto-learned, hidden vars flagged, surprise rate.",
+  "note": "ARC excluded: task-pair induction (in/out) is MetaEngine's domain; SurpriseEngine is for continuous experience streams.",
+  "worlds": [
+    {
+      "world": "synthetic (controlled)",
+      "n_transitions": 400,
+      "invariants": [
+        "a"
+      ],
+      "rules": [
+        "x"
+      ],
+      "hidden_vars": [
+        "noise"
+      ],
+      "surprise_rate": 0.34,
+      "rules_learned": 2,
+      "ledger": {
+        "n_signatures": 2,
+        "n_rules": 2,
+        "n_history": 2,
+        "n_marked_stale": 0
+      },
+      "gt_invariants": [
+        "a"
+      ],
+      "invariants_recalled": 1.0,
+      "invariants_precision": 1.0
+    },
+    {
+      "world": "luanti (real)",
+      "n_transitions": 672,
+      "invariants": [
+        "goal_x",
+        "goal_z",
+        "health",
+        "task_seed"
+      ],
+      "rules": [
+        "energy"
+      ],
+      "hidden_vars": [
+        "x",
+        "z"
+      ],
+      "surprise_rate": 0.154,
+      "rules_learned": 3,
+      "ledger": {
+        "n_signatures": 3,
+        "n_rules": 3,
+        "n_history": 3,
+        "n_marked_stale": 0
+      },
+      "gt_invariants": [
+        "goal_x",
+        "goal_z",
+        "health",
+        "task_seed"
+      ],
+      "invariants_recalled": 1.0,
+      "invariants_precision": 1.0
+    }
+  ],
+  "artifact": "D:\\Documents\\探索新架构\\.claude\\worktrees\\zealous-lamport-398898\\artifacts\\surprise-multiworld.json"
+}
