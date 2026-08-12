@@ -61,9 +61,11 @@ class MultimodalBody:
         self.gate = gate if gate is not None else EvidenceFreshnessGate(world_id)
         self.tick = tick
         self.observations: list[BodyObservation] = []
-        # audit observations are bounded: keep the most recent MAX_OBSERVATIONS
-        # (unbounded growth = memory leak on long autonomous runs)
-        self.max_observations: int = 50_000
+        # audit observations are bounded: keep a SMALL recent window.  The
+        # digestion layer already distills observation statistics into the
+        # ledger, so the raw audit trail only needs a short window (memory
+        # safety: full serialization of all observations is a memory risk).
+        self.max_observations: int = 5_000
         # internal-feeling layer (optional, back-compat): emotion / effort /
         # time-sense give the body interoception + time awareness.
         self.emotion = emotion
