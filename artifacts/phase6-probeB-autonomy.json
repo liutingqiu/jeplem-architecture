@@ -1,0 +1,30 @@
+{
+  "protocol": "phase6 probe B: autonomy -- O4 goal-setting + O3 self-loop in one long-horizon agent. The agent sets its own goals (highest-value x most-uncertain state), acts, and re-verifies when a confident belief is contradicted (10% observation noise). Pass: resolves the high-value domain's uncertainty (gap <= 0.2), >= 0.2 below the no-autonomy baseline (random action, no goal setting, no self-correction), and its goals are self-set (all target the top-value domain via value-gap, not preset).",
+  "results": [
+    {
+      "seed": 444,
+      "autonomous_top_resolved": 8,
+      "no_autonomy_top_resolved": 2,
+      "goals_self_set": true,
+      "goal_top_value_fraction": 1.0,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "autonomous_top_resolved": 8,
+      "no_autonomy_top_resolved": 2,
+      "goals_self_set": true,
+      "goal_top_value_fraction": 1.0,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "autonomous_top_resolved": 7,
+      "no_autonomy_top_resolved": 2,
+      "goals_self_set": true,
+      "goal_top_value_fraction": 1.0,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PROBE B PASS (provisional): O3+O4 combine into an autonomous agent -- it self-sets goals (value-gap), acts on them, and self-corrects observation noise, resolving the high-value domain far better than the no-autonomy baseline. Long-horizon autonomy works."
+}
