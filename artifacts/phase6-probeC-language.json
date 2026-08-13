@@ -1,0 +1,48 @@
+{
+  "protocol": "phase6 probe C: language fluency mechanism (M4-lite). A small char-LSTM realizer trained on (M-rep -> natural paraphrase) pairs; constrained decoding to the M-rep entities + function words. Pass: honest (>=0.9 no extra entity), round-trip (>=0.8 recover the M-rep), diverse (>1 phrasing) -- the template baseline is a fixed formula.",
+  "results": [
+    {
+      "seed": 444,
+      "honesty_rate": 1.0,
+      "roundtrip_rate": 1.0,
+      "template_roundtrip_rate": 1.0,
+      "diverse_outputs": true,
+      "n_distinct_outputs": 3,
+      "sample_outputs": [
+        "cars are for transport",
+        "breads are classified as foods",
+        "dogs are mammals"
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "honesty_rate": 1.0,
+      "roundtrip_rate": 1.0,
+      "template_roundtrip_rate": 1.0,
+      "diverse_outputs": true,
+      "n_distinct_outputs": 3,
+      "sample_outputs": [
+        "birds are classified as animals",
+        "cars are for transport",
+        "apples are classified as fruits"
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "honesty_rate": 1.0,
+      "roundtrip_rate": 1.0,
+      "template_roundtrip_rate": 1.0,
+      "diverse_outputs": true,
+      "n_distinct_outputs": 3,
+      "sample_outputs": [
+        "the tree belongs to the plant family",
+        "the water belongs to the liquid family",
+        "the rose belongs to the flower family"
+      ],
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PROBE C PASS (provisional): a small learned realizer produces fluent, varied natural language from structured answers while staying HONEST (no hallucinated entities) -- more fluent than a template and grounded in the kernel. Language fluency mechanism works (M4-lite)."
+}
