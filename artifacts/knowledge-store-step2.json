@@ -1,0 +1,45 @@
+{
+  "protocol": "knowledge_pretrain_step2_v1: disk-backed (SQLite) knowledge store + transitive reasoning. Scales to Wikidata (memory-bounded); validate recall/unknown on the real KG and demonstrate exact + transitive + self-aware answers.",
+  "results": {
+    "ingested_edges": 3323321,
+    "ingest_seconds": 71.6,
+    "db_size_mb": 460.5,
+    "peak_ram_mb": 528.0,
+    "recall": 1.0,
+    "unknown_detection": 0.9764,
+    "answers": [
+      {
+        "q": "apple is a fruit",
+        "exact": true,
+        "transitive": true,
+        "answer": "KNOW"
+      },
+      {
+        "q": "dog is an animal (transitive)",
+        "exact": false,
+        "transitive": true,
+        "answer": "KNOW"
+      },
+      {
+        "q": "dog is a planet (fake)",
+        "exact": false,
+        "transitive": false,
+        "answer": "DON'T KNOW"
+      },
+      {
+        "q": "car is used for transportation",
+        "exact": false,
+        "transitive": false,
+        "answer": "DON'T KNOW"
+      },
+      {
+        "q": "rose is a plant",
+        "exact": true,
+        "transitive": true,
+        "answer": "KNOW"
+      }
+    ],
+    "scaling_note": "in-memory ledger = ~440B/fact (3.4M -> 1.5GB); disk store keeps RAM bounded, enabling Wikidata 10^8 facts on this machine"
+  },
+  "artifact": "artifacts\\knowledge-store-step2.json"
+}
