@@ -1,0 +1,30 @@
+{
+  "protocol": "phase6 probe D: structured soft reasoning extension. D1 similarity ranking (most structurally similar family) and D2 interpolation judgment (rotation-dimension midpoint). The grounded manifold judges by dimension structure; the statistical baseline by perceptual signature distance/interpolation. Pass: manifold > baseline x 1.2 AND > 0.6 per family.",
+  "results": [
+    {
+      "seed": 444,
+      "manifold_similarity_rank": 1.0,
+      "statistical_similarity_rank": 0.43,
+      "manifold_interpolation": 1.0,
+      "statistical_interpolation": 0.0,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "manifold_similarity_rank": 1.0,
+      "statistical_similarity_rank": 0.44,
+      "manifold_interpolation": 1.0,
+      "statistical_interpolation": 0.0,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "manifold_similarity_rank": 1.0,
+      "statistical_similarity_rank": 0.4,
+      "manifold_interpolation": 1.0,
+      "statistical_interpolation": 0.0,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PROBE D PASS (provisional): the grounded manifold mechanises MORE soft reasoning -- similarity ranking and interpolation judgment -- beating statistical interpolation per family. Structured soft reasoning is not limited to analogy completion."
+}
