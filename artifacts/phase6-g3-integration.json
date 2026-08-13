@@ -1,0 +1,42 @@
+{
+  "protocol": "phase6 G3 gate: integration regression. The v18 body hosts the v17 core (belief/revision/routing/self-head on a flip scenario) AND the new mechanisms (latent-cause creation, soft-reasoning analogy) in one event loop. Pass requires the v17-core criteria AND the new-mechanism criteria to hold together -- no interference. (Isolation controls for each family are the same functions run without the other family.)",
+  "results": [
+    {
+      "seed": 444,
+      "belief_query_acc": 1.0,
+      "revision_detected": true,
+      "router_acc": 1.0,
+      "routed_acc": 1.0,
+      "self_ece": 0.001,
+      "naive_ece": 0.255,
+      "latent_cause_heldout": 1.0,
+      "analogy_acc": 1.0,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "belief_query_acc": 1.0,
+      "revision_detected": true,
+      "router_acc": 1.0,
+      "routed_acc": 1.0,
+      "self_ece": 0.001,
+      "naive_ece": 0.203,
+      "latent_cause_heldout": 1.0,
+      "analogy_acc": 1.0,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "belief_query_acc": 1.0,
+      "revision_detected": true,
+      "router_acc": 1.0,
+      "routed_acc": 1.0,
+      "self_ece": 0.001,
+      "naive_ece": 0.241,
+      "latent_cause_heldout": 1.0,
+      "analogy_acc": 1.0,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "G3 PASS (provisional): the v17 core (belief/revision/routing/self-head) and the new mechanisms (latent-cause creation, soft reasoning) COEXIST in one body without interference -- both sets of criteria hold in the same event loop. H2 falsification condition 3 not triggered."
+}
