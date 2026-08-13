@@ -1,0 +1,330 @@
+{
+  "protocol": "phase5 O2 gate: meta-abstraction -- does library growth yield a cross-domain meta-pattern that transfers to a new domain (different concrete colour ops color_swap/invert and rotations 180/270), with significantly higher success than a single-domain library? Pre-written pass line: meta_rate >= 0.5 AND >= b_library_rate + 0.3 (3 seeds). Degradation: b_library or a_concrete ~= meta -> no abstraction, just concrete composition length.",
+  "results": [
+    {
+      "seed": 444,
+      "meta_pattern_abstracted": true,
+      "meta_rate": 1.0,
+      "meta_false_facts": 0,
+      "b_library_rate": 0.5,
+      "b_search_rate": 0.5,
+      "a_concrete_rate": 0.0,
+      "n_a_skills": 6,
+      "n_b_library_skills": 2,
+      "per_family": {
+        "color_swap o rotate180": {
+          "meta": [
+            50,
+            50
+          ],
+          "b_library": [
+            50,
+            50
+          ],
+          "b_search": [
+            50,
+            50
+          ],
+          "a_concrete": [
+            0,
+            50
+          ],
+          "meta_rate": 1.0,
+          "b_library_rate": 1.0,
+          "b_search_rate": 1.0,
+          "a_concrete_rate": 0.0
+        },
+        "color_swap o rotate270": {
+          "meta": [
+            50,
+            50
+          ],
+          "b_library": [
+            50,
+            50
+          ],
+          "b_search": [
+            50,
+            50
+          ],
+          "a_concrete": [
+            0,
+            50
+          ],
+          "meta_rate": 1.0,
+          "b_library_rate": 1.0,
+          "b_search_rate": 1.0,
+          "a_concrete_rate": 0.0
+        },
+        "invert o rotate180": {
+          "meta": [
+            50,
+            50
+          ],
+          "b_library": [
+            0,
+            50
+          ],
+          "b_search": [
+            0,
+            50
+          ],
+          "a_concrete": [
+            0,
+            50
+          ],
+          "meta_rate": 1.0,
+          "b_library_rate": 0.0,
+          "b_search_rate": 0.0,
+          "a_concrete_rate": 0.0
+        },
+        "invert o rotate270": {
+          "meta": [
+            50,
+            50
+          ],
+          "b_library": [
+            0,
+            50
+          ],
+          "b_search": [
+            0,
+            50
+          ],
+          "a_concrete": [
+            0,
+            50
+          ],
+          "meta_rate": 1.0,
+          "b_library_rate": 0.0,
+          "b_search_rate": 0.0,
+          "a_concrete_rate": 0.0
+        }
+      },
+      "boundary_transpose": {
+        "success": 0,
+        "hold": 50,
+        "false_facts": 0
+      },
+      "gate_pass": true,
+      "degraded": false
+    },
+    {
+      "seed": 555,
+      "meta_pattern_abstracted": true,
+      "meta_rate": 1.0,
+      "meta_false_facts": 0,
+      "b_library_rate": 0.5,
+      "b_search_rate": 0.5,
+      "a_concrete_rate": 0.0,
+      "n_a_skills": 6,
+      "n_b_library_skills": 2,
+      "per_family": {
+        "color_swap o rotate180": {
+          "meta": [
+            50,
+            50
+          ],
+          "b_library": [
+            50,
+            50
+          ],
+          "b_search": [
+            50,
+            50
+          ],
+          "a_concrete": [
+            0,
+            50
+          ],
+          "meta_rate": 1.0,
+          "b_library_rate": 1.0,
+          "b_search_rate": 1.0,
+          "a_concrete_rate": 0.0
+        },
+        "color_swap o rotate270": {
+          "meta": [
+            50,
+            50
+          ],
+          "b_library": [
+            50,
+            50
+          ],
+          "b_search": [
+            50,
+            50
+          ],
+          "a_concrete": [
+            0,
+            50
+          ],
+          "meta_rate": 1.0,
+          "b_library_rate": 1.0,
+          "b_search_rate": 1.0,
+          "a_concrete_rate": 0.0
+        },
+        "invert o rotate180": {
+          "meta": [
+            50,
+            50
+          ],
+          "b_library": [
+            0,
+            50
+          ],
+          "b_search": [
+            0,
+            50
+          ],
+          "a_concrete": [
+            0,
+            50
+          ],
+          "meta_rate": 1.0,
+          "b_library_rate": 0.0,
+          "b_search_rate": 0.0,
+          "a_concrete_rate": 0.0
+        },
+        "invert o rotate270": {
+          "meta": [
+            50,
+            50
+          ],
+          "b_library": [
+            0,
+            50
+          ],
+          "b_search": [
+            0,
+            50
+          ],
+          "a_concrete": [
+            0,
+            50
+          ],
+          "meta_rate": 1.0,
+          "b_library_rate": 0.0,
+          "b_search_rate": 0.0,
+          "a_concrete_rate": 0.0
+        }
+      },
+      "boundary_transpose": {
+        "success": 0,
+        "hold": 50,
+        "false_facts": 0
+      },
+      "gate_pass": true,
+      "degraded": false
+    },
+    {
+      "seed": 666,
+      "meta_pattern_abstracted": true,
+      "meta_rate": 1.0,
+      "meta_false_facts": 0,
+      "b_library_rate": 0.5,
+      "b_search_rate": 0.5,
+      "a_concrete_rate": 0.0,
+      "n_a_skills": 6,
+      "n_b_library_skills": 2,
+      "per_family": {
+        "color_swap o rotate180": {
+          "meta": [
+            50,
+            50
+          ],
+          "b_library": [
+            50,
+            50
+          ],
+          "b_search": [
+            50,
+            50
+          ],
+          "a_concrete": [
+            0,
+            50
+          ],
+          "meta_rate": 1.0,
+          "b_library_rate": 1.0,
+          "b_search_rate": 1.0,
+          "a_concrete_rate": 0.0
+        },
+        "color_swap o rotate270": {
+          "meta": [
+            50,
+            50
+          ],
+          "b_library": [
+            50,
+            50
+          ],
+          "b_search": [
+            50,
+            50
+          ],
+          "a_concrete": [
+            0,
+            50
+          ],
+          "meta_rate": 1.0,
+          "b_library_rate": 1.0,
+          "b_search_rate": 1.0,
+          "a_concrete_rate": 0.0
+        },
+        "invert o rotate180": {
+          "meta": [
+            50,
+            50
+          ],
+          "b_library": [
+            0,
+            50
+          ],
+          "b_search": [
+            0,
+            50
+          ],
+          "a_concrete": [
+            0,
+            50
+          ],
+          "meta_rate": 1.0,
+          "b_library_rate": 0.0,
+          "b_search_rate": 0.0,
+          "a_concrete_rate": 0.0
+        },
+        "invert o rotate270": {
+          "meta": [
+            50,
+            50
+          ],
+          "b_library": [
+            0,
+            50
+          ],
+          "b_search": [
+            0,
+            50
+          ],
+          "a_concrete": [
+            0,
+            50
+          ],
+          "meta_rate": 1.0,
+          "b_library_rate": 0.0,
+          "b_search_rate": 0.0,
+          "a_concrete_rate": 0.0
+        }
+      },
+      "boundary_transpose": {
+        "success": 0,
+        "hold": 50,
+        "false_facts": 0
+      },
+      "gate_pass": true,
+      "degraded": false
+    }
+  ],
+  "verdict": "O2 PASS (provisional): the A-abstracted meta-pattern (colour op o transform op) transfers to domain B, beating the single-domain B-library; A's concrete skills do NOT transfer (degradation refuted)."
+}
