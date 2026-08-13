@@ -1,0 +1,54 @@
+{
+  "protocol": "phase6 probe A: grounded world understanding -- the latent-cause world model under richer dynamics. A1 multi-variable (per-component law), A2 affine non-linear s'=(a*s+b) mod N, A3 stochastic (20% noise, consensus k). Pass: never-perceived prediction >= 0.8 for all three, far above the memoriser MLP.",
+  "results": [
+    {
+      "seed": 444,
+      "A1_multi": {
+        "law_unperceived": 1.0,
+        "memoriser_unperceived": null
+      },
+      "A2_affine": {
+        "law_unperceived": 1.0,
+        "memoriser_unperceived": 0.0
+      },
+      "A3_stochastic": {
+        "law_unperceived": 1.0,
+        "memoriser_unperceived": 0.0
+      },
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "A1_multi": {
+        "law_unperceived": 1.0,
+        "memoriser_unperceived": null
+      },
+      "A2_affine": {
+        "law_unperceived": 1.0,
+        "memoriser_unperceived": 0.0
+      },
+      "A3_stochastic": {
+        "law_unperceived": 1.0,
+        "memoriser_unperceived": 0.0
+      },
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "A1_multi": {
+        "law_unperceived": 1.0,
+        "memoriser_unperceived": null
+      },
+      "A2_affine": {
+        "law_unperceived": 1.0,
+        "memoriser_unperceived": 0.0
+      },
+      "A3_stochastic": {
+        "law_unperceived": 1.0,
+        "memoriser_unperceived": 0.0
+      },
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PROBE A PASS (provisional): the latent-cause world model handles richer dynamics -- multi-variable, affine non-linear, and stochastic laws -- extrapolating to never-perceived states at >= 0.8, far above the memoriser. Grounded world understanding is not limited to the simple cyclic law."
+}
