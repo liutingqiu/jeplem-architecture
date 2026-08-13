@@ -13,3 +13,4 @@ artifacts/*.err.log
 artifacts/*.out.log
 artifacts/*.log
 .reasonix/
+data/knowledge/

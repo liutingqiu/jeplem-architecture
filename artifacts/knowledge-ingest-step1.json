@@ -1,0 +1,14 @@
+{
+  "protocol": "knowledge_pretrain_step1_v1: ingest ConceptNet 5.7 (real KG) into VersionedFactLedger as existence facts; validate recall (ingested), unknown-detection (unseen), revision (P4). G4 was synthetic -- this is the real-data knowledge-base check.",
+  "seed": 41123,
+  "results": {
+    "ingested_edges": 500000,
+    "unique_keys": 472540,
+    "ingest_seconds": 19.3,
+    "recall": 1.0,
+    "unknown_detection": 0.9928,
+    "revision_ok": 1,
+    "ledger_entries": 472541
+  },
+  "artifact": "artifacts\\knowledge-ingest-step1.json"
+}
