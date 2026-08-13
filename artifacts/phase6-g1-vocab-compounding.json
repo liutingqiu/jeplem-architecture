@@ -1,0 +1,57 @@
+{
+  "protocol": "phase6 G1 gate: vocabulary compounding growth. A chain of 6 task families, T_i = P_i o T_{i-1}, where each new latent cause P_i (spatial permutation / colour bijection) is the PREREQUISITE for the next family. The architecture undoes the accumulated transform, infers P_i from the correspondence, verifies, and grows the library. Pre-written pass: coverage rises monotonically, last-1/4-window slope > 0 (no plateau), final coverage >= no-creation control + 0.4.",
+  "results": [
+    {
+      "seed": 444,
+      "n_families_solved": 6,
+      "coverage_curve": [
+        0.167,
+        0.333,
+        0.5,
+        0.667,
+        0.833,
+        1.0
+      ],
+      "monotonic": true,
+      "last_window_slope": 0.167,
+      "final_coverage": 1.0,
+      "no_creation_control": 0.167,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "n_families_solved": 6,
+      "coverage_curve": [
+        0.167,
+        0.333,
+        0.5,
+        0.667,
+        0.833,
+        1.0
+      ],
+      "monotonic": true,
+      "last_window_slope": 0.167,
+      "final_coverage": 1.0,
+      "no_creation_control": 0.167,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "n_families_solved": 6,
+      "coverage_curve": [
+        0.167,
+        0.333,
+        0.5,
+        0.667,
+        0.833,
+        1.0
+      ],
+      "monotonic": true,
+      "last_window_slope": 0.167,
+      "final_coverage": 1.0,
+      "no_creation_control": 0.167,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "G1 PASS (provisional): latent-cause creation COMPOUNDS -- coverage rises monotonically through the 6-family chain (each new primitive is a prerequisite for the next) with a positive tail slope (no plateau), far above the fixed-vocabulary no-creation control. The phase-3 composition-depth plateau does NOT recur when the vocabulary can grow."
+}
