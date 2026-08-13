@@ -1,0 +1,48 @@
+{
+  "protocol": "phase6 G4 gate: experience expansion -- knowledge-driven latent-cause induction (mechanism isolation on a synthetic knowledge base; the real Wikidata/ConceptNet store is being built by the phase-4 session). The architecture recognises recurring patterns in knowledge facts (IsA transitivity, UsedFor categories) and infers NEW latent causes verified by the explicit core. Pre-written pass: knowledge-driven held-out >= no-knowledge baseline + 0.3 and >= 0.6, with >= 2 latent causes inferred.",
+  "results": [
+    {
+      "seed": 444,
+      "knowledge_driven_heldout": 1.0,
+      "no_knowledge_baseline": 0.0,
+      "n_latent_causes_inferred": 5,
+      "latent_causes": [
+        "IsA_transitive",
+        "category_purpose_0",
+        "category_purpose_1",
+        "category_purpose_2",
+        "category_purpose_3"
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "knowledge_driven_heldout": 1.0,
+      "no_knowledge_baseline": 0.0,
+      "n_latent_causes_inferred": 5,
+      "latent_causes": [
+        "IsA_transitive",
+        "category_purpose_0",
+        "category_purpose_1",
+        "category_purpose_2",
+        "category_purpose_3"
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "knowledge_driven_heldout": 1.0,
+      "no_knowledge_baseline": 0.0,
+      "n_latent_causes_inferred": 5,
+      "latent_causes": [
+        "IsA_transitive",
+        "category_purpose_0",
+        "category_purpose_1",
+        "category_purpose_2",
+        "category_purpose_3"
+      ],
+      "gate_pass": true
+    }
+  ],
+  "verdict": "G4 PASS (provisional, mechanism-isolated): knowledge facts drive latent-cause induction -- recurring patterns become traceable, verified rules that generalise far beyond exact match. The real-knowledge version (Wikidata/ConceptNet) is the phase-4 integration step."
+}
