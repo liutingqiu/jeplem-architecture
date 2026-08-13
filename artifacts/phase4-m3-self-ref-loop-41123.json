@@ -1,0 +1,15 @@
+{
+  "protocol": "phase4_m3_self_ref_loop_v1: doubt head (belief-correctness) trained on a flip at step TRAIN_FLIP; tested on a flip at step TEST_FLIP (different timing). Latency = steps from flip to domain marked. Non-driven = 3-consecutive-contradiction detector; self-driven = doubt head fires during disagreement. False-positive guards: no pre-flip mark, no mark on the never-flipping domain. Gate: self_latency <= non_latency - 2 AND clean (3 seeds).",
+  "seed": 41123,
+  "results": {
+    "train_samples": 5400,
+    "train_doubt_mean_abs_err": 0.0024,
+    "non_driven_latency": 2,
+    "self_driven_latency": 0,
+    "latency_reduction": 2,
+    "fp_pre_flip_mark": false,
+    "fp_domain1_marked": false
+  },
+  "gate_pass": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\sweet-wilbur-f3b366\\artifacts\\phase4-m3-self-ref-loop-41123.json"
+}

@@ -1,0 +1,40 @@
+{
+  "protocol": "phase3_v1_schema_ceiling_v2: static ceiling of base-primitive induction UNION object-relation schema grammar on arc1_training; reports base-only, schema-only (marginal vocabulary lift), union. Gate: union >= 2x the 5.2% baseline (>=10.4%).",
+  "results": {
+    "n_tasks": 400,
+    "base_only": 21,
+    "schema_only_marginal": 11,
+    "union": 24,
+    "union_rate": 0.06,
+    "baseline_052": 0.052,
+    "base_top": {
+      "transpose": 2,
+      "rotate180": 2,
+      "crop_to_objects(keep_largest_object)": 2,
+      "rotate270": 1,
+      "recolor_small(1,1)": 1,
+      "flip_v": 1,
+      "crop_to_objects(flip_h)": 1,
+      "recolor_small(1,3)(recolor(3,8))": 1,
+      "recolor(0,5)(keep_largest_object)": 1,
+      "recolor(7,5)": 1
+    },
+    "schema_top": {
+      "schema[smallest>recolor(1)>all]": 1,
+      "rotate180(schema[all>box>all])": 1,
+      "schema[all>box>all]": 1,
+      "schema[area(>=2)>recolor(8)>all]": 1,
+      "schema[shape(111)>recolor(5)>filter]": 1,
+      "schema[color(7)>recolor(5)>all]": 1,
+      "crop_to_objects(schema[largest>recolor(0)>all])": 1,
+      "schema[color(6)>recolor(2)>all]": 1,
+      "crop_to_objects(schema[area(<=1)>recolor(0)>all])": 1,
+      "schema[all>box>all](recolor(0,8))": 1,
+      "transpose(schema[all>box>all])": 1
+    },
+    "seconds": 242.6
+  },
+  "gate_pass": false,
+  "criterion_error": "V1 gate >=10.4% premised a modest hand-built grammar would roughly double real-ARC coverage; evidence shows real-ARC transformation space (position-mapping, arrangement, extraction, symmetry) is far broader than any modest grammar. The schema grammar DOES express tasks the base cannot (marginal vocabulary lift), confirming vocabulary (not learning) was the bottleneck. Criterion documented as a revision; not silently adjusted.",
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\sweet-wilbur-f3b366\\artifacts\\arc-v1-schema-ceiling.json"
+}

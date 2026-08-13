@@ -173,6 +173,14 @@ class UnifiedBody:
         # meta-controller + self-model (trained by the caller on collected data)
         self.router = MetaRouter()
         self.self_head = SelfHead()
+        # Phase-4 M3 self-reference: an independent self-DOUBT head predicts
+        # whether the current BELIEF answer is wrong (from body-internal state
+        # features).  When it fires during belief/ledger disagreement it marks
+        # the domain at once -- faster self-driven revision.  Disabled by
+        # default so the v17 behaviour is unchanged.
+        self.doubt_head = SelfHead(n_feat=5)
+        self.self_head_enabled = False
+        self.self_doubt_threshold = 0.5
 
     # ------------------------------------------------------------------ #
     # identity observation (the core epistemic step)
@@ -247,6 +255,16 @@ class UnifiedBody:
                 self.conflict[key] = 0
             if self.conflict.get(key, 0) >= 3 and domain not in self.marked:
                 self.marked.add(domain)
+            # self-reference (M3): the doubt head says the belief is likely
+            # wrong while it disagrees with memory -> mark at once (faster than
+            # waiting for 3 consecutive contradictions).  Only when enabled,
+            # and only once the belief is confident (avoids firing during the
+            # initial low-confidence convergence).
+            if (self.self_head_enabled and domain not in self.marked
+                    and bel_v != mem_val and conf >= self.mark_belief_conf):
+                doubt = self.self_doubt(domain, state)
+                if doubt is not None and doubt < self.self_doubt_threshold:
+                    self.marked.add(domain)
         self.chain.append({"event": "observe", "snapshot": self.snapshot_digest()})
 
     # ------------------------------------------------------------------ #
@@ -326,6 +344,16 @@ class UnifiedBody:
         mem_v = int(record.value) if record is not None else -1
         bel_v = int(self._belief(domain, state).probs.argmax(-1).item())
         return mem_v, bel_v
+
+    def self_doubt(self, domain: int, state: int) -> float | None:
+        """Phase-4 M3: does the body think its current BELIEF answer might be
+        wrong?  The doubt head predicts belief-correctness from body-internal
+        state features; low prediction = self-doubt.  None when disabled."""
+        if not self.self_head_enabled:
+            return None
+        with torch.no_grad():
+            x = self.state_features(domain, state).unsqueeze(0)
+            return float(self.doubt_head(x).squeeze(-1).item())
 
     # ------------------------------------------------------------------ #
     # snapshots (P5)

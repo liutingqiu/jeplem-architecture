@@ -74,6 +74,57 @@ class KnowledgeStore:
             "SELECT COUNT(*), COUNT(DISTINCT start) FROM facts WHERE rel=?", (rel,)).fetchone()
         return {"edges": row[0], "subjects": row[1]}
 
+    # -- canonical-relation queries (a canonical rel maps to >=1 KB rels) --- #
+    def known_any(self, rels: list[str], start: str, end: str) -> bool:
+        if len(rels) == 1:
+            return self.known(rels[0], start, end)
+        ph = ",".join("?" * len(rels))
+        return self.conn.execute(
+            f"SELECT 1 FROM facts WHERE rel IN ({ph}) AND start=? AND end=? LIMIT 1",
+            (*rels, start, end)).fetchone() is not None
+
+    def successors_any(self, rels: list[str], start: str) -> list[str]:
+        if len(rels) == 1:
+            return self.successors(rels[0], start)
+        ph = ",".join("?" * len(rels))
+        return [r[0] for r in self.conn.execute(
+            f"SELECT end FROM facts WHERE rel IN ({ph}) AND start=?", (*rels, start))]
+
+    def transitive_any(self, rels: list[str], start: str, target: str,
+                       max_hops: int = 4) -> bool:
+        if self.known_any(rels, start, target):
+            return True
+        frontier = {start}
+        seen = {start}
+        for _ in range(max_hops):
+            nxt = set()
+            for s in frontier:
+                for e in self.successors_any(rels, s):
+                    if e == target:
+                        return True
+                    if e not in seen:
+                        seen.add(e)
+                        nxt.add(e)
+            frontier = nxt
+            if not frontier:
+                break
+        return False
+
+    def reachable_any(self, rels: list[str], start: str, max_hops: int = 2) -> set[str]:
+        frontier = {start}
+        seen: set[str] = set()
+        for _ in range(max_hops):
+            nxt = set()
+            for s in frontier:
+                for e in self.successors_any(rels, s):
+                    if e not in seen:
+                        seen.add(e)
+                        nxt.add(e)
+            frontier = nxt
+            if not frontier:
+                break
+        return seen
+
     def count(self) -> int:
         return self.conn.execute("SELECT COUNT(*) FROM facts").fetchone()[0]
 

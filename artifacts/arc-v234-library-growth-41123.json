@@ -1,0 +1,87 @@
+{
+  "protocol": "phase3_v234_library_growth_v1: V2 -- compress recurring 2-step fragments (grid-op after object-rule schema) into atomic learned primitives; test families need 3 steps, solvable only after growth. Gate: trained heldout >= 2x untrained AND >= 0.6 AND rises. V3 -- marginal lift on real arc1_evaluation from a library grown on arc1_training. V4 -- provenance + re-parameterised reuse probe.",
+  "seed": 41123,
+  "results": {
+    "n_teach": 15,
+    "n_test_heldout": 9,
+    "untrained_heldout": 0.0,
+    "trained_heldout": 0.667,
+    "active_primitives": 2,
+    "learning_curve": [
+      {
+        "seen": 2,
+        "active": 0,
+        "heldout": 0.0
+      },
+      {
+        "seen": 4,
+        "active": 1,
+        "heldout": 0.667
+      },
+      {
+        "seen": 6,
+        "active": 1,
+        "heldout": 0.667
+      },
+      {
+        "seen": 8,
+        "active": 1,
+        "heldout": 0.667
+      },
+      {
+        "seen": 10,
+        "active": 2,
+        "heldout": 0.667
+      },
+      {
+        "seen": 12,
+        "active": 2,
+        "heldout": 0.667
+      },
+      {
+        "seen": 14,
+        "active": 2,
+        "heldout": 0.667
+      },
+      {
+        "seen": 15,
+        "active": 2,
+        "heldout": 0.667
+      }
+    ],
+    "v3_eval_base": 0.003,
+    "v3_eval_with_library": 0.003,
+    "v3_marginal": 0.0,
+    "v4_probe_reuse_ok": true,
+    "provenance": [
+      {
+        "fragment": [
+          "crop_to_objects",
+          "largest",
+          "recolor",
+          "all"
+        ],
+        "count": 2,
+        "tasks": [
+          "crop_recolor_largest(3)",
+          "crop_recolor_largest(5)"
+        ]
+      },
+      {
+        "fragment": [
+          "rotate90",
+          "largest",
+          "recolor",
+          "all"
+        ],
+        "count": 2,
+        "tasks": [
+          "rotate_recolor_largest(2)",
+          "rotate_recolor_largest(3)"
+        ]
+      }
+    ]
+  },
+  "v2_pass": true,
+  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\sweet-wilbur-f3b366\\artifacts\\arc-v234-library-growth-41123.json"
+}
