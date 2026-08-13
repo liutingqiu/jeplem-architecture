@@ -1,0 +1,42 @@
+{
+  "arc1_training.json": {
+    "split": "arc1_training",
+    "n_tasks": 400,
+    "train_fit": 13,
+    "train_fit_rate": 0.033,
+    "test_correct": 13,
+    "test_correct_rate": 0.033,
+    "memory_replay_baseline": 0.0,
+    "depth1": 13,
+    "depth2": 0,
+    "top_programs": {
+      "transpose": 2,
+      "rotate180": 2,
+      "rotate270": 1,
+      "flip_v": 1,
+      "recolor(7,5)": 1,
+      "flip_h": 1,
+      "recolor(6,2)": 1,
+      "scale(2)": 1,
+      "swap(5,8)": 1,
+      "scale(3)": 1,
+      "crop(4)(scale(2))": 1
+    },
+    "n_unsolved": 387
+  },
+  "arc1_evaluation.json": {
+    "split": "arc1_evaluation",
+    "n_tasks": 400,
+    "train_fit": 1,
+    "train_fit_rate": 0.003,
+    "test_correct": 1,
+    "test_correct_rate": 0.003,
+    "memory_replay_baseline": 0.0,
+    "depth1": 1,
+    "depth2": 0,
+    "top_programs": {
+      "scale(2)": 1
+    },
+    "n_unsolved": 399
+  }
+}

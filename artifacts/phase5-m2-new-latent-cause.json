@@ -1,0 +1,36 @@
+{
+  "protocol": "phase5 continuation M2: new latent cause creation (library induction / Gershman latent-cause model). When known spatial/colour classes fail, the architecture INFERS a new primitive from the demos: M2a a new per-pixel colour function (invert) read from the colour mapping; M2b a new position permutation (transpose) tracked from cell correspondence. Pre-written pass: held-out generalisation >=0.6 for both, no-inference baseline ~0, primitive inferred from experience (not pre-installed), verified by the explicit core.",
+  "results": [
+    {
+      "seed": 444,
+      "m2a_new_colour_heldout": 1.0,
+      "m2b_new_spatial_heldout": 1.0,
+      "no_inference_baseline": 0.0,
+      "m2a_inferred_custom": 50,
+      "m2a_tot": 50,
+      "m2b_inferred_permutation": true,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "m2a_new_colour_heldout": 1.0,
+      "m2b_new_spatial_heldout": 1.0,
+      "no_inference_baseline": 0.0,
+      "m2a_inferred_custom": 50,
+      "m2a_tot": 50,
+      "m2b_inferred_permutation": true,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "m2a_new_colour_heldout": 1.0,
+      "m2b_new_spatial_heldout": 1.0,
+      "no_inference_baseline": 0.0,
+      "m2a_inferred_custom": 50,
+      "m2a_tot": 50,
+      "m2b_inferred_permutation": true,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "M2 PASS (provisional): the architecture creates NEW latent causes from experience when existing structure fails -- a new colour function and a new position permutation are inferred from demos, verified, and generalise on held-out, while the no-inference baseline holds (~0). Concept formation is mechanised."
+}

@@ -1,0 +1,48 @@
+{
+  "protocol": "phase5 continuation M1: latent-cause world model (predictive coding). The world model hypothesises the law class s'=(s+k) mod N and filters k from observed transitions, then predicts NEVER-perceived states from the fitted law. Pre-written pass: never-perceived accuracy >= 0.8 AND >= memoriser + 0.5 (the memoriser MLP -- the current world model from O5 -- cannot extrapolate). This tests whether the latent-cause mechanism breaks the O5 experience-boundary.",
+  "results": [
+    {
+      "seed": 444,
+      "law_unperceived_accuracy": 1.0,
+      "memoriser_unperceived_accuracy": 0.0,
+      "law_perceived_accuracy": 1.0,
+      "memoriser_perceived_accuracy": 0.625,
+      "k_isolated_after_obs": 1,
+      "n_obs": 12,
+      "unperceived_states": [
+        8,
+        9
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "law_unperceived_accuracy": 1.0,
+      "memoriser_unperceived_accuracy": 0.0,
+      "law_perceived_accuracy": 1.0,
+      "memoriser_perceived_accuracy": 0.875,
+      "k_isolated_after_obs": 1,
+      "n_obs": 12,
+      "unperceived_states": [
+        8,
+        9
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "law_unperceived_accuracy": 1.0,
+      "memoriser_unperceived_accuracy": 0.0,
+      "law_perceived_accuracy": 1.0,
+      "memoriser_perceived_accuracy": 1.0,
+      "k_isolated_after_obs": 1,
+      "n_obs": 12,
+      "unperceived_states": [
+        8,
+        9
+      ],
+      "gate_pass": true
+    }
+  ],
+  "verdict": "M1 PASS (provisional): the latent-cause world model (hypothesise a law class, fit k from experience, predict from the law) extrapolates to never-perceived states, breaking the O5 experience boundary -- the generic memoriser MLP cannot. Predictive coding is mechanised."
+}
