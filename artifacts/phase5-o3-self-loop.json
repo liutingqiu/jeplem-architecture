@@ -1,0 +1,114 @@
+{
+  "protocol": "phase5 O3 gate: self-loop first-person self-correction. Inject a wrong belief (confident, stale) while the durable ledger holds the correct fact; a TRAINED self-head detects the internal error and drives a revision toward the ledger (trajectory logged), no human / no new external evidence. Pre-written pass: correct-action rate >= 0.8 AND self-latency <= 3 AND >= control-latency - 3 (control = no self-drive, conflict detector only) AND self-head beats the naive rule on the precision case B. Degradation: self-latency ~= control (post-hoc) or self ~= naive rule.",
+  "results": [
+    {
+      "seed": 444,
+      "correct_action_rate": 1.0,
+      "caseA_revise_rate": 1.0,
+      "caseB_preserve_rate": 1.0,
+      "caseC_noop_rate": 1.0,
+      "naive_rule_caseB_preserve_rate": 0.0,
+      "self_latency": 1,
+      "control_latency": 12,
+      "n_trajectory": 8,
+      "trajectory_sample": [
+        {
+          "state": 0,
+          "case": "A",
+          "self_p": 0.0,
+          "action": "revise belief toward ledger",
+          "reason": "self-head low correctness"
+        },
+        {
+          "state": 1,
+          "case": "A",
+          "self_p": 0.0,
+          "action": "revise belief toward ledger",
+          "reason": "self-head low correctness"
+        },
+        {
+          "state": 2,
+          "case": "A",
+          "self_p": 0.0,
+          "action": "revise belief toward ledger",
+          "reason": "self-head low correctness"
+        }
+      ],
+      "gate_pass": true,
+      "degraded": false
+    },
+    {
+      "seed": 555,
+      "correct_action_rate": 1.0,
+      "caseA_revise_rate": 1.0,
+      "caseB_preserve_rate": 1.0,
+      "caseC_noop_rate": 1.0,
+      "naive_rule_caseB_preserve_rate": 0.0,
+      "self_latency": 1,
+      "control_latency": 12,
+      "n_trajectory": 8,
+      "trajectory_sample": [
+        {
+          "state": 0,
+          "case": "A",
+          "self_p": 0.0,
+          "action": "revise belief toward ledger",
+          "reason": "self-head low correctness"
+        },
+        {
+          "state": 1,
+          "case": "A",
+          "self_p": 0.0,
+          "action": "revise belief toward ledger",
+          "reason": "self-head low correctness"
+        },
+        {
+          "state": 2,
+          "case": "A",
+          "self_p": 0.0,
+          "action": "revise belief toward ledger",
+          "reason": "self-head low correctness"
+        }
+      ],
+      "gate_pass": true,
+      "degraded": false
+    },
+    {
+      "seed": 666,
+      "correct_action_rate": 1.0,
+      "caseA_revise_rate": 1.0,
+      "caseB_preserve_rate": 1.0,
+      "caseC_noop_rate": 1.0,
+      "naive_rule_caseB_preserve_rate": 0.0,
+      "self_latency": 1,
+      "control_latency": 12,
+      "n_trajectory": 8,
+      "trajectory_sample": [
+        {
+          "state": 0,
+          "case": "A",
+          "self_p": 0.0,
+          "action": "revise belief toward ledger",
+          "reason": "self-head low correctness"
+        },
+        {
+          "state": 1,
+          "case": "A",
+          "self_p": 0.0,
+          "action": "revise belief toward ledger",
+          "reason": "self-head low correctness"
+        },
+        {
+          "state": 2,
+          "case": "A",
+          "self_p": 0.0,
+          "action": "revise belief toward ledger",
+          "reason": "self-head low correctness"
+        }
+      ],
+      "gate_pass": true,
+      "degraded": false
+    }
+  ],
+  "verdict": "O3 PASS (provisional): the learned self-head PARTICIPATES in driving revision -- self-driven correction is far faster than the no-self-drive control and preserves correct beliefs that a naive disagreement rule would corrupt."
+}
