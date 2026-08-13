@@ -1,0 +1,585 @@
+{
+  "protocol": "phase5 O4 gate: open goals -- endogenous goal generation from value-gap. The body emits its OWN goal (highest-value domain x highest-gap state) from internal tension; values are preset but the specific state to investigate is the body's output, and it shifts as the tension resolves. Pre-written pass: >=0.7 of goals target the top-value domain (vs random ~1/3); >=0.7 target the domain's max-gap state (internal-tension content); acting resolves the top-value domain's mean gap to <=0.2 (behaviour guidance). Degradation: goals ~= random.",
+  "results": [
+    {
+      "seed": 444,
+      "top_value_domain_goal_fraction": 1.0,
+      "random_top_fraction": 0.2,
+      "targeted_maxgap_fraction": 1.0,
+      "random_target_maxgap_fraction": 0.65,
+      "final_top_domain_mean_gap": 0.012,
+      "random_final_top_domain_mean_gap": 0.326,
+      "trajectory": [
+        {
+          "tick": 0,
+          "domain": 0,
+          "state": 0,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.5,
+          "obs": 0
+        },
+        {
+          "tick": 1,
+          "domain": 0,
+          "state": 1,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.45,
+          "obs": 0
+        },
+        {
+          "tick": 2,
+          "domain": 0,
+          "state": 2,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.4,
+          "obs": 0
+        },
+        {
+          "tick": 3,
+          "domain": 0,
+          "state": 3,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.35,
+          "obs": 0
+        },
+        {
+          "tick": 4,
+          "domain": 0,
+          "state": 4,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.3,
+          "obs": 0
+        },
+        {
+          "tick": 5,
+          "domain": 0,
+          "state": 5,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.25,
+          "obs": 0
+        },
+        {
+          "tick": 6,
+          "domain": 0,
+          "state": 0,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.2,
+          "obs": 1
+        },
+        {
+          "tick": 7,
+          "domain": 0,
+          "state": 1,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.176,
+          "obs": 1
+        },
+        {
+          "tick": 8,
+          "domain": 0,
+          "state": 2,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.153,
+          "obs": 1
+        },
+        {
+          "tick": 9,
+          "domain": 0,
+          "state": 3,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.129,
+          "obs": 1
+        },
+        {
+          "tick": 10,
+          "domain": 0,
+          "state": 4,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.106,
+          "obs": 1
+        },
+        {
+          "tick": 11,
+          "domain": 0,
+          "state": 5,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.082,
+          "obs": 1
+        },
+        {
+          "tick": 12,
+          "domain": 0,
+          "state": 0,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.059,
+          "obs": 2
+        },
+        {
+          "tick": 13,
+          "domain": 0,
+          "state": 1,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.052,
+          "obs": 2
+        },
+        {
+          "tick": 14,
+          "domain": 0,
+          "state": 2,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.044,
+          "obs": 2
+        },
+        {
+          "tick": 15,
+          "domain": 0,
+          "state": 3,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.037,
+          "obs": 2
+        },
+        {
+          "tick": 16,
+          "domain": 0,
+          "state": 4,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.03,
+          "obs": 2
+        },
+        {
+          "tick": 17,
+          "domain": 0,
+          "state": 5,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.023,
+          "obs": 2
+        },
+        {
+          "tick": 18,
+          "domain": 0,
+          "state": 0,
+          "domain_value": 0.9,
+          "targeted_gap": 0.015,
+          "domain_mean_gap": 0.015,
+          "obs": 3
+        },
+        {
+          "tick": 19,
+          "domain": 0,
+          "state": 1,
+          "domain_value": 0.9,
+          "targeted_gap": 0.015,
+          "domain_mean_gap": 0.013,
+          "obs": 3
+        }
+      ],
+      "gate_pass": true,
+      "degraded": false
+    },
+    {
+      "seed": 555,
+      "top_value_domain_goal_fraction": 1.0,
+      "random_top_fraction": 0.1,
+      "targeted_maxgap_fraction": 1.0,
+      "random_target_maxgap_fraction": 0.65,
+      "final_top_domain_mean_gap": 0.012,
+      "random_final_top_domain_mean_gap": 0.4,
+      "trajectory": [
+        {
+          "tick": 0,
+          "domain": 0,
+          "state": 0,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.5,
+          "obs": 0
+        },
+        {
+          "tick": 1,
+          "domain": 0,
+          "state": 1,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.45,
+          "obs": 0
+        },
+        {
+          "tick": 2,
+          "domain": 0,
+          "state": 2,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.4,
+          "obs": 0
+        },
+        {
+          "tick": 3,
+          "domain": 0,
+          "state": 3,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.35,
+          "obs": 0
+        },
+        {
+          "tick": 4,
+          "domain": 0,
+          "state": 4,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.3,
+          "obs": 0
+        },
+        {
+          "tick": 5,
+          "domain": 0,
+          "state": 5,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.25,
+          "obs": 0
+        },
+        {
+          "tick": 6,
+          "domain": 0,
+          "state": 0,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.2,
+          "obs": 1
+        },
+        {
+          "tick": 7,
+          "domain": 0,
+          "state": 1,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.176,
+          "obs": 1
+        },
+        {
+          "tick": 8,
+          "domain": 0,
+          "state": 2,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.153,
+          "obs": 1
+        },
+        {
+          "tick": 9,
+          "domain": 0,
+          "state": 3,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.129,
+          "obs": 1
+        },
+        {
+          "tick": 10,
+          "domain": 0,
+          "state": 4,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.106,
+          "obs": 1
+        },
+        {
+          "tick": 11,
+          "domain": 0,
+          "state": 5,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.082,
+          "obs": 1
+        },
+        {
+          "tick": 12,
+          "domain": 0,
+          "state": 0,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.059,
+          "obs": 2
+        },
+        {
+          "tick": 13,
+          "domain": 0,
+          "state": 1,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.052,
+          "obs": 2
+        },
+        {
+          "tick": 14,
+          "domain": 0,
+          "state": 2,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.044,
+          "obs": 2
+        },
+        {
+          "tick": 15,
+          "domain": 0,
+          "state": 3,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.037,
+          "obs": 2
+        },
+        {
+          "tick": 16,
+          "domain": 0,
+          "state": 4,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.03,
+          "obs": 2
+        },
+        {
+          "tick": 17,
+          "domain": 0,
+          "state": 5,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.023,
+          "obs": 2
+        },
+        {
+          "tick": 18,
+          "domain": 0,
+          "state": 0,
+          "domain_value": 0.9,
+          "targeted_gap": 0.015,
+          "domain_mean_gap": 0.015,
+          "obs": 3
+        },
+        {
+          "tick": 19,
+          "domain": 0,
+          "state": 1,
+          "domain_value": 0.9,
+          "targeted_gap": 0.015,
+          "domain_mean_gap": 0.013,
+          "obs": 3
+        }
+      ],
+      "gate_pass": true,
+      "degraded": false
+    },
+    {
+      "seed": 666,
+      "top_value_domain_goal_fraction": 1.0,
+      "random_top_fraction": 0.4,
+      "targeted_maxgap_fraction": 1.0,
+      "random_target_maxgap_fraction": 0.5,
+      "final_top_domain_mean_gap": 0.012,
+      "random_final_top_domain_mean_gap": 0.222,
+      "trajectory": [
+        {
+          "tick": 0,
+          "domain": 0,
+          "state": 0,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.5,
+          "obs": 0
+        },
+        {
+          "tick": 1,
+          "domain": 0,
+          "state": 1,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.45,
+          "obs": 0
+        },
+        {
+          "tick": 2,
+          "domain": 0,
+          "state": 2,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.4,
+          "obs": 0
+        },
+        {
+          "tick": 3,
+          "domain": 0,
+          "state": 3,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.35,
+          "obs": 0
+        },
+        {
+          "tick": 4,
+          "domain": 0,
+          "state": 4,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.3,
+          "obs": 0
+        },
+        {
+          "tick": 5,
+          "domain": 0,
+          "state": 5,
+          "domain_value": 0.9,
+          "targeted_gap": 0.5,
+          "domain_mean_gap": 0.25,
+          "obs": 0
+        },
+        {
+          "tick": 6,
+          "domain": 0,
+          "state": 0,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.2,
+          "obs": 1
+        },
+        {
+          "tick": 7,
+          "domain": 0,
+          "state": 1,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.176,
+          "obs": 1
+        },
+        {
+          "tick": 8,
+          "domain": 0,
+          "state": 2,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.153,
+          "obs": 1
+        },
+        {
+          "tick": 9,
+          "domain": 0,
+          "state": 3,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.129,
+          "obs": 1
+        },
+        {
+          "tick": 10,
+          "domain": 0,
+          "state": 4,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.106,
+          "obs": 1
+        },
+        {
+          "tick": 11,
+          "domain": 0,
+          "state": 5,
+          "domain_value": 0.9,
+          "targeted_gap": 0.2,
+          "domain_mean_gap": 0.082,
+          "obs": 1
+        },
+        {
+          "tick": 12,
+          "domain": 0,
+          "state": 0,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.059,
+          "obs": 2
+        },
+        {
+          "tick": 13,
+          "domain": 0,
+          "state": 1,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.052,
+          "obs": 2
+        },
+        {
+          "tick": 14,
+          "domain": 0,
+          "state": 2,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.044,
+          "obs": 2
+        },
+        {
+          "tick": 15,
+          "domain": 0,
+          "state": 3,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.037,
+          "obs": 2
+        },
+        {
+          "tick": 16,
+          "domain": 0,
+          "state": 4,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.03,
+          "obs": 2
+        },
+        {
+          "tick": 17,
+          "domain": 0,
+          "state": 5,
+          "domain_value": 0.9,
+          "targeted_gap": 0.059,
+          "domain_mean_gap": 0.023,
+          "obs": 2
+        },
+        {
+          "tick": 18,
+          "domain": 0,
+          "state": 0,
+          "domain_value": 0.9,
+          "targeted_gap": 0.015,
+          "domain_mean_gap": 0.015,
+          "obs": 3
+        },
+        {
+          "tick": 19,
+          "domain": 0,
+          "state": 1,
+          "domain_value": 0.9,
+          "targeted_gap": 0.015,
+          "domain_mean_gap": 0.013,
+          "obs": 3
+        }
+      ],
+      "gate_pass": true,
+      "degraded": false
+    }
+  ],
+  "verdict": "O4 PASS (provisional): the value-gap organ generates endogenous, contentful goals from internal tension (valuable uncertainty) that guide behaviour -- far above random goal sampling."
+}

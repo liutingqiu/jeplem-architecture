@@ -1,0 +1,51 @@
+{
+  "protocol": "phase5 O5 gate: grounded world model (the most honest red line). Can the action->prediction->difference->update loop CONVERGE as a PLWM mechanism (perception + explicit-memory ledger + learned prediction head + prediction-error-driven exploration), learning the transition law s'=(s+3) mod 10 on the states the body perceives, WITHOUT a real-environment substrate? Pre-written pass: perceived prediction accuracy >= 0.9 with the error dropping. Internal-simulation finding (open question 7, reported not gated): can the model predict next-states for never-perceived states? Transplant line: no convergence from the body's own experience -> U falsified at the core.",
+  "results": [
+    {
+      "seed": 444,
+      "perceived_accuracy": 1.0,
+      "internal_simulation_accuracy": 0.0,
+      "unperceived_states": [
+        8,
+        9
+      ],
+      "n_states_probed": 8,
+      "error_first10": 2.2403,
+      "error_last10": 0.0011,
+      "loop_converged": true,
+      "transplant_required": false,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "perceived_accuracy": 1.0,
+      "internal_simulation_accuracy": 0.0,
+      "unperceived_states": [
+        8,
+        9
+      ],
+      "n_states_probed": 8,
+      "error_first10": 2.2668,
+      "error_last10": 0.001,
+      "loop_converged": true,
+      "transplant_required": false,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "perceived_accuracy": 1.0,
+      "internal_simulation_accuracy": 0.0,
+      "unperceived_states": [
+        8,
+        9
+      ],
+      "n_states_probed": 8,
+      "error_first10": 2.2082,
+      "error_last10": 0.0014,
+      "loop_converged": true,
+      "transplant_required": false,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "O5 PASS (provisional): the grounded world model is implementable as a PLWM mechanism -- the prediction-difference-update loop converges on the body's own observation stream with explicit-memory grounding and error-driven exploration, learning the transition LAW. No real-environment substrate is introduced; the transplant red line is NOT triggered. (Internal-simulation generalisation to never-perceived states is reported separately.)"
+}
