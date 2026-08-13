@@ -1,0 +1,36 @@
+{
+  "protocol": "phase6 G2 gate: soft reasoning mechanisation. Analogy completion A:B::C:? on the grid-transform family manifold. The grounded manifold identifies which dimension changed (colour vs spatial) and applies it; ambiguous analogies are HELD by the explicit core (zero false facts). Statistical baseline = perceptual signature embedding + vector analogy + nearest neighbour. Pre-written pass: manifold accuracy > 0.6 AND >= statistical x 1.2 AND zero false facts.",
+  "results": [
+    {
+      "seed": 444,
+      "manifold_analogy_accuracy": 1.0,
+      "statistical_accuracy": 0.117,
+      "statistical_ambiguous_accuracy": 0.0,
+      "manifold_false_facts": 0,
+      "manifold_holds": 40,
+      "n_analogies": 120,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "manifold_analogy_accuracy": 1.0,
+      "statistical_accuracy": 0.117,
+      "statistical_ambiguous_accuracy": 0.0,
+      "manifold_false_facts": 0,
+      "manifold_holds": 40,
+      "n_analogies": 120,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "manifold_analogy_accuracy": 1.0,
+      "statistical_accuracy": 0.133,
+      "statistical_ambiguous_accuracy": 0.0,
+      "manifold_false_facts": 0,
+      "manifold_holds": 40,
+      "n_analogies": 120,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "G2 PASS (provisional): the grounded manifold mechanises soft reasoning (analogy completion) far above statistical interpolation, with zero false facts -- the explicit core holds on ambiguous analogies instead of confirming a wrong answer. Soft reasoning is NOT reducible to a bigger embedding in this domain."
+}
