@@ -86,17 +86,13 @@ def main() -> None:
         round_no += 1
         # practice pass: train on all specs (persistent model, persistent pool)
         for spec in specs:
-            cands = pool
+            cands = list(pool)   # snapshot: pool may grow (outward unlock)
             feats = torch.stack(
                 [torch.tensor(list(spec_feature(spec)) + _onehot(p, n_prim)).float()
                  for p in cands])
             with torch.no_grad():
                 scores = torch.sigmoid(model(feats)).squeeze(-1)
             best = cands[int(scores.argmax())]
-            if not verify(spec, PRIMITIVES[best][0], TEST_INPUTS):
-                need = _prim_index(PROBLEMS[spec])
-                if need not in pool:      # outward acquisition, kept forever
-                    pool.append(need)
             outcomes = torch.tensor(
                 [1.0 if verify(spec, PRIMITIVES[p][0], TEST_INPUTS) else 0.0
                  for p in cands])
@@ -105,6 +101,10 @@ def main() -> None:
                 opt.zero_grad(set_to_none=True)
                 loss.backward()
                 opt.step()
+            if not verify(spec, PRIMITIVES[best][0], TEST_INPUTS):
+                need = _prim_index(PROBLEMS[spec])
+                if need not in pool:      # outward acquisition, kept forever
+                    pool.append(need)
         # evaluation pass: honest current level
         ev = evaluate(model, pool)
         consec_perfect = consec_perfect + 1 if ev["last_acc"] >= 1.0 else 0
