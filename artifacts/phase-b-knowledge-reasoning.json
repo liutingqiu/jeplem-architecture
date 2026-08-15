@@ -1,0 +1,84 @@
+{
+  "protocol": "Phase-B knowledge-conditioned reasoning: grid selection rules that are SEMANTIC (entity property in the Wikidata store) and visually random.  Knowledge system queries the store per object; visual baseline is the phase-3 search mechanism.  Gate: knowledge held-out >= 0.9 AND visual == 0 (the rule is genuinely semantic), 3 seeds.",
+  "results": [
+    {
+      "writer": {
+        "knowledge": 1.0,
+        "visual": 0.0,
+        "k_ok": 10,
+        "k_tot": 10
+      },
+      "physicist": {
+        "knowledge": 1.0,
+        "visual": 0.0,
+        "k_ok": 10,
+        "k_tot": 10
+      },
+      "composer": {
+        "knowledge": 1.0,
+        "visual": 0.0,
+        "k_ok": 10,
+        "k_tot": 10
+      },
+      "mammal": {
+        "knowledge": 1.0,
+        "visual": 0.0,
+        "k_ok": 10,
+        "k_tot": 10
+      }
+    },
+    {
+      "writer": {
+        "knowledge": 1.0,
+        "visual": 0.0,
+        "k_ok": 10,
+        "k_tot": 10
+      },
+      "physicist": {
+        "knowledge": 1.0,
+        "visual": 0.0,
+        "k_ok": 10,
+        "k_tot": 10
+      },
+      "composer": {
+        "knowledge": 1.0,
+        "visual": 0.0,
+        "k_ok": 10,
+        "k_tot": 10
+      },
+      "mammal": {
+        "knowledge": 1.0,
+        "visual": 0.0,
+        "k_ok": 10,
+        "k_tot": 10
+      }
+    },
+    {
+      "writer": {
+        "knowledge": 1.0,
+        "visual": 0.0,
+        "k_ok": 10,
+        "k_tot": 10
+      },
+      "physicist": {
+        "knowledge": 1.0,
+        "visual": 0.0,
+        "k_ok": 10,
+        "k_tot": 10
+      },
+      "composer": {
+        "knowledge": 1.0,
+        "visual": 0.0,
+        "k_ok": 10,
+        "k_tot": 10
+      },
+      "mammal": {
+        "knowledge": 1.0,
+        "visual": 0.0,
+        "k_ok": 10,
+        "k_tot": 10
+      }
+    }
+  ],
+  "gate_pass": true
+}

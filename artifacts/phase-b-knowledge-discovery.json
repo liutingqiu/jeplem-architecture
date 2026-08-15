@@ -1,0 +1,66 @@
+{
+  "protocol": "Phase-B discovery: the system DISCOVERS the semantic rule from demos -- the (rel, end) predicate shared by all kept entities and none of the dropped ones -- then applies it to held-out.  Gate: discovered rule correct, knowledge held-out >= 0.9, visual == 0.",
+  "results": [
+    {
+      "writer": {
+        "discovered": "P106:writer",
+        "correct_rule": true,
+        "knowledge": 1.0,
+        "visual": 0.0
+      },
+      "physicist": {
+        "discovered": "P106:physicist",
+        "correct_rule": true,
+        "knowledge": 1.0,
+        "visual": 0.0
+      },
+      "composer": {
+        "discovered": "P106:composer",
+        "correct_rule": true,
+        "knowledge": 1.0,
+        "visual": 0.0
+      }
+    },
+    {
+      "writer": {
+        "discovered": "P106:writer",
+        "correct_rule": true,
+        "knowledge": 1.0,
+        "visual": 0.0
+      },
+      "physicist": {
+        "discovered": "P106:physicist",
+        "correct_rule": true,
+        "knowledge": 1.0,
+        "visual": 0.0
+      },
+      "composer": {
+        "discovered": "P106:composer",
+        "correct_rule": true,
+        "knowledge": 1.0,
+        "visual": 0.0
+      }
+    },
+    {
+      "writer": {
+        "discovered": "P106:writer",
+        "correct_rule": true,
+        "knowledge": 1.0,
+        "visual": 0.0
+      },
+      "physicist": {
+        "discovered": "P106:physicist",
+        "correct_rule": true,
+        "knowledge": 1.0,
+        "visual": 0.0
+      },
+      "composer": {
+        "discovered": "P106:composer",
+        "correct_rule": true,
+        "knowledge": 1.0,
+        "visual": 0.0
+      }
+    }
+  ],
+  "gate_pass": true
+}
