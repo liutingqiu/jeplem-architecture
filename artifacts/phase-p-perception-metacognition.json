@@ -1,0 +1,33 @@
+{
+  "protocol": "Phase-P perception into the metacognitive loop: the body PERCEIVES scenes, a learned layer recognises entities, knowledge answers a semantic question, and the meta-router + self-model oversee mem/bel/PERCEPTION/KNOWLEDGE.  Gate: routed acc >= 0.8, self-ECE <= 0.25, both perception and knowledge genuinely used.",
+  "results": [
+    {
+      "seed": 444,
+      "routed_acc": 0.836,
+      "perception_routing": 1.0,
+      "knowledge_routing": 1.0,
+      "self_ece": 0.108,
+      "ledger_entries": 60,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "routed_acc": 0.836,
+      "perception_routing": 1.0,
+      "knowledge_routing": 1.0,
+      "self_ece": 0.036,
+      "ledger_entries": 60,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "routed_acc": 0.836,
+      "perception_routing": 1.0,
+      "knowledge_routing": 1.0,
+      "self_ece": 0.019,
+      "ledger_entries": 60,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PHASE-P PASS: perception and knowledge FEED the same metacognitive loop -- the body sees, recognises, knows, and knows it knows.  The architecture's perception pillar joins knowledge in the metacognition (self-training prerequisite)."
+}
