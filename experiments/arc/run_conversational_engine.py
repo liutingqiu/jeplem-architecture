@@ -26,7 +26,8 @@ from experiments.resource_guard import start_resource_guard
 from plwm.knowledge_store import KnowledgeStore
 from experiments.arc.knowledge_query import answer, WIKIDATA_RELS
 from plwm.language_gen import render
-from experiments.arc.run_realizer import train_realizer, realizer_render, PARAPHRASES
+from experiments.arc.run_realizer import (train_realizer, realizer_render_rel,
+                                          PARAPHRASES)
 
 DB = ROOT / "data" / "knowledge" / "wikidata.db"
 
@@ -44,7 +45,7 @@ def mrep_to_render(rep, rmodel, w2i, i2w) -> str:
         s = rep.sources[0].subject
         o = rep.sources[0].object
         rel_tok = REL_TO_TOKEN.get(rep.sources[0].rel, "isa")
-        text = realizer_render(rmodel, w2i, i2w, s, rel_tok, o)
+        text = realizer_render_rel(rmodel, w2i, i2w, s, rel_tok, o)
         return text
     return render(rep)
 

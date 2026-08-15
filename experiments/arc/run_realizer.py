@@ -111,24 +111,14 @@ class Realizer(nn.Module):
         return self.head(h)
 
 
-def run_seed(seed: int, facts, hidden: int = 256, epochs: int = 6) -> dict:
+def train_realizer(facts, seed: int, hidden: int = 256, epochs: int = 6):
+    """Train a realizer on the given facts; return (model, w2i, i2w, pad_id).
+    Reusable by the body integration."""
     rng = random.Random(seed)
     torch.manual_seed(seed)
-    # train/holdout split by FACT (entities may overlap)
-    rng.shuffle(facts)
-    n_hold = max(1, int(len(facts) * 0.2))
-    train_facts = facts[n_hold:]
-    hold_facts = facts[:n_hold]
-
-    X, Y, _ = build_corpus(train_facts, seed)
+    X, Y, _ = build_corpus(facts, seed)
     words, w2i, i2w = build_vocab(X, Y, set(), FUNCTION_WORDS)
     V = len(words)
-    # held-out eval is over IN-VOCAB facts only: a realizer cannot emit an
-    # entity it never saw (no such token), so OOV facts are unanswerable BY
-    # CONSTRUCTION -- they are counted separately and excluded from the gate.
-    hold_invocab = [f for f in hold_facts
-                    if f[0].replace(" ", "_") in w2i and f[2].replace(" ", "_") in w2i]
-    n_oov_excluded = len(hold_facts) - len(hold_invocab)
     model = Realizer(V, hidden)
     opt = torch.optim.AdamW(model.parameters(), lr=1e-3)
     pad_id = w2i["<PAD>"]
@@ -148,6 +138,68 @@ def run_seed(seed: int, facts, hidden: int = 256, epochs: int = 6) -> dict:
             loss = nn.functional.cross_entropy(logits[mask], targets[mask])
             opt.zero_grad(set_to_none=True); loss.backward(); opt.step()
     model.eval()
+    return model, w2i, i2w, pad_id
+
+
+def realizer_render_rel(model, w2i, i2w, s: str, r: str, o: str) -> str:
+    """Like realizer_render but constrained to the fact's OWN relation bank
+    (better output quality for the conversational engine -- an IsA fact always
+    gets an is-a phrasing)."""
+    import torch as _t
+    sos = w2i["<S>"]
+    su, ou = s.replace(" ", "_"), o.replace(" ", "_")
+
+    def loglik(toks):
+        ctx = _t.tensor([w2i.get(t, sos) for t in ("<S>", su, r, ou, "<E>")]).unsqueeze(0)
+        seq = _t.cat([ctx, _t.tensor([w2i.get(t, sos) for t in toks])[None]], dim=1)
+        with _t.no_grad():
+            lg = _t.log_softmax(model(seq[:, :-1]), -1)
+            target = seq[:, 1:].unsqueeze(-1)
+            return float(lg.gather(-1, target).sum().item())
+
+    bank = PARAPHRASES.get(r, PARAPHRASES["isa"])
+    cands = [p.format(s=su, o=ou) for p in bank]
+    best = max(cands, key=lambda t: loglik(t.split()))
+    return best.replace("_", " ")
+
+
+def realizer_render(model, w2i, i2w, s: str, r: str, o: str) -> str:
+    """Scoring-based generation for one fact (s, r, o): fill the paraphrase
+    bank across ALL relations, rank by the realizer's log-likelihood, return
+    the most natural phrasing (display form, spaces restored)."""
+    import torch as _t
+    sos = w2i["<S>"]
+    su, ou = s.replace(" ", "_"), o.replace(" ", "_")
+
+    def loglik(toks):
+        ctx = _t.tensor([w2i.get(t, sos) for t in ("<S>", su, r, ou, "<E>")]).unsqueeze(0)
+        seq = _t.cat([ctx, _t.tensor([w2i.get(t, sos) for t in toks])[None]], dim=1)
+        with _t.no_grad():
+            lg = _t.log_softmax(model(seq[:, :-1]), -1)
+            target = seq[:, 1:].unsqueeze(-1)
+            return float(lg.gather(-1, target).sum().item())
+
+    cands = [p.format(s=su, o=ou) for rel_bank in PARAPHRASES.values() for p in rel_bank]
+    best = max(cands, key=lambda t: loglik(t.split()))
+    return best.replace("_", " ")
+
+
+def run_seed(seed: int, facts, hidden: int = 256, epochs: int = 6) -> dict:
+    rng = random.Random(seed)
+    # train/holdout split by FACT (entities may overlap)
+    rng.shuffle(facts)
+    n_hold = max(1, int(len(facts) * 0.2))
+    train_facts = facts[n_hold:]
+    hold_facts = facts[:n_hold]
+
+    model, w2i, i2w, pad_id = train_realizer(train_facts, seed, hidden, epochs)
+    V = len(w2i)
+    # held-out eval is over IN-VOCAB facts only: a realizer cannot emit an
+    # entity it never saw (no such token), so OOV facts are unanswerable BY
+    # CONSTRUCTION -- they are counted separately and excluded from the gate.
+    hold_invocab = [f for f in hold_facts
+                    if f[0].replace(" ", "_") in w2i and f[2].replace(" ", "_") in w2i]
+    n_oov_excluded = len(hold_facts) - len(hold_invocab)
 
     func_ids = {w2i[w] for w in FUNCTION_WORDS if w in w2i}
     rel_ids = {w2i[w] for w in REL_WORDS if w in w2i}
