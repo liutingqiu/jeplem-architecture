@@ -1,0 +1,93 @@
+{
+  "protocol": "Phase-B two-channel: multi-modal CONJUNCTIVE selection -- keep = (colour==C) AND (entity is writer).  Demos fit EACH single rule; tests over-select either alone.  Full system composes visual + knowledge.  Gate: conjunction >= 0.9, visual-only == 0, knowledge-only == 0.",
+  "results": [
+    {
+      "writer": {
+        "visual_rule": 5,
+        "semantic_rules": [
+          "P106:writer"
+        ],
+        "full_conjunction": 1.0,
+        "visual_only": 0.0,
+        "knowledge_only": 0.0
+      },
+      "physicist": {
+        "visual_rule": 1,
+        "semantic_rules": [
+          "P106:physicist"
+        ],
+        "full_conjunction": 1.0,
+        "visual_only": 0.0,
+        "knowledge_only": 0.0
+      },
+      "composer": {
+        "visual_rule": 9,
+        "semantic_rules": [
+          "P106:composer"
+        ],
+        "full_conjunction": 1.0,
+        "visual_only": 0.0,
+        "knowledge_only": 0.0
+      }
+    },
+    {
+      "writer": {
+        "visual_rule": 4,
+        "semantic_rules": [
+          "P106:writer"
+        ],
+        "full_conjunction": 1.0,
+        "visual_only": 0.0,
+        "knowledge_only": 0.0
+      },
+      "physicist": {
+        "visual_rule": 3,
+        "semantic_rules": [
+          "P106:physicist"
+        ],
+        "full_conjunction": 1.0,
+        "visual_only": 0.0,
+        "knowledge_only": 0.0
+      },
+      "composer": {
+        "visual_rule": 2,
+        "semantic_rules": [
+          "P106:composer"
+        ],
+        "full_conjunction": 1.0,
+        "visual_only": 0.0,
+        "knowledge_only": 0.0
+      }
+    },
+    {
+      "writer": {
+        "visual_rule": 8,
+        "semantic_rules": [
+          "P106:writer"
+        ],
+        "full_conjunction": 1.0,
+        "visual_only": 0.0,
+        "knowledge_only": 0.0
+      },
+      "physicist": {
+        "visual_rule": 3,
+        "semantic_rules": [
+          "P106:physicist"
+        ],
+        "full_conjunction": 1.0,
+        "visual_only": 0.0,
+        "knowledge_only": 0.0
+      },
+      "composer": {
+        "visual_rule": 2,
+        "semantic_rules": [
+          "P106:composer"
+        ],
+        "full_conjunction": 1.0,
+        "visual_only": 0.0,
+        "knowledge_only": 0.0
+      }
+    }
+  ],
+  "gate_pass": true
+}

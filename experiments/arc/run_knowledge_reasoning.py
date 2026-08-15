@@ -430,17 +430,153 @@ def run_seed_trans_discovery(seed: int, store) -> dict:
     return out
 
 
+def discover_condition_set(store, demos) -> set[tuple] | None:
+    """Like discover_condition but returns ALL candidate (rel, end) predicates
+    shared by kept and none of dropped (not just when exactly one)."""
+    kept: set[str] = set()
+    dropped: set[str] = set()
+    for d in demos:
+        g_in, g_out = d["input"], d["output"]
+        for o in d["objects"]:
+            r, c = o["pos"]
+            if g_out[r][c] != BG:
+                kept.add(o["entity"])
+            elif g_in[r][c] != BG:
+                dropped.add(o["entity"])
+    if not kept or not dropped:
+        return None
+    common: dict[tuple, int] = {}
+    for e in kept:
+        seen = set()
+        for rel, end in store.conn.execute(
+                "SELECT rel, end FROM facts WHERE start=? AND length(end)<40", (e,)):
+            seen.add((rel, end))
+        for k in seen:
+            common[k] = common.get(k, 0) + 1
+    shared = {k for k, v in common.items() if v == len(kept)}
+    dropped_holds = set()
+    for e in dropped:
+        for rel, end in store.conn.execute(
+                "SELECT rel, end FROM facts WHERE start=? AND length(end)<40", (e,)):
+            dropped_holds.add((rel, end))
+    cands = shared - dropped_holds
+    return cands or None
+
+
+def make_task_twoc(rng, writers, non_writers, keep_n: int, tot_n: int,
+                   demos_mode: bool, c_red: int) -> dict:
+    """Multi-modal conjunctive selection: keep = (colour == C) AND (is writer).
+    DEMOS: grid has only RED-writers + NON-red-non-writers, so EACH single rule
+    ('red', 'is writer') fits the demos.  TESTS: grid has all four types (red/non-red
+    x writer/non-writer), so each single rule OVER-selects and only the conjunction
+    is correct.  ``c_red`` is fixed across demos+tests (the surface colour)."""
+    rng.shuffle(writers); rng.shuffle(non_writers)
+    red_w = writers[:keep_n]
+    if demos_mode:
+        nred_nw = non_writers[: tot_n - keep_n]
+        objs = ([(e, True, True) for e in red_w]
+                + [(e, False, False) for e in nred_nw])
+    else:
+        red_nw = non_writers[: keep_n]
+        nred_w = writers[keep_n: keep_n + keep_n]
+        nred_nw = non_writers[keep_n: tot_n - keep_n - keep_n]
+        objs = ([(e, True, True) for e in red_w]
+                + [(e, True, False) for e in red_nw]
+                + [(e, False, False) for e in nred_w]
+                + [(e, False, False) for e in nred_nw])
+    c_other = rng.choice([p for p in PALETTE if p != c_red])
+    objects = []
+    used = set()
+    for e, is_red, is_pos in objs:
+        while True:
+            r, c = rng.randrange(12), rng.randrange(12)
+            if (r, c) not in used:
+                used.add((r, c))
+                break
+        color = c_red if is_red else c_other
+        objects.append({"entity": e, "pos": (r, c), "color": color,
+                        "is_positive": is_pos})
+    kept_ids = {id(o) for o in objects if o["is_positive"]}
+    g = [[BG] * 12 for _ in range(12)]
+    for o in objects:
+        g[o["pos"][0]][o["pos"][1]] = o["color"]
+    out = [[BG] * 12 for _ in range(12)]
+    for o in objects:
+        if id(o) in kept_ids:
+            out[o["pos"][0]][o["pos"][1]] = o["color"]
+    return {"objects": objects, "input": g, "output": out, "red_colour": c_red}
+
+
+def run_seed_twoc(seed: int, store) -> dict:
+    rng = random.Random(seed)
+    out = {}
+    for rel, end, label in DIRECT_CONDITIONS:
+        pos, neg = sample_pool(store, rel, end, pos_n=30, neg_n=30, seed=seed)
+        if len(pos) < 8 or len(neg) < 8:
+            continue
+        c_red = rng.choice(PALETTE)
+        demos = [make_task_twoc(rng, list(pos), list(neg), keep_n=3, tot_n=6, demos_mode=True, c_red=c_red)
+                 for _ in range(3)]
+        vis_c = discover_visual_rule(demos)          # the 'red' colour
+        sem = discover_condition_set(store, demos)   # (rel, end) candidates
+        tests = [make_task_twoc(rng, list(pos), list(neg), keep_n=3, tot_n=6, demos_mode=False, c_red=c_red)
+                 for _ in range(10)]
+        full_ok = vis_ok = sem_ok = n = 0
+        for t in tests:
+            true_kept = {o["entity"] for o in t["objects"] if o["is_positive"]}
+            n += 1
+            # full system: conjunction (colour==C AND is writer)
+            if vis_c is not None and sem:
+                full = {o["entity"] for o in t["objects"]
+                        if o["color"] == vis_c
+                        and any(store.known_any([r2], o["entity"], e2) for r2, e2 in sem)}
+                full_ok += int(full == true_kept)
+            # visual-only: colour rule
+            if vis_c is not None:
+                v_kept = {o["entity"] for o in t["objects"] if o["color"] == vis_c}
+                vis_ok += int(v_kept == true_kept)
+            # knowledge-only: semantic rule
+            if sem:
+                s_kept = {o["entity"] for o in t["objects"]
+                          if any(store.known_any([r2], o["entity"], e2) for r2, e2 in sem)}
+                sem_ok += int(s_kept == true_kept)
+        out[label] = {"visual_rule": vis_c, "semantic_rules": sorted([f"{a}:{b}" for a, b in (sem or [])]),
+                      "full_conjunction": round(full_ok / n, 3) if n else 0.0,
+                      "visual_only": round(vis_ok / n, 3) if n else 0.0,
+                      "knowledge_only": round(sem_ok / n, 3) if n else 0.0}
+    return out
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--db", type=Path, default=DB)
     parser.add_argument("--seeds", type=int, nargs="*", default=[444, 555, 666])
-    parser.add_argument("--mode", choices=["handed", "discovery", "disambiguate", "trans-discovery"],
+    parser.add_argument("--mode", choices=["handed", "discovery", "disambiguate", "trans-discovery",
+                                           "two-channel"],
                         default="handed")
     parser.add_argument("--artifact", type=Path, default=ROOT / "artifacts" / "phase-b-knowledge-reasoning.json")
     args = parser.parse_args()
 
     store = KnowledgeStore(args.db)
-    if args.mode == "trans-discovery":
+    if args.mode == "two-channel":
+        reports = [run_seed_twoc(s, store) for s in args.seeds]
+        store.close()
+        all_full = [r[c]["full_conjunction"] for r in reports for c in r]
+        all_vis = [r[c]["visual_only"] for r in reports for c in r]
+        all_sem = [r[c]["knowledge_only"] for r in reports for c in r]
+        gate = bool(all_full and min(all_full) >= 0.9
+                    and max(all_vis) == 0.0 and max(all_sem) == 0.0)
+        report = {
+            "protocol": (
+                "Phase-B two-channel: multi-modal CONJUNCTIVE selection -- keep = (colour==C) "
+                "AND (entity is writer).  Demos fit EACH single rule; tests over-select either "
+                "alone.  Full system composes visual + knowledge.  Gate: conjunction >= 0.9, "
+                "visual-only == 0, knowledge-only == 0."
+            ),
+            "results": reports,
+            "gate_pass": bool(gate),
+        }
+    elif args.mode == "trans-discovery":
         reports = [run_seed_trans_discovery(s, store) for s in args.seeds]
         store.close()
         all_correct = [r[c]["correct"] for r in reports for c in r
