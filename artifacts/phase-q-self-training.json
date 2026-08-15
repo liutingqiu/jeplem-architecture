@@ -1,0 +1,30 @@
+{
+  "protocol": "Phase-Q self-training loop (M5 prototype): the system GENERATES candidate rules, its SELF-MODEL scores them, KNOWLEDGE verifies, and it optimises toward the verified high-scoring ones.  Gate: last-ten accuracy >= 0.9, the KNOWLEDGE rule dominates the final proposals (it learned the right behaviour, not a spurious shortcut), self-model ECE <= 0.2, 3 seeds.",
+  "results": [
+    {
+      "seed": 444,
+      "first_ten_acc": 0.9,
+      "last_ten_acc": 1.0,
+      "knowledge_rule_dominant": 1.0,
+      "self_model_ece": 0.084,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "first_ten_acc": 0.9,
+      "last_ten_acc": 1.0,
+      "knowledge_rule_dominant": 1.0,
+      "self_model_ece": 0.141,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "first_ten_acc": 1.0,
+      "last_ten_acc": 1.0,
+      "knowledge_rule_dominant": 1.0,
+      "self_model_ece": 0.089,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PHASE-Q PASS: the system trains ITSELF -- it generates candidate behaviours, self-scores, verifies against knowledge, and improves across rounds.  The self-training loop (M5) works, grounded by knowledge (no drift)."
+}
