@@ -1,0 +1,42 @@
+{
+  "protocol": "Phase-T merged skill-acquisition loop: absorb (corpus) + practice (self-train with EXECUTION verification) + explore (outward acquisition of missing primitives), as ONE loop, for the first skill (list-transformation programming).  Gate: last-rounds accuracy >= 0.9 (the system converges from no skill to solving the problems), self-model ECE <= 0.25, and outward exploration unlocked primitives the initial pool lacked.",
+  "results": [
+    {
+      "seed": 444,
+      "first_rounds_acc": 0.167,
+      "last_rounds_acc": 1.0,
+      "total_acc": 0.725,
+      "outward_acquired": [
+        "odds",
+        "negate"
+      ],
+      "self_model_ece": 0.033,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "first_rounds_acc": 0.125,
+      "last_rounds_acc": 1.0,
+      "total_acc": 0.708,
+      "outward_acquired": [
+        "odds",
+        "negate"
+      ],
+      "self_model_ece": 0.035,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "first_rounds_acc": 0.083,
+      "last_rounds_acc": 1.0,
+      "total_acc": 0.617,
+      "outward_acquired": [
+        "odds",
+        "negate"
+      ],
+      "self_model_ece": 0.117,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PHASE-T PASS: the system acquired its FIRST skill (programming) through the merged absorb+practice+explore loop -- verified by execution (code that works is true), improving from no skill to solving the problems, with outward exploration filling the gaps."
+}
