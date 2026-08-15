@@ -1,0 +1,24 @@
+{
+  "protocol": "Phase-K predictive world model: a valuable object moves (constant torus velocity); the MODEL agent holds a detection report (position + velocity) and PREDICTS the object's hidden trajectory to intercept it; the memoryless agent has no report and wanders.  Gate: world-model interception >= 0.8 AND >= memoryless + 0.35, 3 seeds.",
+  "results": [
+    {
+      "seed": 444,
+      "world_model_interception": 0.86,
+      "memoryless_interception": 0.44,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "world_model_interception": 0.82,
+      "memoryless_interception": 0.36,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "world_model_interception": 0.86,
+      "memoryless_interception": 0.42,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PHASE-K PASS: the predictive world model lets the agent intercept a moving target it cannot see -- prediction under partial observability is decisive for goal achievement."
+}
