@@ -1,0 +1,33 @@
+{
+  "protocol": "Phase-I knowledge-driven agent: in a grid world, the agent PERCEIVES objects (learned recognition), UNDERSTANDS which are fruits (world KB), PLANS a route, ACTS, and honestly skips low-confidence recognitions.  Gate: completeness >= 0.9, zero non-fruit collections, no-knowledge baseline fails (fruit-ness is semantic), 3 seeds.",
+  "results": [
+    {
+      "seed": 444,
+      "fruits_collected": 36,
+      "total_fruits": 36,
+      "completeness": 1.0,
+      "non_fruits_collected": 0,
+      "no_knowledge_baseline_wrong": 15,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "fruits_collected": 37,
+      "total_fruits": 37,
+      "completeness": 1.0,
+      "non_fruits_collected": 0,
+      "no_knowledge_baseline_wrong": 19,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "fruits_collected": 36,
+      "total_fruits": 36,
+      "completeness": 1.0,
+      "non_fruits_collected": 0,
+      "no_knowledge_baseline_wrong": 15,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PHASE-I PASS: the knowledge-driven AGENT sees, understands, plans, acts, and self-corrects in a world -- the perceive->understand->act loop.  The no-knowledge baseline cannot tell fruits from non-fruits (semantic, not visual)."
+}
