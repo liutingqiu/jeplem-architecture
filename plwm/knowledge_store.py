@@ -26,7 +26,9 @@ class KnowledgeStore:
         if memory_mode:
             self.conn = sqlite3.connect(":memory:")
         else:
-            self.conn = sqlite3.connect(self.path)
+            # check_same_thread=False: the connection may be shared by a
+            # threaded service (read-only queries; SQLite serialises access).
+            self.conn = sqlite3.connect(self.path, check_same_thread=False)
         self.conn.execute(
             "CREATE TABLE IF NOT EXISTS facts (rel TEXT, start TEXT, end TEXT, "
             "PRIMARY KEY (rel, start, end)) WITHOUT ROWID"
