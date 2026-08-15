@@ -1,0 +1,48 @@
+{
+  "protocol": "Phase-L self-improving agent: the world model starts EMPTY and is learned from failed interception attempts (observations -> velocity estimate converging to the truth).  Gate: the learned estimate equals the true velocity AND second-half interception >= 0.7 without degrading, 3 seeds.",
+  "results": [
+    {
+      "seed": 444,
+      "first_half": 0.65,
+      "second_half": 0.75,
+      "final_estimate": [
+        1,
+        1
+      ],
+      "true_velocity": [
+        1,
+        1
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "first_half": 0.75,
+      "second_half": 0.75,
+      "final_estimate": [
+        1,
+        1
+      ],
+      "true_velocity": [
+        1,
+        1
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "first_half": 0.5,
+      "second_half": 0.8,
+      "final_estimate": [
+        1,
+        1
+      ],
+      "true_velocity": [
+        1,
+        1
+      ],
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PHASE-L PASS: the agent LEARNS the world's dynamics from its own failed attempts and demonstrably improves (interception climbs to the second half).  Self-improvement through experience."
+}
