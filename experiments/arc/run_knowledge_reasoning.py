@@ -39,11 +39,16 @@ DB = ROOT / "data" / "knowledge" / "wikidata.db"
 BG = 0
 PALETTE = list(range(1, 10))
 
-# conditions: (rel, end, label) -- direct + transitive class conditions
+# conditions: (rel, end, label) -- direct + transitive class conditions.
+# Diverse relation families: occupation (P106), part-of (P361), located-in
+# (P131), country (P17), instance/class (P31/P279).
 DIRECT_CONDITIONS = [
     ("P106", "writer", "writer"),
     ("P106", "physicist", "physicist"),
     ("P106", "composer", "composer"),
+    ("P361", "membrane protein", "part-of-membrane-protein"),
+    ("P131", "Germany", "located-in-germany"),
+    ("P17", "United States", "country-us"),
 ]
 TRANSITIVE_CONDITIONS = [
     ("mammal", "mammal"),   # P31/P279 transitive -> instance of mammal
@@ -139,6 +144,8 @@ def run_seed(seed: int, store) -> dict:
     out = {}
     for rel, end, label in DIRECT_CONDITIONS:
         pos, neg = sample_pool(store, rel, end, pos_n=20, neg_n=20, seed=seed)
+        if len(pos) < 3 or len(neg) < 3:
+            continue
         demos = [make_task(rng, pos, neg, keep_n=3, tot_n=6) for _ in range(3)]
         tests = [make_task(rng, pos, neg, keep_n=3, tot_n=6) for _ in range(10)]
         k_ok = k_tot = 0
