@@ -1,0 +1,50 @@
+{
+  "part": "B",
+  "protocol": "phase6 decisive ARC integration (#44) Part B: the latent-cause discovery pipeline runs INSIDE UnifiedBody (v18 event-loop pattern) on real ARC-1 training tasks, confirmed transform facts written to the SHARED ledger.  v17-core criteria (belief/revision/router/self-ECE) must hold alongside the ARC discovery -- no interference, zero false facts, provenance traceable.",
+  "false_facts_zero_all_seeds": true,
+  "core_holds_all_seeds": true,
+  "per_seed": [
+    {
+      "seed": 444,
+      "belief_query_acc": 1.0,
+      "revision_detected": true,
+      "router_acc": 1.0,
+      "self_ece": 0.001,
+      "arc_tasks_confirmed": 0,
+      "arc_tasks_test_correct": 0,
+      "arc_test_rate": 0.0,
+      "arc_false_facts": 0,
+      "ledger_written": 0,
+      "provenance_traceable": false,
+      "ledger_sample": []
+    },
+    {
+      "seed": 555,
+      "belief_query_acc": 1.0,
+      "revision_detected": true,
+      "router_acc": 1.0,
+      "self_ece": 0.001,
+      "arc_tasks_confirmed": 0,
+      "arc_tasks_test_correct": 0,
+      "arc_test_rate": 0.0,
+      "arc_false_facts": 0,
+      "ledger_written": 0,
+      "provenance_traceable": false,
+      "ledger_sample": []
+    },
+    {
+      "seed": 666,
+      "belief_query_acc": 1.0,
+      "revision_detected": true,
+      "router_acc": 1.0,
+      "self_ece": 0.001,
+      "arc_tasks_confirmed": 0,
+      "arc_tasks_test_correct": 0,
+      "arc_test_rate": 0.0,
+      "arc_false_facts": 0,
+      "ledger_written": 0,
+      "provenance_traceable": false,
+      "ledger_sample": []
+    }
+  ]
+}

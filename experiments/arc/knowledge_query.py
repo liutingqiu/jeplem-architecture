@@ -42,18 +42,31 @@ WIKIDATA_RELS: dict[str, list[str]] = {
 }
 
 # patterns: (regex, handler) -- ordered specific-first.  Entity capture is
-# permissive (`[^.?]+`: anything but sentence enders) because ConceptNet
-# entities carry arbitrary punctuation ("1,4 dioxane").  Leading articles are
-# only consumed WITH their space (`a `/`an `/`the `) so an entity that starts
-# with "a"/"the" is not truncated ("accepted" must not lose its leading "a").
-_ENTITY = r"[^.?]+"
+# permissive (anything but a question mark; NOT greedy so a trailing "."/"?"
+# stays out of the entity) because Wikidata labels carry dots, brackets and
+# punctuation ("(1,4,6-Trioxaspiro[4.6]undecan-2-yl)methanol",
+# "N-(...spiro[4.5]dec-...)formamide") and ConceptNet entities carry commas.
+# Entity boundaries are the structural anchors (`\s+a\s+` separators, " used
+# for ", `[.?]?$`).  Leading articles are only consumed WITH their space
+# (`a `/`an `/`the `) so an entity that starts with "a"/"the" is not
+# truncated.  IGNORECASE: questions are matched against the ORIGINAL-case
+# question so the captured entity keeps its stored spelling ("Douglas Adams").
+# non-capturing wrappers: `({_EG}?)` expands to `((?:[^?]+)?)` -- the trailing
+# `?` is a GROUP quantifier (optional), not adjacent to `+`, so no "multiple
+# repeat".  GREEDY for entities followed by a structural separator (the
+# separator anchors the boundary, and greedy makes the subject absorb a
+# trailing "A" that IGNORECASE would otherwise mis-read as an article, e.g.
+# "(-)-Ampelopsin A a ampelopsin A"); LAZY for the LAST entity so a trailing
+# "." / "?" stays out of the capture.
+_EG = r"(?:[^?]+)"
+_EL = r"(?:[^?]+?)"
 _ART = r"(?:a |an |the )?"
-_WHAT_IS = re.compile(rf"^what\s+is\s+{_ART}\s*({_ENTITY}?)[.?]?$")
-_DO_YOU_KNOW = re.compile(rf"^do\s+you\s+know\s+(?:about\s+)?{_ART}\s*({_ENTITY}?)[.?]?$")
-_USED_FOR = re.compile(rf"^(?:is\s+)?({_ENTITY}?)\s+(?:is\s+)?used\s+for\s+{_ART}\s*({_ENTITY}?)[.?]?$")
-_IS_A = re.compile(rf"^is\s+{_ART}\s*({_ENTITY}?)\s+an?\s+({_ENTITY}?)[.?]?$")
-_IS_A2 = re.compile(rf"^([a-z][^.?]+?)\s+is\s+an?\s+({_ENTITY}?)[.?]?$")
-_HAS_PROP = re.compile(rf"^(?:is\s+)?{_ART}\s*({_ENTITY}?)\s+is\s+({_ENTITY}?)[.?]?$")
+_WHAT_IS = re.compile(rf"^what\s+is\s+{_ART}\s*({_EL}?)[.?]?$", re.IGNORECASE)
+_DO_YOU_KNOW = re.compile(rf"^do\s+you\s+know\s+(?:about\s+)?{_ART}\s*({_EL}?)[.?]?$", re.IGNORECASE)
+_USED_FOR = re.compile(rf"^(?:is\s+)?({_EG}?)\s+(?:is\s+)?used\s+for\s+{_ART}\s*({_EL}?)[.?]?$", re.IGNORECASE)
+_IS_A = re.compile(rf"^is\s+{_ART}\s*({_EG}?)\s+an?\s+({_EL}?)[.?]?$", re.IGNORECASE)
+_IS_A2 = re.compile(rf"^(.+?)\s+is\s+an?\s+({_EL}?)[.?]?$", re.IGNORECASE)
+_HAS_PROP = re.compile(rf"^(?:is\s+)?{_ART}\s*({_EG}?)\s+is\s+({_EL}?)[.?]?$", re.IGNORECASE)
 
 # confidence model: exact fact near-certain, transitive decays with chain length
 EXACT_CONF = 0.98
@@ -65,6 +78,50 @@ def norm(word: str) -> str:
     return "en:" + " ".join(word.lower().split())
 
 
+def _forms(word: str) -> list[str]:
+    """Candidate entity forms to match against the KB.  ConceptNet stores
+    'en:...' canonical entities; the Wikidata ingest stores RAW English labels
+    ('Douglas Adams').  A query can originate from either format, so lookups
+    try both the raw form and the en:-normalized form."""
+    raw = " ".join(word.split())
+    n = norm(word)
+    return [n] if n == raw else [raw, n]
+
+
+def _aligned_pairs(s_raw: str, o_raw: str):
+    """(raw, raw) and (norm, norm) entity pairs.  NOT the cross product: a KB
+    stores entities in ONE format, so a mixed (raw start, en: target) pair can
+    never match -- and trying it triggers a full-graph BFS with no early exit
+    (the target never matches), which is catastrophic on ConceptNet."""
+    yield s_raw, o_raw
+    sn, on = norm(s_raw), norm(o_raw)
+    if (sn, on) != (s_raw, o_raw):
+        yield sn, on
+
+
+def _known_pair(store, rels, s_raw: str, o_raw: str):
+    """known_any across aligned entity-form pairs; returns the matched (s, o)
+    form (for MRep entities) or None."""
+    for s, o in _aligned_pairs(s_raw, o_raw):
+        if store.known_any(rels, s, o):
+            return s, o
+    return None
+
+
+def _transitive_any(store, rels, s_raw: str, o_raw: str) -> bool:
+    for s, o in _aligned_pairs(s_raw, o_raw):
+        if store.transitive_any(rels, s, o):
+            return True
+    return False
+
+
+def _reachable(store, rels, s_raw: str) -> set[str]:
+    out: set[str] = set()
+    for s in _forms(s_raw):
+        out |= store.reachable_any(rels, s, max_hops=1)
+    return out
+
+
 def _chain_confidence(k: int) -> float:
     return round(EXACT_CONF ** (k + 1), 4)
 
@@ -73,11 +130,11 @@ def answer(store: KnowledgeStore, question: str,
            rels: dict[str, list[str]] | None = None) -> MRep:
     rels = rels or CONCEPTNET_RELS
     is_a = rels["IsA"]
-    q = question.lower().strip()
+    q = question.strip()
     m = _WHAT_IS.match(q)
     if m:
-        subj = norm(m.group(1))
-        kinds = store.reachable_any(is_a, subj, max_hops=1)
+        subj = m.group(1)
+        kinds = _reachable(store, is_a, subj)
         if kinds:
             labels = sorted(kinds)
             text = ", ".join(k[3:] if k.startswith("en:") else k for k in labels[:8])
@@ -108,13 +165,16 @@ def answer(store: KnowledgeStore, question: str,
         return MRep.honest_unknown(question)
     m = _IS_A.match(q) or _IS_A2.match(q)
     if m:
-        subj, obj = norm(m.group(1)), norm(m.group(2))
-        if store.known_any(is_a, subj, obj):
-            return MRep.fact(question, "Yes", "IsA", subj, obj)
-        if store.transitive_any(is_a, subj, obj):
+        subj, obj = m.group(1), m.group(2)
+        pair = _known_pair(store, is_a, subj, obj)
+        if pair is not None:
+            s, o = pair
+            return MRep.fact(question, "Yes", "IsA", s, o)
+        if _transitive_any(store, is_a, subj, obj):
+            path = _transitive_path(store, subj, obj, is_a)
             return MRep.chain(question, "Yes", subj, "IsA", obj,
-                              [(s, "IsA", o) for s, o in _transitive_path(store, subj, obj, is_a)],
-                              _chain_confidence(_transitive_path_len(store, subj, obj, is_a)))
+                              [(s, "IsA", o) for s, o in path],
+                              _chain_confidence(len(path)))
         return MRep.honest_unknown(question)
     m = _HAS_PROP.match(q)
     if m:
@@ -128,35 +188,35 @@ def answer(store: KnowledgeStore, question: str,
 
 def _transitive_path(store: KnowledgeStore, start: str, target: str,
                      is_a: list[str], max_hops: int = 4) -> list[tuple[str, str]]:
-    """BFS path start -> ... -> target via is_a rels (for auditable reasoning)."""
+    """BFS path start -> ... -> target via is_a rels (for auditable reasoning),
+    across entity-form candidates (raw + en:-normalized)."""
     from collections import deque
-    frontier = deque([start])
-    parent: dict[str, str] = {}
-    seen = {start}
-    found = False
-    while frontier and not found:
-        s = frontier.popleft()
-        for e in store.successors_any(is_a, s):
-            if e == target:
-                parent[e] = s
-                found = True
-                break
-            if e not in seen:
-                seen.add(e)
-                parent[e] = s
-                frontier.append(e)
-    if not found:
+
+    def bfs(st, tg):
+        frontier = deque([st])
+        parent: dict[str, str] = {}
+        seen = {st}
+        while frontier:
+            s = frontier.popleft()
+            for e in store.successors_any(is_a, s):
+                if e == tg:
+                    parent[e] = s
+                    path = [e]
+                    while path[-1] != st:
+                        path.append(parent[path[-1]])
+                    path.reverse()
+                    return [(path[i], path[i + 1]) for i in range(len(path) - 1)]
+                if e not in seen:
+                    seen.add(e)
+                    parent[e] = s
+                    frontier.append(e)
         return []
-    path = [target]
-    while path[-1] != start:
-        path.append(parent[path[-1]])
-    path.reverse()
-    return [(path[i], path[i + 1]) for i in range(len(path) - 1)]
 
-
-def _transitive_path_len(store: KnowledgeStore, start: str, target: str,
-                         is_a: list[str]) -> int:
-    return len(_transitive_path(store, start, target, is_a))
+    for st, tg in _aligned_pairs(start, target):
+        path = bfs(st, tg)
+        if path:
+            return path
+    return []
 
 
 def main() -> None:

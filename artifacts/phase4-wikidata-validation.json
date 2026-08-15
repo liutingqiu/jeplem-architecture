@@ -1,0 +1,262 @@
+{
+  "protocol": "phase4 Wikidata knowledge-base validation (#43): after the facts join, report knowledge-base SCALE (facts per relation, distinct entities, labels), run the G-K gate (3 seeds) and show REAL query demos (facts sampled from the DB, asked as natural questions, answered by the language interface).",
+  "db": "D:\\Documents\\探索新架构\\.claude\\worktrees\\sweet-wilbur-f3b366\\data\\knowledge\\wikidata.db",
+  "scale": {
+    "labels": 76837633,
+    "facts": 132108788,
+    "per_rel": {
+      "P279": {
+        "edges": 3827603,
+        "subjects": 3184238,
+        "objects": 205012
+      },
+      "P31": {
+        "edges": 73012944,
+        "subjects": 68356287,
+        "objects": 76831
+      },
+      "P131": {
+        "edges": 7544649,
+        "subjects": 5785338,
+        "objects": 252027
+      },
+      "P17": {
+        "edges": 9640748,
+        "subjects": 9243618,
+        "objects": 3248
+      },
+      "P106": {
+        "edges": 9657182,
+        "subjects": 6228097,
+        "objects": 14454
+      },
+      "P361": {
+        "edges": 2961363,
+        "subjects": 2039813,
+        "objects": 315246
+      },
+      "P527": {
+        "edges": 1701831,
+        "subjects": 547037,
+        "objects": 947273
+      },
+      "P50": {
+        "edges": 23242701,
+        "subjects": 10162599,
+        "objects": 1621172
+      },
+      "P123": {
+        "edges": 519767,
+        "subjects": 499948,
+        "objects": 33213
+      }
+    },
+    "distinct_subjects": {},
+    "distinct_entities": 69792904
+  },
+  "query_demo": [
+    {
+      "question": "is (+)-(7S,8S)-guaiacylglycerol a guaiacylglycerol",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:(+)-(7S,8S)-guaiacylglycerol->guaiacylglycerol"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA((+)-(7S,8S)-guaiacylglycerol, guaiacylglycerol)]"
+    },
+    {
+      "question": "is (+)-2-chloropropionic acid a 2-chloropropionic acid",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:(+)-2-chloropropionic acid->2-chloropropionic acid"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA((+)-2-chloropropionic acid, 2-chloropropionic acid)]"
+    },
+    {
+      "question": "is (+)-1-Hydroxyboivinianic acid a 1-hydroxyboivinianic acid",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:(+)-1-Hydroxyboivinianic acid->1-hydroxyboivinianic acid"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA((+)-1-Hydroxyboivinianic acid, 1-hydroxyboivinianic acid)]"
+    },
+    {
+      "question": "is ( )-Dendroparishiol a chemical compound",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:( )-Dendroparishiol->chemical compound"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA(( )-Dendroparishiol, chemical compound)]"
+    },
+    {
+      "question": "is (+)-1-bromo-2-methylbutane a 1-Bromo-2-methylbutane",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:(+)-1-bromo-2-methylbutane->1-Bromo-2-methylbutane"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA((+)-1-bromo-2-methylbutane, 1-Bromo-2-methylbutane)]"
+    },
+    {
+      "question": "is ((Perfluorohexadecyl)methyl)oxirane a chemical compound",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:((Perfluorohexadecyl)methyl)oxirane->chemical compound"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA(((Perfluorohexadecyl)methyl)oxirane, chemical compound)]"
+    },
+    {
+      "question": "is !Kung a Kx'a",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:!Kung->Kx'a"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA(!Kung, Kx'a)]"
+    },
+    {
+      "question": "is (+)-(S)-alapyridaine a chemical compound",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:(+)-(S)-alapyridaine->chemical compound"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA((+)-(S)-alapyridaine, chemical compound)]"
+    },
+    {
+      "question": "is (+)-Ascosalitoxin a Ascosalitoxin",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:(+)-Ascosalitoxin->Ascosalitoxin"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA((+)-Ascosalitoxin, Ascosalitoxin)]"
+    },
+    {
+      "question": "is (+)-15-Kaurene a (-)-Isokaurene",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:(+)-15-Kaurene->(-)-Isokaurene"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA((+)-15-Kaurene, (-)-Isokaurene)]"
+    },
+    {
+      "question": "is (+)-Catechin hydrate a chemical compound",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:(+)-Catechin hydrate->chemical compound"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA((+)-Catechin hydrate, chemical compound)]"
+    },
+    {
+      "question": "is (+)-8-Phenylmenthyl chloroacetate a chemical compound",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:(+)-8-Phenylmenthyl chloroacetate->chemical compound"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA((+)-8-Phenylmenthyl chloroacetate, chemical compound)]"
+    },
+    {
+      "question": "is (+)-4-epi-cryptomeridiol a eudesmane sesquiterpenoid",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:(+)-4-epi-cryptomeridiol->eudesmane sesquiterpenoid"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA((+)-4-epi-cryptomeridiol, eudesmane sesquiterpenoid)]"
+    },
+    {
+      "question": "is !Xu a Khoisan",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:!Xu->Khoisan"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA(!Xu, Khoisan)]"
+    },
+    {
+      "question": "is 'de novo' GMP biosynthetic process a GMP biosynthetic process",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:'de novo' GMP biosynthetic process->GMP biosynthetic process"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA('de novo' GMP biosynthetic process, GMP biosynthetic process)]"
+    },
+    {
+      "question": "is ((Perfluorotetradecyl)methyl)oxirane a chemical compound",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:((Perfluorotetradecyl)methyl)oxirane->chemical compound"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA(((Perfluorotetradecyl)methyl)oxirane, chemical compound)]"
+    },
+    {
+      "question": "is (+)-3,9-Dihydroxy-4,7-megastigmadiene a megastigmane",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:(+)-3,9-Dihydroxy-4,7-megastigmadiene->megastigmane"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA((+)-3,9-Dihydroxy-4,7-megastigmadiene, megastigmane)]"
+    },
+    {
+      "question": "is (+)-2-aminothiazoline-4-carboxylic acid a 2-aminothiazoline-4-carboxylic acid",
+      "answer_type": "fact",
+      "answer": "Yes",
+      "confidence": 0.98,
+      "unknown": false,
+      "sources": [
+        "IsA:(+)-2-aminothiazoline-4-carboxylic acid->2-aminothiazoline-4-carboxylic acid"
+      ],
+      "rendered": "Yes (confidence 0.98).  [source: IsA((+)-2-aminothiazoline-4-carboxylic acid, 2-aminothiazoline-4-carboxylic acid)]"
+    }
+  ],
+  "gk_seeds_requested": [
+    41123,
+    41124,
+    41125
+  ]
+}

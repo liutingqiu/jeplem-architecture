@@ -1,6 +1,6 @@
 # PHASE4_KNOWLEDGE_LANGUAGE_REPORT — 阶段四近端里程碑 M1/M2/M3
 
-> 2026-08-14。阶段四(完整自研架构)近端三里程碑实现与验证记录。知识库(Wikidata)大 join 后台运行中,M1 全量验证待其完成后执行。
+> 2026-08-14 初稿;2026-08-15 **更新:Wikidata 灌入完成(1.32 亿事实),M1 全量验证通过**。阶段四(完整自研架构)近端三里程碑实现与验证记录。
 
 ## M2 语言机制(M-rep + 模板生成器)——完成
 
@@ -23,7 +23,27 @@
 | 41124 | 0.9973 | 0.9979 | 1.0 | 0.0388 | ✅ |
 | 41125 | 0.9963 | 0.9968 | 1.0 | 0.0388 | ✅ |
 
-判据:recall≥0.95 / 传递≥0.85 / 诚实≥0.98 / ECE≤0.10。产物 `artifacts/phase4-gk-knowledge-eval-{seed}.json`(在 ConceptNet 上;Wikidata join 完成后换库重跑)。
+判据:recall≥0.95 / 传递≥0.85 / 诚实≥0.98 / ECE≤0.10。产物 `artifacts/phase4-gk-knowledge-eval-{seed}.json`。
+
+### M1 Wikidata 全量验证(2026-08-15)——3 seed 全过 ✅
+
+**知识库**:`wikidata.db` 43GB——69.1 亿三元组摄入 → **1.32 亿事实**(insert OR IGNORE 去重 740 万跨块重复)、**6980 万 distinct 实体**、7683 万标签。关系分布:P31 instance-of 7300 万 / P50 author 2300 万 / P106 occupation 960 万 / P17 country 960 万 / P131 located-in 750 万 / P279 subclass 380 万 / P361 part-of 300 万 / P527 has-part 170 万 / P123 publisher 52 万。
+
+**G-K 门(wikidata.db,3 seed)**:
+
+| seed | recall | transitive | honest-unknown | ECE | gate |
+|---|---|---|---|---|---|
+| 41123 | 1.0000 | 1.0000 | 1.0 | 0.0394 | ✅ |
+| 41124 | 0.9997 | 0.9997 | 1.0 | 0.0394 | ✅ |
+| 41125 | 0.9997 | 0.9997 | 1.0 | 0.0394 | ✅ |
+
+**查询演示**:真实事实→自然问句→MRep 回答(置信 0.98 + 溯源),含点号化学标签正确解析(如 "is (+)-(7S,8S)-guaiacylglycerol a guaiacylglycerol → Yes")。产物 `artifacts/phase4-wikidata-validation.json`。
+
+**本日 parser 修复(3 个,影响 Wikidata recall 从 0.81 → 1.0)**:
+1. **实体点号截断**:`_ENTITY` 原为 `[^.?]+` → 含点号标签("spiro[4.5]dec")截断。改为 GREEDY 主语(`(?:[^?]+)`)+ LAZY 末实体(`(?:[^?]+?)`),靠结构锚定边界。
+2. **IGNORECASE 冠词误吞**:主语尾部大写 "A" 被 `an?`(IGNORECASE)误当冠词 → GREEDY 主语取最后一个有效冠词位。
+3. **原始大小写丢失**:整体 `.lower()` 使实体小写,匹配不到存库原大小写("Douglas Adams")→ 改 IGNORECASE 匹配原问题保留实体大小写。
+4. **跨形式 BFS 灾难**:交叉形式组合触发无提前退出的全图 BFS(ConceptNet 超时 >2min)→ 改**对齐组合**((raw,raw)+(norm,norm)),恢复 ~4s,两库 gate 均过。
 
 ## M3 自指闭环(G-S)——3 seed 全过,零假阳性
 
@@ -47,6 +67,6 @@
 
 ## 待办(不阻塞)
 
-- **Wikidata join 完成** → `run_gk_knowledge_eval.py --db wikidata.db` 跑全量 G-K + 知识库规模/查询验证。
+- ~~**Wikidata join 完成** → `run_gk_knowledge_eval.py --db wikidata.db` 跑全量 G-K + 知识库规模/查询验证~~ ✅ **2026-08-15 完成**(见上)。
 - M2 输入侧(自然语言 → M-rep)v1 为正则;更鲁棒解析器属流畅核心(M4/M5)。
 - Ollama 过渡皮层:等资源/阶段五空闲再挂(监控纪律)。

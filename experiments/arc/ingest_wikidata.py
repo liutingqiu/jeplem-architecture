@@ -66,6 +66,7 @@ def labels_mode(gz: Path, db: Path, max_triples: int) -> int:
     """Pass 1: build Q-ID -> English label map, written to SQLite INCREMENTALLY
     (memory-bounded; the in-memory dict of ~10M labels was RAM-unsafe)."""
     conn = sqlite3_connect(db)
+    conn.execute("PRAGMA journal_mode=DELETE")  # disk-safe: no WAL blowup
     conn.execute("CREATE TABLE IF NOT EXISTS labels (q TEXT PRIMARY KEY, label TEXT) WITHOUT ROWID")
     t0 = time.time()
     n = 0
@@ -122,12 +123,15 @@ def facts_mode(gz: Path, db: Path, max_triples: int) -> dict:
     drop it before a fresh run so stale rows do not accumulate.
     """
     conn = sqlite3_connect(db)
+    conn.execute("PRAGMA journal_mode=DELETE")  # disk-safe: no WAL blowup
     conn.execute("DROP TABLE IF EXISTS rawfacts")
     conn.execute("CREATE TABLE rawfacts (pshort TEXT, sq TEXT, oq TEXT)")
+    # facts table (schema the KnowledgeStore expects) -- built here on the one
+    # connection used for the join (single-connection avoids lock contention)
+    conn.execute("CREATE TABLE IF NOT EXISTS facts (rel TEXT, start TEXT, end TEXT, "
+                 "PRIMARY KEY (rel, start, end)) WITHOUT ROWID")
+    conn.execute("DELETE FROM facts")  # idempotent full run: start clean
     conn.commit()
-    store = KnowledgeStore(db)
-    store.conn.execute("DELETE FROM facts")  # idempotent full run: start clean
-    store.conn.commit()
 
     t0 = time.time()
     n = 0
@@ -165,27 +169,50 @@ def facts_mode(gz: Path, db: Path, max_triples: int) -> dict:
         conn.commit()
     print(f"  scan done: {n:,} triples, spooled {spooled:,} in {time.time()-t0:.0f}s", flush=True)
 
-    # 2b: indexed merge joins -> readable facts (sequential, disk-friendly)
-    conn.execute("CREATE INDEX IF NOT EXISTS idx_rf_sq ON rawfacts(sq)")
-    conn.execute("CREATE INDEX IF NOT EXISTS idx_rf_oq ON rawfacts(oq)")
-    conn.commit()
+    # 2b: batch-IN label resolution (fast, disk-safe).  Stream rawfacts in
+    # chunks, resolve the chunk's distinct sq/oq labels via indexed IN queries
+    # (good cache locality -- NOT 170us random lookups), insert readable facts.
+    # No rawfacts indexes (saves ~15GB) and no INSERT...SELECT (whose plan
+    # without ANALYZE became a 17h nested loop).  Single connection: no locks.
     j0 = time.time()
-    cur = store.conn.execute(
-        """
-        INSERT OR IGNORE INTO facts (rel, start, end)
-        SELECT rf.pshort, l1.label, l2.label
-        FROM rawfacts rf
-        JOIN labels l1 ON l1.q = rf.sq
-        JOIN labels l2 ON l2.q = rf.oq
-        """
-    )
-    facts = cur.rowcount
-    store.conn.commit()
+    facts = 0
+    cur = conn.execute("SELECT pshort, sq, oq FROM rawfacts")
+    while True:
+        rows = cur.fetchmany(50_000)
+        if not rows:
+            break
+        qs: set[str] = set()
+        for _, sq, oq in rows:
+            qs.add(sq)
+            qs.add(oq)
+        labels: dict[str, str] = {}
+        ql = list(qs)
+        for i in range(0, len(ql), 5000):
+            chunk = ql[i:i + 5000]
+            ph = ",".join("?" * len(chunk))
+            labels.update(conn.execute(
+                f"SELECT q, label FROM labels WHERE q IN ({ph})", chunk).fetchall())
+        edges: list[tuple[str, str, str]] = []
+        for pshort, sq, oq in rows:
+            sl, ol = labels.get(sq), labels.get(oq)
+            if sl and ol:
+                edges.append((pshort, sl, ol))
+        conn.executemany("INSERT OR IGNORE INTO facts VALUES (?,?,?)", edges)
+        conn.commit()
+        facts += len(edges)
+        if facts % 5_000_000 < 50_000:
+            print(f"  join: {facts:,} facts in {time.time()-j0:.0f}s", flush=True)
     join_s = time.time() - j0
-    store.close()
+    # query indexes the KnowledgeStore needs
+    t1 = time.time()
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_facts_start ON facts(start)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_facts_rel ON facts(rel)")
+    conn.commit()
+    idx_s = time.time() - t1
     conn.close()
     return {"triples_scanned": n, "spooled": spooled, "facts_ingested": facts,
-            "spool_seconds": round(time.time() - t0, 1), "join_seconds": round(join_s, 1)}
+            "spool_seconds": round(time.time() - t0, 1), "join_seconds": round(join_s, 1),
+            "index_seconds": round(idx_s, 1)}
 
 
 def main() -> None:

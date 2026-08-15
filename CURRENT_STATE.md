@@ -2,7 +2,7 @@
 
 > 用途：让新会话用几分钟读完"项目现在在哪、下一步做什么"，避免重读历史大文件。
 > 更新规则：每个阶段闭环后更新本节头部；历史细节写进 NIGHT_RUN/各 REPORT，不搬进本文件。
-> 最后更新：2026-08-14（**阶段四近端里程碑 M1/M2/M3 完成**：M-rep 语言机制 + G-K 知识引擎判据 3 seed 全过(recall 0.997/诚实 1.0/ECE 0.039) + 自指闭环 3 seed 全过(自驱动修订延迟 0 vs 非驱动 2,零假阳性)；Wikidata 大 join 后台运行中 → M1 全量验证；阶段四白皮书见 JEPLM_PHASE4_WHITEPAPER.md，阶段五批判性白皮书已移交另一工作区）
+> 最后更新：2026-08-15（**阶段四 M1 知识预训练完成 + 阶段六 ARC 集成决战完成**：Wikidata 灌入完成——69.1 亿三元组→1.32 亿事实/6980 万实体，G-K 门 3 seed 全过(recall 0.999-1.0/诚实 1.0/ECE 0.039，ConceptNet+Wikidata 双库)；阶段六 #44 决战——机制×真实经验集成后真实 ARC 覆盖上限仍 ~6%(schema union 6.0%/潜因 +1 任务/知识驱动 instance-of 原子)，零假事实，终局证伪条件 4 候选坐实，详见 `JEPLM_PHASE6_ARC_INTEGRATION_REPORT.md`；233 回归 OK(3 skipped)）
 
 ---
 

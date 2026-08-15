@@ -1,0 +1,129 @@
+{
+  "protocol": "phase6 G4 port to the REAL Wikidata KB: mixed-relation transitive class membership latent cause (X --P279--> ... --P279--> Y --P31--> C  implies  X is an instance of C).  Held-out P31 edges recovered by the latent cause vs exact-match baseline (0).  Traceable source paths.",
+  "results": [
+    {
+      "seed": 444,
+      "classes_sampled": 179,
+      "train_instances": 159560,
+      "heldout_edges": 39968,
+      "recovered_by_latent_cause": 10,
+      "recovery_rate": 0.0003,
+      "no_knowledge_baseline": 0.0,
+      "traceable_sample": [
+        {
+          "instance": "(+)-homotyrosine",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+/-)-homotyrosine",
+          "path_hint": "(+)-homotyrosine --P279--> ... --P279--> (+/-)-homotyrosine --P31--> type of chemical entity"
+        },
+        {
+          "instance": "(+)-adomeglivant",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+/-)-adomeglivant",
+          "path_hint": "(+)-adomeglivant --P279--> ... --P279--> (+/-)-adomeglivant --P31--> type of chemical entity"
+        },
+        {
+          "instance": "(2R,3S)-epoxiconazole",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+/-)-epoxiconazole",
+          "path_hint": "(2R,3S)-epoxiconazole --P279--> ... --P279--> (+/-)-epoxiconazole --P31--> type of chemical entity"
+        },
+        {
+          "instance": "(+)-penicillamine hydrochloride",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+/-)-penicillamine hydrochloride",
+          "path_hint": "(+)-penicillamine hydrochloride --P279--> ... --P279--> (+/-)-penicillamine hydrochloride --P31--> type of chemical entity"
+        },
+        {
+          "instance": "(-)-3-hydroxymandelic acid",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+/-)-3-hydroxymandelic acid",
+          "path_hint": "(-)-3-hydroxymandelic acid --P279--> ... --P279--> (+/-)-3-hydroxymandelic acid --P31--> type of chemical entity"
+        }
+      ]
+    },
+    {
+      "seed": 555,
+      "classes_sampled": 179,
+      "train_instances": 159560,
+      "heldout_edges": 39968,
+      "recovered_by_latent_cause": 7,
+      "recovery_rate": 0.0002,
+      "no_knowledge_baseline": 0.0,
+      "traceable_sample": [
+        {
+          "instance": "(2S)-2-methylbutanimidic acid",
+          "class": "type of chemical entity",
+          "via_ancestor": "(2R)-2-Methylbutanamide",
+          "path_hint": "(2S)-2-methylbutanimidic acid --P279--> ... --P279--> (2R)-2-Methylbutanamide --P31--> type of chemical entity"
+        },
+        {
+          "instance": "(+)-rotigotine",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+/-)-rotigotine",
+          "path_hint": "(+)-rotigotine --P279--> ... --P279--> (+/-)-rotigotine --P31--> type of chemical entity"
+        },
+        {
+          "instance": "(-)-codamine",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+/-)-codamine",
+          "path_hint": "(-)-codamine --P279--> ... --P279--> (+/-)-codamine --P31--> type of chemical entity"
+        },
+        {
+          "instance": "(-)-2-octylamine hydrochloride",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+/-)-2-octylamine hydrochloride",
+          "path_hint": "(-)-2-octylamine hydrochloride --P279--> ... --P279--> (+/-)-2-octylamine hydrochloride --P31--> type of chemical entity"
+        },
+        {
+          "instance": "(+)-buxafuranamide",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+)-Buxafuranamide",
+          "path_hint": "(+)-buxafuranamide --P279--> ... --P279--> (+)-Buxafuranamide --P31--> type of chemical entity"
+        }
+      ]
+    },
+    {
+      "seed": 666,
+      "classes_sampled": 179,
+      "train_instances": 159560,
+      "heldout_edges": 39968,
+      "recovered_by_latent_cause": 15,
+      "recovery_rate": 0.0004,
+      "no_knowledge_baseline": 0.0,
+      "traceable_sample": [
+        {
+          "instance": "(2S,3R)-epoxiconazole",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+/-)-epoxiconazole",
+          "path_hint": "(2S,3R)-epoxiconazole --P279--> ... --P279--> (+/-)-epoxiconazole --P31--> type of chemical entity"
+        },
+        {
+          "instance": "(-)-codamine",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+/-)-codamine",
+          "path_hint": "(-)-codamine --P279--> ... --P279--> (+/-)-codamine --P31--> type of chemical entity"
+        },
+        {
+          "instance": "(+)-erdin",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+/-)-erdin",
+          "path_hint": "(+)-erdin --P279--> ... --P279--> (+/-)-erdin --P31--> type of chemical entity"
+        },
+        {
+          "instance": "(+)-homotyrosine",
+          "class": "type of chemical entity",
+          "via_ancestor": "(+/-)-homotyrosine",
+          "path_hint": "(+)-homotyrosine --P279--> ... --P279--> (+/-)-homotyrosine --P31--> type of chemical entity"
+        },
+        {
+          "instance": "(3R,5R)-3,5-Heptanediol",
+          "class": "type of chemical entity",
+          "via_ancestor": "(3S,5S)-3,5-Heptanediol",
+          "path_hint": "(3R,5R)-3,5-Heptanediol --P279--> ... --P279--> (3S,5S)-3,5-Heptanediol --P31--> type of chemical entity"
+        }
+      ]
+    }
+  ],
+  "verdict": "G4-real result: see per-seed recovery rates (RECORD, not a gate)."
+}

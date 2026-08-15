@@ -1,0 +1,24 @@
+{
+  "protocol": "phase4_gk_knowledge_eval_v1: knowledge engine (MRep) on G-K gate -- recall(ingested IsA), transitive(2-3 hop), honest-unknown(random negatives), confidence ECE(10 bins). Gate: recall>=0.95, honest>=0.98, transitive>=0.85, ECE<=0.10.",
+  "seed": 41124,
+  "results": {
+    "n_sampled_starts": 3000,
+    "exact_answered": 3000,
+    "recall": 0.9997,
+    "transitive_answered": 3000,
+    "transitive": 0.9997,
+    "unknown_answered": 3000,
+    "honest_unknown": 1.0,
+    "calibration_n": 5998,
+    "ece": 0.0394,
+    "seconds": 4.0
+  },
+  "gate": {
+    "recall": 0.95,
+    "honest_unknown": 0.98,
+    "transitive": 0.85,
+    "ece": 0.1
+  },
+  "gate_pass": true,
+  "artifact": "artifacts\\phase4-gk-wikidata-41124.json"
+}

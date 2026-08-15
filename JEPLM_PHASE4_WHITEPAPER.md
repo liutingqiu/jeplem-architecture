@@ -43,9 +43,11 @@
 
 ## 四、里程碑 M1-M6（逐步闭环，最便宜的先行）
 
-### M1：知识预训练（G-K）
+### M1：知识预训练（G-K）——**知识库验证已完成（2026-08-15）**
 - **内容**：Wikidata join 完成后 → 知识库验证（规模/查询）；设计语义层训练目标：问句→知识查询映射（自举 + 领域语料）、多跳推理、置信校准（复用 self-head）、诚实无知。训练小接口，产出可用的**知识引擎**。
-- **交付**：知识引擎（精确检索 + 推理 + 置信 + 诚实），`/knowledge` API 雏形。
+- **✅ 交付（已验证）**：**真实 Wikidata 知识库 1.32 亿事实、6980 万 distinct 实体、7683 万标签**（69.1 亿三元组摄入；P31 instance-of 7300 万边 / P50 author 2300 万边 / P279 subclass 380 万边等）。G-K 门 **3 seed 全过**：recall **0.999** / transitive **0.999** / honest-unknown **1.0** / confidence ECE **0.039**（达标线 0.95/0.85/0.98/0.10）。语言接口（`knowledge_query.answer`→MRep）在真实事实上回答自然问句（置信 0.98 + 溯源），含点号化学标签正确解析。
+- **关键修复**：查询层实体匹配需兼容 Wikidata 原始大小写标签 + 含点号标签（`_ENTITY` GREEDY 主语 / LAZY 末实体 / 双形式容错），修复前 recall 0.81（解析器截断），修复后 1.0。
+- **证据**：`artifacts/phase4-wikidata-validation.json` + `phase4-gk-wikidata-{41123,41124,41125}.json` + `experiments/arc/run_gk_knowledge_eval.py`。
 
 ### M2：语言机制（G-L）——内核会说话
 - **内容**：M-rep（意义表征 schema：回答类型 fact/chain/unknown/explanation/revision-note + 实体 + 关系 + 置信 + 来源 + 推理步骤）→ 模板生成器（文法 + 槽填充）实现为自然语言。**零训练，纯机制**。Ollama 挂为过渡皮层（补流畅，临时脚手架，非最终依赖）。
@@ -97,7 +99,7 @@
 
 ## 九、立即下一步（M1）
 
-1. Wikidata join 完成 → 知识库验证（规模/查询演示）。
+1. ~~Wikidata join 完成 → 知识库验证（规模/查询演示）~~ ✅ **已完成（2026-08-15）**：1.32 亿事实 / 6980 万实体 / G-K 3 seed 全过（recall 0.999 / transitive 0.999 / honest 1.0 / ECE 0.039）。
 2. 设计语义层训练目标协议（G-K 判据细化：检索映射/多跳/置信/诚实）。
 3. 领域语料盘点（知识问答/报告域）。
 4. M1 里程碑启动。

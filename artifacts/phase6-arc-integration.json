@@ -1,0 +1,101 @@
+{
+  "part": "A",
+  "protocol": "phase6 decisive ARC integration (#44): apply latent-cause creation (M2) + grounded manifold (O1) to REAL ARC-1 tasks.  Static primitive library ceilings at ~3-5%; the mechanism reads a NEW colour/permutation latent cause from a task's own demos when existing structure fails.  RECORDING milestone: before/after coverage + mechanism-only solutions + zero false facts, 3 seeds.",
+  "baseline_note": "arc1-coverage.json static baseline: training 0.0325 test_correct, evaluation 0.0025.  mech_only_rate = tasks solved ONLY by the mechanism.",
+  "false_facts_zero_all_seeds": true,
+  "per_seed": [
+    {
+      "seed": 444,
+      "arc1_training.json": {
+        "n_tasks": 400,
+        "static_train_fit": 21,
+        "static_test_correct": 21,
+        "mech_train_fit": 1,
+        "mech_test_correct": 1,
+        "combined_test_correct": 22,
+        "mech_false_facts": 0,
+        "mech_sources": {
+          "custom_color": 1
+        },
+        "static_rate": 0.052,
+        "mech_only_rate": 0.003,
+        "combined_rate": 0.055
+      },
+      "arc1_evaluation.json": {
+        "n_tasks": 400,
+        "static_train_fit": 2,
+        "static_test_correct": 2,
+        "mech_train_fit": 0,
+        "mech_test_correct": 0,
+        "combined_test_correct": 2,
+        "mech_false_facts": 0,
+        "mech_sources": {},
+        "static_rate": 0.005,
+        "mech_only_rate": 0.0,
+        "combined_rate": 0.005
+      }
+    },
+    {
+      "seed": 555,
+      "arc1_training.json": {
+        "n_tasks": 400,
+        "static_train_fit": 21,
+        "static_test_correct": 21,
+        "mech_train_fit": 1,
+        "mech_test_correct": 1,
+        "combined_test_correct": 22,
+        "mech_false_facts": 0,
+        "mech_sources": {
+          "custom_color": 1
+        },
+        "static_rate": 0.052,
+        "mech_only_rate": 0.003,
+        "combined_rate": 0.055
+      },
+      "arc1_evaluation.json": {
+        "n_tasks": 400,
+        "static_train_fit": 2,
+        "static_test_correct": 2,
+        "mech_train_fit": 0,
+        "mech_test_correct": 0,
+        "combined_test_correct": 2,
+        "mech_false_facts": 0,
+        "mech_sources": {},
+        "static_rate": 0.005,
+        "mech_only_rate": 0.0,
+        "combined_rate": 0.005
+      }
+    },
+    {
+      "seed": 666,
+      "arc1_training.json": {
+        "n_tasks": 400,
+        "static_train_fit": 21,
+        "static_test_correct": 21,
+        "mech_train_fit": 1,
+        "mech_test_correct": 1,
+        "combined_test_correct": 22,
+        "mech_false_facts": 0,
+        "mech_sources": {
+          "custom_color": 1
+        },
+        "static_rate": 0.052,
+        "mech_only_rate": 0.003,
+        "combined_rate": 0.055
+      },
+      "arc1_evaluation.json": {
+        "n_tasks": 400,
+        "static_train_fit": 2,
+        "static_test_correct": 2,
+        "mech_train_fit": 0,
+        "mech_test_correct": 0,
+        "combined_test_correct": 2,
+        "mech_false_facts": 0,
+        "mech_sources": {},
+        "static_rate": 0.005,
+        "mech_only_rate": 0.0,
+        "combined_rate": 0.005
+      }
+    }
+  ]
+}
