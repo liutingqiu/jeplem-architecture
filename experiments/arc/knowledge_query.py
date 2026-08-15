@@ -74,6 +74,9 @@ _WHAT_OCC = re.compile(rf"^(?:what\s+is\s+the\s+occupation\s+of\s+|what\s+does\s
 _WHAT_COUNTRY = re.compile(rf"^what\s+country\s+is\s+({_EL}?)\s+in[.?]?$", re.IGNORECASE)
 _WHAT_PARTOF = re.compile(rf"^what\s+is\s+{_ART}\s*({_EL}?)\s+part\s+of[.?]?$", re.IGNORECASE)
 _WHAT_HAS_PART = re.compile(rf"^what\s+are\s+the\s+parts?\s+of\s+({_EL}?)[.?]?$", re.IGNORECASE)
+# compound / compositional questions (multi-hop over relations)
+_COMPOUND_OCC = re.compile(rf"^what\s+is\s+the\s+occupation\s+of\s+the\s+author\s+of\s+({_EL}?)[.?]?$", re.IGNORECASE)
+_COMPOUND_WHERE = re.compile(rf"^where\s+is\s+the\s+author\s+of\s+({_EL}?)\s+from[.?]?$", re.IGNORECASE)
 
 # confidence model: exact fact near-certain, transitive decays with chain length
 EXACT_CONF = 0.98
@@ -150,6 +153,37 @@ def answer(store: KnowledgeStore, question: str,
                     relations=[(relname, subj, k) for k in labels],
                     reasoning=[f"{subj} {verb} {k[3:] if k.startswith('en:') else k}"
                                for k in labels], sources=reps)
+
+    # ---- compound / compositional questions FIRST (most specific) ----
+    def _compound(subj, hop1, hop1name, hop2, hop2name, verb):
+        mids = store.successors_any(hop1, subj)
+        facts = []
+        for mid in mids[:6]:
+            for e2 in store.successors_any(hop2, mid)[:4]:
+                facts.append((mid, e2))
+        if not facts:
+            return None
+        labels = sorted({e2 for _, e2 in facts})[:8]
+        text = ", ".join(labels)
+        reps = [Source(hop2name, subj, e2) for e2 in labels]
+        reason = [f"{subj} {verb} {e2} (via {mid})" for mid, e2 in facts[:6]]
+        return MRep(answer_type=EXPLANATION, question=question, answer=text,
+                    confidence=0.9, entities=[subj] + labels,
+                    relations=[(hop2name, subj, e2) for e2 in labels],
+                    reasoning=reason, sources=reps)
+
+    m = _COMPOUND_OCC.match(q)
+    if m:
+        rep = _compound(m.group(1), ["P50"], "Author", ["P106"], "Occupation", "is an author who works as")
+        if rep is not None:
+            return rep
+        return MRep.honest_unknown(question)
+    m = _COMPOUND_WHERE.match(q)
+    if m:
+        rep = _compound(m.group(1), ["P50"], "Author", ["P17"], "Country", "is an author from")
+        if rep is not None:
+            return rep
+        return MRep.honest_unknown(question)
 
     m = _WHO_WROTE.match(q)
     if m:
