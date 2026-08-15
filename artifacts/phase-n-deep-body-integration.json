@@ -1,0 +1,30 @@
+{
+  "protocol": "Deep body integration: knowledge is a FIRST-CLASS source in the body's metacognitive loop -- the meta-router learns when to trust memory / belief / KNOWLEDGE, and the self-head predicts the routed answer's correctness over the combined reasoning.  Gate: routed acc >= 0.8, self-ECE <= 0.25, knowledge routing correct >= 0.5, 3 seeds.",
+  "results": [
+    {
+      "seed": 444,
+      "routed_acc": 0.839,
+      "knowledge_routing_correct": 1.0,
+      "self_ece_over_combined": 0.199,
+      "ledger_entries": 60,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "routed_acc": 0.839,
+      "knowledge_routing_correct": 1.0,
+      "self_ece_over_combined": 0.188,
+      "ledger_entries": 60,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "routed_acc": 0.839,
+      "knowledge_routing_correct": 1.0,
+      "self_ece_over_combined": 0.149,
+      "ledger_entries": 60,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "DEEP-BODY PASS: knowledge is COUPLED into the body's core -- the router learns WHEN to trust it, and the self-model predicts the correctness of the combined reasoning.  The architecture, perfected (not hosted): knowledge feeds metacognition."
+}
