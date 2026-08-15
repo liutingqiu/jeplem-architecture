@@ -11,7 +11,7 @@
       "samples": [
         {
           "q": "is 'nduja a product",
-          "answer": "the occupation of 'nduja is product",
+          "answer": "a 'nduja is a product",
           "entities": [
             "'nduja",
             "product"
@@ -19,7 +19,7 @@
         },
         {
           "q": "is #HurtigJoakimLøbet 5.0 a DCU licensløb",
-          "answer": "the occupation of #HurtigJoakimLøbet 5.0 is DCU licensløb",
+          "answer": "a #HurtigJoakimLøbet 5.0 is a DCU licensløb",
           "entities": [
             "#HurtigJoakimLøbet 5.0",
             "DCU licensløb"
@@ -27,7 +27,7 @@
         },
         {
           "q": "is (&#177;)-4'-Methoxyflavanone a flavanone",
-          "answer": "the occupation of (&#177;)-4'-Methoxyflavanone is flavanone",
+          "answer": "a (&#177;)-4'-Methoxyflavanone is a flavanone",
           "entities": [
             "(&#177;)-4'-Methoxyflavanone",
             "flavanone"
@@ -35,7 +35,7 @@
         },
         {
           "q": "is #vBIB a occurrence",
-          "answer": "#vBIB is a occurrence",
+          "answer": "#vBIB is classified as a occurrence",
           "entities": [
             "#vBIB",
             "occurrence"
@@ -43,7 +43,7 @@
         },
         {
           "q": "is 'Are'are a Malaita",
-          "answer": "'Are'are is a Malaita",
+          "answer": "'Are'are is classified as a Malaita",
           "entities": [
             "'Are'are",
             "Malaita"
@@ -51,7 +51,7 @@
         },
         {
           "q": "is 't Hooft loop a observable",
-          "answer": "the occupation of 't Hooft loop is observable",
+          "answer": "a 't Hooft loop is a observable",
           "entities": [
             "'t Hooft loop",
             "observable"
@@ -85,7 +85,7 @@
       "samples": [
         {
           "q": "is 't Hooft–Polyakov monopole a magnetic monopole",
-          "answer": "the occupation of 't Hooft–Polyakov monopole is magnetic monopole",
+          "answer": "a 't Hooft–Polyakov monopole counts as a magnetic monopole",
           "entities": [
             "'t Hooft–Polyakov monopole",
             "magnetic monopole"
@@ -93,7 +93,7 @@
         },
         {
           "q": "is 'otai a drink",
-          "answer": "the occupation of 'otai is drink",
+          "answer": "a 'otai counts as a drink",
           "entities": [
             "'otai",
             "drink"
@@ -101,7 +101,7 @@
         },
         {
           "q": "is (+)-1-octen-3-ol a hydroxy fatty acid",
-          "answer": "the occupation of (+)-1-octen-3-ol is hydroxy fatty acid",
+          "answer": "a (+)-1-octen-3-ol counts as a hydroxy fatty acid",
           "entities": [
             "(+)-1-octen-3-ol",
             "hydroxy fatty acid"
@@ -109,7 +109,7 @@
         },
         {
           "q": "is (+)-1-bromo-2-methylbutane a 1-bromo-2-methylbutane",
-          "answer": "the occupation of (+)-1-bromo-2-methylbutane is 1-bromo-2-methylbutane",
+          "answer": "a (+)-1-bromo-2-methylbutane counts as a 1-bromo-2-methylbutane",
           "entities": [
             "(+)-1-bromo-2-methylbutane",
             "1-bromo-2-methylbutane"
@@ -117,7 +117,7 @@
         },
         {
           "q": "is (+)-1-Hydroxyboivinianic acid a 1-hydroxyboivinianic acid",
-          "answer": "the occupation of (+)-1-Hydroxyboivinianic acid is 1-hydroxyboivinianic acid",
+          "answer": "a (+)-1-Hydroxyboivinianic acid counts as a 1-hydroxyboivinianic acid",
           "entities": [
             "(+)-1-Hydroxyboivinianic acid",
             "1-hydroxyboivinianic acid"
@@ -125,7 +125,7 @@
         },
         {
           "q": "is 'Ota 'ika a seafood dish",
-          "answer": "the occupation of 'Ota 'ika is seafood dish",
+          "answer": "a 'Ota 'ika counts as a seafood dish",
           "entities": [
             "'Ota 'ika",
             "seafood dish"
@@ -159,7 +159,7 @@
       "samples": [
         {
           "q": "is !Xu a Khoisan",
-          "answer": "the occupation of !Xu is Khoisan",
+          "answer": "a !Xu is a Khoisan",
           "entities": [
             "!Xu",
             "Khoisan"
@@ -167,7 +167,7 @@
         },
         {
           "q": "is (+)-1-phenyl-2-propanol a 1-phenyl-2-propanol",
-          "answer": "the occupation of (+)-1-phenyl-2-propanol is 1-phenyl-2-propanol",
+          "answer": "a (+)-1-phenyl-2-propanol is a 1-phenyl-2-propanol",
           "entities": [
             "(+)-1-phenyl-2-propanol",
             "1-phenyl-2-propanol"
@@ -175,7 +175,7 @@
         },
         {
           "q": "is (+)-1-bromo-2-methylbutane a 1-Bromo-2-methylbutane",
-          "answer": "the occupation of (+)-1-bromo-2-methylbutane is 1-Bromo-2-methylbutane",
+          "answer": "a (+)-1-bromo-2-methylbutane is a 1-Bromo-2-methylbutane",
           "entities": [
             "(+)-1-bromo-2-methylbutane",
             "1-Bromo-2-methylbutane"
@@ -183,7 +183,7 @@
         },
         {
           "q": "is (&#177;)-Voriconazole a chemical compound",
-          "answer": "the occupation of (&#177;)-Voriconazole is chemical compound",
+          "answer": "a (&#177;)-Voriconazole is a chemical compound",
           "entities": [
             "(&#177;)-Voriconazole",
             "chemical compound"
@@ -191,7 +191,7 @@
         },
         {
           "q": "is (+)-1-phenyl-3-acetoxybutane a 1-phenyl-3-acetoxybutane",
-          "answer": "the occupation of (+)-1-phenyl-3-acetoxybutane is 1-phenyl-3-acetoxybutane",
+          "answer": "a (+)-1-phenyl-3-acetoxybutane is a 1-phenyl-3-acetoxybutane",
           "entities": [
             "(+)-1-phenyl-3-acetoxybutane",
             "1-phenyl-3-acetoxybutane"
@@ -199,7 +199,7 @@
         },
         {
           "q": "is 'uli'uli a shekere",
-          "answer": "the occupation of 'uli'uli is shekere",
+          "answer": "a 'uli'uli is a shekere",
           "entities": [
             "'uli'uli",
             "shekere"
