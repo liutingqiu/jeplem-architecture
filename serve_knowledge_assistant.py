@@ -82,10 +82,7 @@ class Handler(BaseHTTPRequestHandler):
                 "note": "JEPLM knowledge engine -- 1.32亿-fact Wikidata base, exact + transitive, honest unknowns",
             })
         if u.path == "/":
-            html = ("<h1>JEPLM 知识助手</h1>"
-                    "<p>问真实问题,比如: <code>/ask?q=is a dog a mammal</code></p>"
-                    "<p>或 <code>/ask?q=what is an apple</code></p>"
-                    f"<p>知识库规模: {_stats['facts']:,}+ facts (全量 132,108,788)</p>")
+            html = _UI_PAGE
             body = html.encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -94,6 +91,44 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(body)
             return
         return self._json({"error": "not found", "paths": ["/ask?q=...", "/stats", "/health"]}, 404)
+
+
+_UI_PAGE = """<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8">
+<title>JEPLM 知识助手</title>
+<style>
+ body { font-family: system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; background:#0f1115; color:#e8e8e8; }
+ h1 { font-size: 22px; } .sub { color:#9aa; font-size: 13px; }
+ input { width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #334; background:#1a1d24; color:#eee; box-sizing:border-box; }
+ button { margin-top: 10px; padding: 10px 22px; font-size: 15px; border-radius: 8px; border: 0; background:#2d6cdf; color:#fff; cursor:pointer; }
+ .ans { margin-top: 16px; padding: 14px; background:#1a1d24; border-radius: 8px; white-space: pre-wrap; font-size: 15px; line-height: 1.5; }
+ .meta { color:#9aa; font-size: 12px; margin-top: 8px; }
+ .examples { color:#7ab; font-size: 13px; margin-top: 14px; }
+ .examples span { cursor: pointer; border-bottom: 1px dotted #7ab; margin-right: 10px; }
+</style></head><body>
+<h1>JEPLM 知识助手</h1>
+<div class="sub">底层:1.32 亿事实 Wikidata 知识库 · 精确 + 传递推理 · 诚实(不知道就说不知道)· 带置信与溯源</div>
+<div style="margin-top:16px"><input id="q" placeholder="问点什么,比如: is a dog a mammal" onkeydown="if(event.key==='Enter')ask()"></div>
+<button onclick="ask()">提问</button>
+<div class="examples">
+  试:<span onclick="set('what is the occupation of Albert Einstein')">爱因斯坦的职业</span>
+  <span onclick="set('who wrote Hamlet')">哈姆雷特作者</span>
+  <span onclick="set('what country is Paris in')">巴黎的国家</span>
+  <span onclick="set('is a dog a planet')">狗是行星吗(诚实)</span>
+</div>
+<div class="ans" id="a" style="display:none"></div>
+<div class="meta" id="m"></div>
+<script>
+function set(t){ document.getElementById('q').value=t; ask(); }
+async function ask(){
+  const q=document.getElementById('q').value.trim(); if(!q) return;
+  const r=await fetch('/ask?q='+encodeURIComponent(q)); const d=await r.json();
+  const a=document.getElementById('a'); a.style.display='block';
+  a.textContent=d.answer || d.error || 'no answer';
+  document.getElementById('m').textContent='type: '+d.type+' · unknown: '+d.unknown
+    +' · confidence: '+(d.confidence??'-');
+}
+</script></body></html>"""
 
 
 def main() -> None:
