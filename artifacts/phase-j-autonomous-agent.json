@@ -1,0 +1,36 @@
+{
+  "protocol": "Phase-J autonomous agent: only a primitive VALUE ('plant-based food is good') is baked in; the agent DERIVES its goal from knowledge (which objects are plant-based food, transitive P31/P279), then perceives, plans, acts, self-corrects.  Gate: completeness >= 0.9, zero non-valuable collections, no-knowledge baseline fails.",
+  "results": [
+    {
+      "seed": 444,
+      "worlds_acted": 10,
+      "completeness": 1.0,
+      "valuable_collected": 36,
+      "total_valuable": 36,
+      "non_valuable_collected": 0,
+      "no_knowledge_baseline_wrong": 15,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "worlds_acted": 10,
+      "completeness": 1.0,
+      "valuable_collected": 37,
+      "total_valuable": 37,
+      "non_valuable_collected": 0,
+      "no_knowledge_baseline_wrong": 19,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "worlds_acted": 10,
+      "completeness": 1.0,
+      "valuable_collected": 36,
+      "total_valuable": 36,
+      "non_valuable_collected": 0,
+      "no_knowledge_baseline_wrong": 15,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PHASE-J PASS: the agent's goal EMERGES from value + knowledge, not from an external instruction -- it wants something (derived), figures out how to get it, and does it.  An autonomous agent."
+}
