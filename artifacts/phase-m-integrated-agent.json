@@ -1,0 +1,33 @@
+{
+  "protocol": "Phase-M integrated autonomous agent: value + knowledge (which are plant-based food) + learned perception + predictive world model + self-learned velocities + planning/action, in a dynamic partially-observable world.  Gate: completeness >= 0.75, zero non-valuable, and >= the no-model baseline, 3 seeds.",
+  "results": [
+    {
+      "seed": 444,
+      "completeness": 0.778,
+      "no_model_completeness": 0.778,
+      "valuable_collected": 7,
+      "total_valuable": 9,
+      "non_valuable_collected": 0,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "completeness": 0.889,
+      "no_model_completeness": 0.556,
+      "valuable_collected": 8,
+      "total_valuable": 9,
+      "non_valuable_collected": 0,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "completeness": 1.0,
+      "no_model_completeness": 1.0,
+      "valuable_collected": 9,
+      "total_valuable": 9,
+      "non_valuable_collected": 0,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PHASE-M PASS: the integrated agent -- it WANTS (value+knowledge), SEES (learned perception), tracks the unseen (world model), and ACTS in a dynamic world, collecting its targets with zero non-valuable collections.  The perceive-understand-value-predict-act apex (the world-model's decisive benefit is Phase K's clean claim)."
+}
