@@ -1,0 +1,126 @@
+{
+  "protocol": "Phase-G self-directed knowledge exploration: the system sets its OWN exploration order (curiosity = entropy of member properties), explores categories, induces prototypes (new generalisations), validates them (held-out vs random), accepts valid ones into the ledger and rejects the rest.  Gate: explored >= 20, accepted >= 12 valid prototypes, traceable, 3 seeds.",
+  "results": [
+    {
+      "seed": 444,
+      "explored": 25,
+      "accepted": 25,
+      "rejected": 0,
+      "n_candidate_categories": 30,
+      "gate": true,
+      "accepted_sample": [
+        {
+          "key": "prototype_P31_buurtschap",
+          "value": "P17:Netherlands;P31:buurtschap",
+          "source": "exploration",
+          "margin": 0.875
+        },
+        {
+          "key": "prototype_P106_meteorologist",
+          "value": "P106:meteorologist;P31:human",
+          "source": "exploration",
+          "margin": 0.515
+        },
+        {
+          "key": "prototype_P106_ethnologist",
+          "value": "P106:ethnologist;P31:human",
+          "source": "exploration",
+          "margin": 0.458
+        },
+        {
+          "key": "prototype_P106_forester",
+          "value": "P106:forester;P31:human",
+          "source": "exploration",
+          "margin": 0.448
+        },
+        {
+          "key": "prototype_P106_mineralogist",
+          "value": "P106:mineralogist;P31:human",
+          "source": "exploration",
+          "margin": 0.52
+        }
+      ]
+    },
+    {
+      "seed": 555,
+      "explored": 25,
+      "accepted": 25,
+      "rejected": 0,
+      "n_candidate_categories": 30,
+      "gate": true,
+      "accepted_sample": [
+        {
+          "key": "prototype_P31_buurtschap",
+          "value": "P17:Netherlands;P31:buurtschap",
+          "source": "exploration",
+          "margin": 0.875
+        },
+        {
+          "key": "prototype_P106_presenter",
+          "value": "P106:presenter;P31:human",
+          "source": "exploration",
+          "margin": 0.52
+        },
+        {
+          "key": "prototype_P31_biological process",
+          "value": "P31:biological process",
+          "source": "exploration",
+          "margin": 1.0
+        },
+        {
+          "key": "prototype_P106_Qur'anic exegete",
+          "value": "P106:Qur'anic exegete;P31:human",
+          "source": "exploration",
+          "margin": 0.505
+        },
+        {
+          "key": "prototype_P106_photojournalist",
+          "value": "P106:photojournalist;P31:human",
+          "source": "exploration",
+          "margin": 0.39
+        }
+      ]
+    },
+    {
+      "seed": 666,
+      "explored": 25,
+      "accepted": 25,
+      "rejected": 0,
+      "n_candidate_categories": 30,
+      "gate": true,
+      "accepted_sample": [
+        {
+          "key": "prototype_P106_astrologer",
+          "value": "P106:astrologer;P106:astronomer;P31:human",
+          "source": "exploration",
+          "margin": 0.503
+        },
+        {
+          "key": "prototype_P106_local historian",
+          "value": "P106:local historian;P31:human",
+          "source": "exploration",
+          "margin": 0.375
+        },
+        {
+          "key": "prototype_P106_human rights defender",
+          "value": "P106:human rights defender;P31:human",
+          "source": "exploration",
+          "margin": 0.375
+        },
+        {
+          "key": "prototype_P106_member of parliament",
+          "value": "P106:member of parliament;P106:politician;P31:human",
+          "source": "exploration",
+          "margin": 0.677
+        },
+        {
+          "key": "prototype_P106_caricaturist",
+          "value": "P106:caricaturist;P31:human",
+          "source": "exploration",
+          "margin": 0.51
+        }
+      ]
+    }
+  ],
+  "verdict": "PHASE-G PASS: the system EXPLORES its own knowledge autonomously (curiosity-driven), discovers and validates NEW generalisations, and accumulates them -- an integrated autonomy+knowledge+discovery+self-ref+ledger loop."
+}
