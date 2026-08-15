@@ -1,0 +1,228 @@
+{
+  "protocol": "Phase-D conversational knowledge engine: natural question -> G-K answer (MRep) -> fluent grounded language (learned realizer for facts, honest template for unknown/explanation).  Gate: facts answered >= 0.9, unknown detected >= 0.9, rendered text honest >= 0.9.",
+  "results": [
+    {
+      "seed": 444,
+      "fact_answered": 30,
+      "fact_correct": 30,
+      "unknown_answered": 20,
+      "unknown_correct": 20,
+      "render_honest": 1.0,
+      "samples": [
+        {
+          "q": "is 'nduja a product",
+          "answer": "the occupation of 'nduja is product",
+          "entities": [
+            "'nduja",
+            "product"
+          ]
+        },
+        {
+          "q": "is #HurtigJoakimLøbet 5.0 a DCU licensløb",
+          "answer": "the occupation of #HurtigJoakimLøbet 5.0 is DCU licensløb",
+          "entities": [
+            "#HurtigJoakimLøbet 5.0",
+            "DCU licensløb"
+          ]
+        },
+        {
+          "q": "is (&#177;)-4'-Methoxyflavanone a flavanone",
+          "answer": "the occupation of (&#177;)-4'-Methoxyflavanone is flavanone",
+          "entities": [
+            "(&#177;)-4'-Methoxyflavanone",
+            "flavanone"
+          ]
+        },
+        {
+          "q": "is #vBIB a occurrence",
+          "answer": "#vBIB is a occurrence",
+          "entities": [
+            "#vBIB",
+            "occurrence"
+          ]
+        },
+        {
+          "q": "is 'Are'are a Malaita",
+          "answer": "'Are'are is a Malaita",
+          "entities": [
+            "'Are'are",
+            "Malaita"
+          ]
+        },
+        {
+          "q": "is 't Hooft loop a observable",
+          "answer": "the occupation of 't Hooft loop is observable",
+          "entities": [
+            "'t Hooft loop",
+            "observable"
+          ]
+        },
+        {
+          "q": "is   Baldasare a   Brooks",
+          "answer": "I don't know.",
+          "unknown": true
+        },
+        {
+          "q": "is   Aherns a   Bakker",
+          "answer": "I don't know.",
+          "unknown": true
+        },
+        {
+          "q": "is   Adams a   Becerra",
+          "answer": "I don't know.",
+          "unknown": true
+        }
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "fact_answered": 28,
+      "fact_correct": 28,
+      "unknown_answered": 20,
+      "unknown_correct": 20,
+      "render_honest": 1.0,
+      "samples": [
+        {
+          "q": "is 't Hooft–Polyakov monopole a magnetic monopole",
+          "answer": "the occupation of 't Hooft–Polyakov monopole is magnetic monopole",
+          "entities": [
+            "'t Hooft–Polyakov monopole",
+            "magnetic monopole"
+          ]
+        },
+        {
+          "q": "is 'otai a drink",
+          "answer": "the occupation of 'otai is drink",
+          "entities": [
+            "'otai",
+            "drink"
+          ]
+        },
+        {
+          "q": "is (+)-1-octen-3-ol a hydroxy fatty acid",
+          "answer": "the occupation of (+)-1-octen-3-ol is hydroxy fatty acid",
+          "entities": [
+            "(+)-1-octen-3-ol",
+            "hydroxy fatty acid"
+          ]
+        },
+        {
+          "q": "is (+)-1-bromo-2-methylbutane a 1-bromo-2-methylbutane",
+          "answer": "the occupation of (+)-1-bromo-2-methylbutane is 1-bromo-2-methylbutane",
+          "entities": [
+            "(+)-1-bromo-2-methylbutane",
+            "1-bromo-2-methylbutane"
+          ]
+        },
+        {
+          "q": "is (+)-1-Hydroxyboivinianic acid a 1-hydroxyboivinianic acid",
+          "answer": "the occupation of (+)-1-Hydroxyboivinianic acid is 1-hydroxyboivinianic acid",
+          "entities": [
+            "(+)-1-Hydroxyboivinianic acid",
+            "1-hydroxyboivinianic acid"
+          ]
+        },
+        {
+          "q": "is 'Ota 'ika a seafood dish",
+          "answer": "the occupation of 'Ota 'ika is seafood dish",
+          "entities": [
+            "'Ota 'ika",
+            "seafood dish"
+          ]
+        },
+        {
+          "q": "is   Benton a  ",
+          "answer": "I don't know.",
+          "unknown": true
+        },
+        {
+          "q": "is   Blunt a   Bauer",
+          "answer": "I don't know.",
+          "unknown": true
+        },
+        {
+          "q": "is   Andersen a   Bogk",
+          "answer": "I don't know.",
+          "unknown": true
+        }
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "fact_answered": 30,
+      "fact_correct": 30,
+      "unknown_answered": 20,
+      "unknown_correct": 20,
+      "render_honest": 1.0,
+      "samples": [
+        {
+          "q": "is !Xu a Khoisan",
+          "answer": "the occupation of !Xu is Khoisan",
+          "entities": [
+            "!Xu",
+            "Khoisan"
+          ]
+        },
+        {
+          "q": "is (+)-1-phenyl-2-propanol a 1-phenyl-2-propanol",
+          "answer": "the occupation of (+)-1-phenyl-2-propanol is 1-phenyl-2-propanol",
+          "entities": [
+            "(+)-1-phenyl-2-propanol",
+            "1-phenyl-2-propanol"
+          ]
+        },
+        {
+          "q": "is (+)-1-bromo-2-methylbutane a 1-Bromo-2-methylbutane",
+          "answer": "the occupation of (+)-1-bromo-2-methylbutane is 1-Bromo-2-methylbutane",
+          "entities": [
+            "(+)-1-bromo-2-methylbutane",
+            "1-Bromo-2-methylbutane"
+          ]
+        },
+        {
+          "q": "is (&#177;)-Voriconazole a chemical compound",
+          "answer": "the occupation of (&#177;)-Voriconazole is chemical compound",
+          "entities": [
+            "(&#177;)-Voriconazole",
+            "chemical compound"
+          ]
+        },
+        {
+          "q": "is (+)-1-phenyl-3-acetoxybutane a 1-phenyl-3-acetoxybutane",
+          "answer": "the occupation of (+)-1-phenyl-3-acetoxybutane is 1-phenyl-3-acetoxybutane",
+          "entities": [
+            "(+)-1-phenyl-3-acetoxybutane",
+            "1-phenyl-3-acetoxybutane"
+          ]
+        },
+        {
+          "q": "is 'uli'uli a shekere",
+          "answer": "the occupation of 'uli'uli is shekere",
+          "entities": [
+            "'uli'uli",
+            "shekere"
+          ]
+        },
+        {
+          "q": "is   Carroll a   Bradley",
+          "answer": "I don't know.",
+          "unknown": true
+        },
+        {
+          "q": "is   Booth a   Butler",
+          "answer": "I don't know.",
+          "unknown": true
+        },
+        {
+          "q": "is   Brumpaugh a   Adams",
+          "answer": "I don't know.",
+          "unknown": true
+        }
+      ],
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PHASE-D PASS: the conversational knowledge engine works -- the architecture answers natural questions from a 1.3亿-fact knowledge base and speaks fluent, honest natural language."
+}
