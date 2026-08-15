@@ -1,0 +1,93 @@
+{
+  "protocol": "Phase-B disambiguation: demos have an ACCIDENTAL surface rule (kept objects share a colour) AND a semantic rule (all writers).  The knowledge system prefers the discovered semantic rule; the visual system uses the surface colour rule.  Tests give kept objects random colours, so only the semantic rule generalises.  Gate: knowledge >= 0.9, visual == 0.",
+  "results": [
+    {
+      "writer": {
+        "semantic_rule": [
+          "P106",
+          "writer"
+        ],
+        "visual_rule": 5,
+        "knowledge": 1.0,
+        "visual": 0.0
+      },
+      "physicist": {
+        "semantic_rule": [
+          "P106",
+          "physicist"
+        ],
+        "visual_rule": 8,
+        "knowledge": 1.0,
+        "visual": 0.0
+      },
+      "composer": {
+        "semantic_rule": [
+          "P106",
+          "composer"
+        ],
+        "visual_rule": 3,
+        "knowledge": 1.0,
+        "visual": 0.0
+      }
+    },
+    {
+      "writer": {
+        "semantic_rule": [
+          "P106",
+          "writer"
+        ],
+        "visual_rule": 4,
+        "knowledge": 1.0,
+        "visual": 0.0
+      },
+      "physicist": {
+        "semantic_rule": [
+          "P106",
+          "physicist"
+        ],
+        "visual_rule": 1,
+        "knowledge": 1.0,
+        "visual": 0.0
+      },
+      "composer": {
+        "semantic_rule": [
+          "P106",
+          "composer"
+        ],
+        "visual_rule": 9,
+        "knowledge": 1.0,
+        "visual": 0.0
+      }
+    },
+    {
+      "writer": {
+        "semantic_rule": [
+          "P106",
+          "writer"
+        ],
+        "visual_rule": 8,
+        "knowledge": 1.0,
+        "visual": 0.0
+      },
+      "physicist": {
+        "semantic_rule": [
+          "P106",
+          "physicist"
+        ],
+        "visual_rule": 5,
+        "knowledge": 1.0,
+        "visual": 0.0
+      },
+      "composer": {
+        "semantic_rule": [
+          "P106",
+          "composer"
+        ],
+        "visual_rule": 2,
+        "knowledge": 1.0,
+        "visual": 0.0
+      }
+    }
+  ],
+  "gate_pass": true
+}

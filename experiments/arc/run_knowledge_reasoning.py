@@ -256,11 +256,95 @@ def run_seed_discovery(seed: int, store) -> dict:
     return out
 
 
+def make_task_disambig(rng, positives, negatives, keep_n, tot_n, demos_mode: bool,
+                       kept_colour: int | None = None) -> dict:
+    """For DEMOS the kept objects all share one colour (an accidental surface
+    rule 'keep <colour>') -- SAME colour across all demos so a consistent visual
+    rule exists; for TESTS the kept objects get random colours so only the
+    semantic rule generalises.  Everything else matches make_task."""
+    kept = rng.sample(positives, min(keep_n, len(positives)))
+    filler = rng.sample(negatives, min(tot_n - len(kept), len(negatives)))
+    objects = []
+    used = set()
+    demo_kept_colour = kept_colour if kept_colour is not None else rng.choice(PALETTE)
+    for e in kept + filler:
+        while True:
+            r, c = rng.randrange(12), rng.randrange(12)
+            if (r, c) not in used:
+                used.add((r, c))
+                break
+        if e in kept and demos_mode:
+            color = demo_kept_colour
+        else:
+            color = rng.choice(PALETTE)
+        objects.append({"entity": e, "pos": (r, c), "color": color,
+                        "is_positive": e in kept})
+    kept_ids = {id(o) for o in objects if o["is_positive"]}
+    g = [[BG] * 12 for _ in range(12)]
+    for o in objects:
+        g[o["pos"][0]][o["pos"][1]] = o["color"]
+    out = [[BG] * 12 for _ in range(12)]
+    for o in objects:
+        if id(o) in kept_ids:
+            out[o["pos"][0]][o["pos"][1]] = o["color"]
+    return {"objects": objects, "input": g, "output": out}
+
+
+def discover_visual_rule(demos) -> int | None:
+    """If all kept objects across demos share ONE colour (an accidental surface
+    rule), return that colour; else None."""
+    colours = set()
+    for d in demos:
+        g_out = d["output"]
+        for o in d["objects"]:
+            if o["is_positive"]:
+                colours.add(g_out[o["pos"][0]][o["pos"][1]])
+    return next(iter(colours)) if len(colours) == 1 else None
+
+
+def run_seed_disambig(seed: int, store) -> dict:
+    rng = random.Random(seed)
+    out = {}
+    for rel, end, label in DIRECT_CONDITIONS:
+        pos, neg = sample_pool(store, rel, end, pos_n=20, neg_n=20, seed=seed)
+        if not pos or not neg:
+            continue
+        demo_colour = rng.choice(PALETTE)
+        demos = [make_task_disambig(rng, pos, neg, keep_n=3, tot_n=6,
+                                    demos_mode=True, kept_colour=demo_colour)
+                 for _ in range(3)]
+        sem = discover_condition(store, demos)          # semantic rule (knowledge)
+        vis = discover_visual_rule(demos)               # surface rule (colour)
+        tests = [make_task_disambig(rng, pos, neg, keep_n=3, tot_n=6, demos_mode=False)
+                 for _ in range(10)]
+        k_ok = k_tot = v_ok = v_tot = 0
+        for t in tests:
+            # knowledge system: prefer the discovered SEMANTIC rule
+            if sem is not None:
+                kept = {o["entity"] for o in t["objects"]
+                        if store.known_any([sem[0]], o["entity"], sem[1])}
+            else:
+                kept = set()
+            true_kept = {o["entity"] for o in t["objects"] if o["is_positive"]}
+            k_ok += int(kept == true_kept)
+            k_tot += 1
+            # visual system: uses the surface colour rule
+            if vis is not None:
+                v_kept = {o["entity"] for o in t["objects"]
+                          if t["input"][o["pos"][0]][o["pos"][1]] == vis}
+                v_ok += int(v_kept == true_kept)
+            v_tot += 1
+        out[label] = {"semantic_rule": sem, "visual_rule": vis,
+                      "knowledge": round(k_ok / k_tot, 3) if k_tot else 0.0,
+                      "visual": round(v_ok / v_tot, 3) if v_tot else 0.0}
+    return out
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--db", type=Path, default=DB)
     parser.add_argument("--seeds", type=int, nargs="*", default=[444, 555, 666])
-    parser.add_argument("--mode", choices=["handed", "discovery"], default="handed")
+    parser.add_argument("--mode", choices=["handed", "discovery", "disambiguate"], default="handed")
     parser.add_argument("--artifact", type=Path, default=ROOT / "artifacts" / "phase-b-knowledge-reasoning.json")
     args = parser.parse_args()
 
@@ -268,7 +352,6 @@ def main() -> None:
     if args.mode == "discovery":
         reports = [run_seed_discovery(s, store) for s in args.seeds]
         store.close()
-        # gate: discovered rule correct AND knowledge held-out >= 0.9 AND visual == 0
         correct = [r[c]["correct_rule"] for r in reports for c in r
                    if r[c].get("correct_rule") is not None]
         all_k = [r[c]["knowledge"] for r in reports for c in r]
@@ -280,6 +363,23 @@ def main() -> None:
                 "the (rel, end) predicate shared by all kept entities and none of the dropped "
                 "ones -- then applies it to held-out.  Gate: discovered rule correct, "
                 "knowledge held-out >= 0.9, visual == 0."
+            ),
+            "results": reports,
+            "gate_pass": bool(gate),
+        }
+    elif args.mode == "disambiguate":
+        reports = [run_seed_disambig(s, store) for s in args.seeds]
+        store.close()
+        all_k = [r[c]["knowledge"] for r in reports for c in r]
+        all_v = [r[c]["visual"] for r in reports for c in r]
+        gate = bool(all_k and all_v and min(all_k) >= 0.9 and max(all_v) == 0.0)
+        report = {
+            "protocol": (
+                "Phase-B disambiguation: demos have an ACCIDENTAL surface rule (kept objects "
+                "share a colour) AND a semantic rule (all writers).  The knowledge system "
+                "prefers the discovered semantic rule; the visual system uses the surface "
+                "colour rule.  Tests give kept objects random colours, so only the semantic "
+                "rule generalises.  Gate: knowledge >= 0.9, visual == 0."
             ),
             "results": reports,
             "gate_pass": bool(gate),
