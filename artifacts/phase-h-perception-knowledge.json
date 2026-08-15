@@ -1,0 +1,45 @@
+{
+  "protocol": "Phase-H perception->knowledge loop: a perception layer LEARNS to recognise entities from visual signatures; the system then reasons with the world knowledge base ('keep the fruits' via transitive P31/P279) and responds. Gate: held-out end-to-end accuracy >= 0.9, zero false-fruit selections, low-confidence -> honest UNKNOWN, 3 seeds.",
+  "results": [
+    {
+      "seed": 444,
+      "end_to_end_acc": 1.0,
+      "false_fruit_selections": 0,
+      "honest_unknown_count": 0,
+      "responses": [
+        "kept the fruits: pear, apple, lemon",
+        "kept the fruits: pear, lemon, orange, cherry, strawberry",
+        "kept the fruits: orange, apple",
+        "kept the fruits: mango"
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "end_to_end_acc": 1.0,
+      "false_fruit_selections": 0,
+      "honest_unknown_count": 0,
+      "responses": [
+        "kept the fruits: pear, grape, orange",
+        "kept the fruits: pear, cherry, strawberry",
+        "kept the fruits: apple, grape, lemon",
+        "kept the fruits: orange, mango"
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "end_to_end_acc": 1.0,
+      "false_fruit_selections": 0,
+      "honest_unknown_count": 0,
+      "responses": [
+        "kept the fruits: cherry, pear, apple, mango",
+        "kept the fruits: apple, grape, cherry",
+        "kept the fruits: strawberry, apple, orange, pear",
+        "kept the fruits: grape, pear"
+      ],
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PHASE-H PASS: the architecture SEES (learned perception), UNDERSTANDS (world knowledge about what it saw), and SPEAKS (renders the decision) -- the perception->entity bridge, toward AGI."
+}
