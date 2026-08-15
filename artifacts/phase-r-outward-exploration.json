@@ -1,0 +1,99 @@
+{
+  "protocol": "Phase-R outward exploration: when the snapshot cannot answer, the system fetches the LIVE web (Wikipedia) -- grounded, source-cited, honest on failure.  Eval: snapshot-gaps filled by REAL grounded summaries; no fabrication.",
+  "snapshot_gaps": 2,
+  "gaps_filled_by_outward": 2,
+  "gaps_honest": 0,
+  "outward_grounded_rate": 1.0,
+  "results": [
+    {
+      "entity": "quantum entanglement",
+      "snapshot_answered": true,
+      "outward_explored": true,
+      "outward_grounded": true,
+      "source": "https://en.wikipedia.org/wiki/Quantum entanglement",
+      "excerpt": "Quantum entanglement is the phenomenon in which the quantum state of each particle in a group cannot be described indepe",
+      "honest_if_failed": false
+    },
+    {
+      "entity": "machine learning",
+      "snapshot_answered": true,
+      "outward_explored": true,
+      "outward_grounded": true,
+      "source": "https://en.wikipedia.org/wiki/Machine learning",
+      "excerpt": "Machine learning (ML) is a field of study in artificial intelligence concerned with the development and study of statist",
+      "honest_if_failed": false
+    },
+    {
+      "entity": "Fermi paradox",
+      "snapshot_answered": true,
+      "outward_explored": true,
+      "outward_grounded": true,
+      "source": "https://en.wikipedia.org/wiki/Fermi paradox",
+      "excerpt": "The Fermi paradox is the seeming inconsistency between the lack of evidence of extraterrestrial civilizations and the ap",
+      "honest_if_failed": false
+    },
+    {
+      "entity": "black hole",
+      "snapshot_answered": true,
+      "outward_explored": true,
+      "outward_grounded": true,
+      "source": "https://en.wikipedia.org/wiki/Black hole",
+      "excerpt": "A black hole is an astronomical body so compact that its gravity prevents anything, including light, from escaping. Albe",
+      "honest_if_failed": false
+    },
+    {
+      "entity": "photosynthesis",
+      "snapshot_answered": true,
+      "outward_explored": true,
+      "outward_grounded": true,
+      "source": "https://en.wikipedia.org/wiki/Photosynthesis",
+      "excerpt": "Photosynthesis is a system of biological processes by which photopigment-bearing autotrophic organisms, such as most pla",
+      "honest_if_failed": false
+    },
+    {
+      "entity": "general relativity",
+      "snapshot_answered": false,
+      "outward_explored": true,
+      "outward_grounded": true,
+      "source": "https://en.wikipedia.org/wiki/General relativity",
+      "excerpt": "General relativity, also known as the general theory of relativity, and as Einstein's theory of gravity, is the geometri",
+      "honest_if_failed": false
+    },
+    {
+      "entity": "dark matter",
+      "snapshot_answered": true,
+      "outward_explored": true,
+      "outward_grounded": true,
+      "source": "https://en.wikipedia.org/wiki/Dark matter",
+      "excerpt": "In astronomy and cosmology, dark matter is an invisible and hypothetical form of matter that does not interact with elec",
+      "honest_if_failed": false
+    },
+    {
+      "entity": "neural network",
+      "snapshot_answered": true,
+      "outward_explored": true,
+      "outward_grounded": true,
+      "source": "https://en.wikipedia.org/wiki/Neural network",
+      "excerpt": "A neural network is a group of interconnected units called neurons that send signals to one another. Neurons can be eith",
+      "honest_if_failed": false
+    },
+    {
+      "entity": "climate change",
+      "snapshot_answered": false,
+      "outward_explored": true,
+      "outward_grounded": true,
+      "source": "https://en.wikipedia.org/wiki/Climate change",
+      "excerpt": "Present-day climate change includes both global warming—the ongoing increase in global average temperature—and its wider",
+      "honest_if_failed": false
+    },
+    {
+      "entity": "artificial general intelligence",
+      "snapshot_answered": true,
+      "outward_explored": true,
+      "outward_grounded": true,
+      "source": "https://en.wikipedia.org/wiki/Artificial general intelligence",
+      "excerpt": "Artificial general intelligence (AGI) is a hypothetical type of artificial intelligence that matches or surpasses human ",
+      "honest_if_failed": false
+    }
+  ]
+}
