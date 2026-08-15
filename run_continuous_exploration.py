@@ -54,7 +54,7 @@ def main() -> None:
             g = gen_seed(seed + 1000, store, explored=explored_cats)  # free + diverse
             if g["category"]:
                 explored_cats.add(g["category"])
-            skills_solved_total += int(s1["total_acc"] >= 0.9)
+            skills_solved_total += int(s1["last_rounds_acc"] >= 0.9)
             rules_generated_total += len(g["self_generated_rules"])
             rounds += 1
             log({"round": rounds, "seed": seed, "time": time.time(),
