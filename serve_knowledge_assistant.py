@@ -116,7 +116,7 @@ class Handler(BaseHTTPRequestHandler):
             rep = answer(_store, q, rels=WIKIDATA_RELS)
             return self._json({
                 "question": q,
-                "answer": render(rep),
+                "answer": render(rep),   # template: clear "Yes + reasoning chain"
                 "type": rep.answer_type,
                 "unknown": rep.unknown,
                 "confidence": rep.confidence,
