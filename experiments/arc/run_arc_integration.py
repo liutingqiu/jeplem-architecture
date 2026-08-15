@@ -357,8 +357,10 @@ def main() -> None:
                 "before/after coverage + mechanism-only solutions + zero false facts, 3 seeds."
             ),
             "baseline_note": (
-                "arc1-coverage.json static baseline: training 0.0325 test_correct, "
-                "evaluation 0.0025.  mech_only_rate = tasks solved ONLY by the mechanism."
+                "Current static baseline (run_coverage, post-G1a extended library): "
+                "training 0.052 test_correct (21/400, all depth-1), evaluation 0.005 (2/400). "
+                "The arc1-coverage.json 0.0325/0.0025 numbers are the pre-G1a historical record. "
+                "mech_only_rate = tasks solved ONLY by the mechanism."
             ),
             "false_facts_zero_all_seeds": bool(all_false_zero),
             "per_seed": per_seed,

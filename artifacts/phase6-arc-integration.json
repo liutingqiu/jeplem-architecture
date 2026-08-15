@@ -1,7 +1,7 @@
 {
   "part": "A",
   "protocol": "phase6 decisive ARC integration (#44): apply latent-cause creation (M2) + grounded manifold (O1) to REAL ARC-1 tasks.  Static primitive library ceilings at ~3-5%; the mechanism reads a NEW colour/permutation latent cause from a task's own demos when existing structure fails.  RECORDING milestone: before/after coverage + mechanism-only solutions + zero false facts, 3 seeds.",
-  "baseline_note": "arc1-coverage.json static baseline: training 0.0325 test_correct, evaluation 0.0025.  mech_only_rate = tasks solved ONLY by the mechanism.",
+  "baseline_note": "Current static baseline (run_coverage, post-G1a): training 0.052 test_correct (21/400), evaluation 0.005 (2/400). arc1-coverage.json 0.0325/0.0025 = pre-G1a historical. mech_only_rate = tasks solved ONLY by the mechanism.",
   "false_facts_zero_all_seeds": true,
   "per_seed": [
     {
