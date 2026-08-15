@@ -1,0 +1,42 @@
+{
+  "protocol": "Phase-BC body integration: the v17 identity core + knowledge-conditioned selection (Phase B, real Wikidata P106) + realizer rendering (Phase C) in ONE event loop.  Gate: v17 core holds (belief>=0.8, revision, router>=0.7, self-ECE<=0.15) AND knowledge selection >= 0.9 AND render round-trip >= 0.8, 3 seeds.",
+  "results": [
+    {
+      "seed": 444,
+      "belief_query_acc": 1.0,
+      "revision_detected": true,
+      "router_acc": 1.0,
+      "self_ece": 0.001,
+      "knowledge_selection_acc": 1.0,
+      "render_roundtrip_acc": 1.0,
+      "ledger_written": 40,
+      "sample_render": "a   Maki is a human",
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "belief_query_acc": 1.0,
+      "revision_detected": true,
+      "router_acc": 1.0,
+      "self_ece": 0.001,
+      "knowledge_selection_acc": 1.0,
+      "render_roundtrip_acc": 1.0,
+      "ledger_written": 40,
+      "sample_render": "a   Maki counts as a human",
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "belief_query_acc": 1.0,
+      "revision_detected": true,
+      "router_acc": 1.0,
+      "self_ece": 0.001,
+      "knowledge_selection_acc": 1.0,
+      "render_roundtrip_acc": 1.0,
+      "ledger_written": 40,
+      "sample_render": "a   Maki is a human",
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PHASE-BC INTEGRATION PASS: the knowledge channel and the learned language layer coexist with the v17 core in one body -- no interference; semantic selection and grounded rendering both hold. The complete-form sketch stands."
+}

@@ -2,7 +2,7 @@
 
 > 用途：让新会话用几分钟读完"项目现在在哪、下一步做什么"，避免重读历史大文件。
 > 更新规则：每个阶段闭环后更新本节头部；历史细节写进 NIGHT_RUN/各 REPORT，不搬进本文件。
-> 最后更新：2026-08-15（**阶段四 M1 知识预训练完成 + 阶段六 ARC 集成决战完成**：Wikidata 灌入完成——69.1 亿三元组→1.32 亿事实/6980 万实体，G-K 门 3 seed 全过(recall 0.999-1.0/诚实 1.0/ECE 0.039，ConceptNet+Wikidata 双库)；阶段六 #44 决战——机制×真实经验集成后真实 ARC 覆盖上限仍 ~6%(schema union 6.0%/潜因 +1 任务/知识驱动 instance-of 原子)，零假事实，终局证伪条件 4 候选坐实，详见 `JEPLM_PHASE6_ARC_INTEGRATION_REPORT.md`；233 回归 OK(3 skipped)）
+> 最后更新：2026-08-15（**阶段四 M1 知识预训练完成 + 阶段六 #44 决战 + 自主发展阶段 B/C**：Wikidata 1.32 亿事实 G-K 双库 3 seed 全过；#44 真实 ARC ~6% 上限(终局证伪条件 4 候选坐实)；**阶段 B 知识条件化推理 3 seed PASS**(选择/规则发现/歧义消解 1.0 vs 视觉 0.0，两条推理通道成立)；**阶段 C 可扩展学习层 realizer 3 seed PASS**(真实语料学自然度，诚实 1.0/roundtrip 1.0)；阶段 BC 完整形态集成(知识+realizer+v17 core 共存零干扰)。详见 PHASEB/PHASEC REPORT + 白皮书附录十一）
 
 ---
 
