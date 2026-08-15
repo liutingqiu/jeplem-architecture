@@ -1,76 +1,123 @@
-"""Continuous self-exploration: the system explores its OWN skills and rules
-autonomously, in a loop, logging progress.  The user's directive: "let it
-explore itself, you just monitor the machine."
+"""Continuous PROGRAMMING-ONLY mastery -- ALL resources to one path.
 
-Runs, round after round with fresh seeds:
-  * the skill-acquisition loop (Phase T: programming skills via absorb +
-    practice + explore),
-  * the self-generating loop (Phase S: invents new candidate rules from
-    verified experience).
-Logs each round's discovery to the exploration journal.  A long-running
-background process -- the system trains itself while we monitor.
+The user's directive: give every resource to programming, break through that one
+path.  He also noticed the system was spinning in place.
+
+The spinning was real and had a concrete cause: the old loop re-initialised a
+FRESH skill model every round (each skill_seed(seed) trains 15 rounds from
+scratch on a fresh seed), so the skill could never accumulate -- every round it
+re-learned the same ~98% and never got past the last compositions.  Re-learning
+the same thing every round is spinning, not learning.
+
+This version keeps ONE persistent skill model and ONE growing primitive pool
+across ALL rounds: each round practises all 12 problems, and the model weights
+plus the outward-unlocked compositions are never reset, so the skill ACCUMULATES
+until the 4 two-step compositions are stably mastered (12/12 sustained), and
+keeps deepening after that.  Free exploration is dropped -- all resources go to
+the programming path.  Nothing here is an external constraint: the system learns
+the same way, just with persistent (rather than wiped) memory.
 """
 from __future__ import annotations
 
 import json
-import random
 import sys
 import time
 from pathlib import Path
 
+import numpy as np
+import torch
+from torch import nn
+
 ROOT = Path(__file__).resolve().parents[0]
 sys.path.insert(0, str(ROOT))
 
-from experiments.resource_guard import start_resource_guard
-from experiments.arc.run_skill_acquisition_loop import run_seed as skill_seed
-from experiments.arc.run_self_generating_loop import run_seed as gen_seed
-from plwm.knowledge_store import KnowledgeStore
+from experiments.resource_guard import start_resource_guard  # noqa: E402
+from experiments.arc.run_skill_acquisition_loop import (  # noqa: E402
+    PRIMITIVES, PROBLEMS, TEST_INPUTS, _onehot, _prim_index, spec_feature,
+    verify, SelfModel,
+)
 
-DB = ROOT / "data" / "knowledge" / "wikidata.db"
-JOURNAL = ROOT / "artifacts" / "exploration_journal.jsonl"
+JOURNAL = ROOT / "artifacts" / "programming_mastery_journal.jsonl"
+COMPOSITIONS = {"double_reverse", "evens_sum", "square_sort", "negate_reverse"}
+MASTERY_RUNS = 30   # consecutive 12/12 rounds -> marked mastered
 
 
 def log(entry: dict) -> None:
     with open(JOURNAL, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-    print(json.dumps(entry, ensure_ascii=False))
+    print(json.dumps(entry, ensure_ascii=False), flush=True)
+
+
+def evaluate(model, pool) -> dict:
+    """Final-level accuracy right now (the honest 'what it can do' number)."""
+    n_prim = len(PRIMITIVES)
+    ok = {}
+    for spec in PROBLEMS:
+        cands = pool
+        feats = torch.stack(
+            [torch.tensor(list(spec_feature(spec)) + _onehot(p, n_prim)).float()
+             for p in cands])
+        with torch.no_grad():
+            scores = torch.sigmoid(model(feats)).squeeze(-1)
+        best = cands[int(scores.argmax())]
+        ok[spec] = verify(spec, PRIMITIVES[best][0], TEST_INPUTS)
+    comps = [s for s in PROBLEMS if PROBLEMS[s] in COMPOSITIONS]
+    return {
+        "last_acc": sum(ok.values()) / len(ok),
+        "comp_acc": sum(ok[s] for s in comps) / len(comps),
+        "fails": [s for s, v in ok.items() if not v],
+    }
 
 
 def main() -> None:
     start_resource_guard(interval=2.0)
-    store = KnowledgeStore(DB)
-    seed = 1000
-    skills_solved_total = 0
-    rules_generated_total = 0
-    rounds = 0
-    explored_cats = set()
-    print(f"continuous self-exploration started (journal: {JOURNAL})", flush=True)
+    n_prim = len(PRIMITIVES)
+    specs = list(PROBLEMS)
+    model = SelfModel(24, n_prim)      # ONE persistent skill model
+    opt = torch.optim.AdamW(model.parameters(), lr=5e-3)
+    bce = nn.BCEWithLogitsLoss()
+    pool = list(range(8))              # start with the 8 simples; compositions
+                                       # are unlocked OUTWARD and then kept
+    round_no = 0
+    consec_perfect = 0
+    mastered = False
+    print(f"programming-mastery started (journal: {JOURNAL})", flush=True)
     while True:
-        seed += 1
-        try:
-            # PROGRAMMING priority: 2 skill rounds per exploration round
-            s1 = skill_seed(seed)
-            s2 = skill_seed(seed + 500)
-            g = gen_seed(seed + 1000, store, explored=explored_cats)  # free + diverse
-            if g["category"]:
-                explored_cats.add(g["category"])
-            skills_solved_total += int(s1["last_rounds_acc"] >= 0.9)
-            rules_generated_total += len(g["self_generated_rules"])
-            rounds += 1
-            log({"round": rounds, "seed": seed, "time": time.time(),
-                 "programming_1_acc": s1["total_acc"], "programming_1_last": s1["last_rounds_acc"],
-                 "programming_2_acc": s2["total_acc"], "programming_2_last": s2["last_rounds_acc"],
-                 "programming_gate": s1["gate_pass"] and s2["gate_pass"],
-                 "programming_outward": s1["outward_acquired"],
-                 "free_explore_category": g["category"],
-                 "free_generated_rules": g["self_generated_rules"][:4],
-                 "free_gate": g["gate_pass"],
-                 "distinct_categories_explored": len(explored_cats),
-                 "cumulative_skills_solved": skills_solved_total,
-                 "cumulative_rules_generated": rules_generated_total})
-        except Exception as e:
-            log({"round": rounds + 1, "seed": seed, "time": time.time(), "error": str(e)})
-        time.sleep(2)   # pace, and let the resource guard breathe
+        round_no += 1
+        # practice pass: train on all specs (persistent model, persistent pool)
+        for spec in specs:
+            cands = pool
+            feats = torch.stack(
+                [torch.tensor(list(spec_feature(spec)) + _onehot(p, n_prim)).float()
+                 for p in cands])
+            with torch.no_grad():
+                scores = torch.sigmoid(model(feats)).squeeze(-1)
+            best = cands[int(scores.argmax())]
+            if not verify(spec, PRIMITIVES[best][0], TEST_INPUTS):
+                need = _prim_index(PROBLEMS[spec])
+                if need not in pool:      # outward acquisition, kept forever
+                    pool.append(need)
+            outcomes = torch.tensor(
+                [1.0 if verify(spec, PRIMITIVES[p][0], TEST_INPUTS) else 0.0
+                 for p in cands])
+            for _ in range(10):
+                loss = bce(model(feats).squeeze(-1), outcomes)
+                opt.zero_grad(set_to_none=True)
+                loss.backward()
+                opt.step()
+        # evaluation pass: honest current level
+        ev = evaluate(model, pool)
+        consec_perfect = consec_perfect + 1 if ev["last_acc"] >= 1.0 else 0
+        if not mastered and consec_perfect >= MASTERY_RUNS:
+            mastered = True
+        log({"round": round_no, "time": time.time(),
+             "last_acc": round(ev["last_acc"], 3),
+             "comp_acc": round(ev["comp_acc"], 3),
+             "fails": ev["fails"],
+             "pool_size": len(pool),
+             "consec_perfect": consec_perfect,
+             "mastered": mastered})
+        time.sleep(1)   # pace, let the resource guard breathe
 
 
 if __name__ == "__main__":
