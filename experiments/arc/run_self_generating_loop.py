@@ -25,6 +25,7 @@ import argparse
 import json
 import random
 import sys
+from collections import Counter
 from pathlib import Path
 
 import numpy as np
@@ -54,14 +55,19 @@ class SelfModel(nn.Module):
         return self.net(x)
 
 
-def sample_category(store, rng) -> str:
-    """Pick a RANDOM knowledge category (not hardcoded) with enough members --
-    the system explores whatever category it lands on."""
-    ends = [r[0] for r in store.conn.execute(
-        "SELECT end FROM facts WHERE rel IN ('P31','P279') AND length(end)<25 "
-        "GROUP BY end HAVING COUNT(*)>=12 LIMIT 300")]
-    rng.shuffle(ends)
-    return rng.choice(ends) if ends else "fruit"
+def sample_category(store, rng, explored=None):
+    """Pick a RANDOM knowledge category with enough members, preferring ones
+    NOT already explored (diversity-aware -- avoids repeating the same domains
+    like calendar days)."""
+    explored = explored or set()
+    # diverse pool: sample a random subset of the facts, count ends in Python
+    ends = Counter(r[0] for r in store.conn.execute(
+        "SELECT end FROM facts WHERE rel IN ('P31','P279') AND length(end)<25 LIMIT 200000"))
+    pool = [e for e, c in ends.items() if c >= 12]
+    rng.shuffle(pool)
+    fresh = [e for e in pool if e not in explored]
+    pick_from = fresh if fresh else pool
+    return rng.choice(pick_from) if pick_from else "fruit"
 
 
 def make_scene(rng, members, others, n_obj=6):
@@ -117,11 +123,11 @@ def generate_new_rule(store, rng, verified, used_props):
     return None
 
 
-def run_seed(seed: int, store, cat: str | None = None) -> dict:
+def run_seed(seed: int, store, cat: str | None = None, explored=None) -> dict:
     rng = random.Random(seed)
     torch.manual_seed(seed)
     if cat is None:
-        cat = sample_category(store, rng)
+        cat = sample_category(store, rng, explored)
     # category members + non-members (free exploration: whatever category)
     rows = [r[0] for r in store.conn.execute(
         f"SELECT start FROM facts WHERE rel IN ('P31','P279') AND end=? AND length(start)<30 LIMIT 40",

@@ -43,6 +43,7 @@ def main() -> None:
     skills_solved_total = 0
     rules_generated_total = 0
     rounds = 0
+    explored_cats = set()
     print(f"continuous self-exploration started (journal: {JOURNAL})", flush=True)
     while True:
         seed += 1
@@ -50,7 +51,9 @@ def main() -> None:
             # PROGRAMMING priority: 2 skill rounds per exploration round
             s1 = skill_seed(seed)
             s2 = skill_seed(seed + 500)
-            g = gen_seed(seed + 1000, store)          # random category (free)
+            g = gen_seed(seed + 1000, store, explored=explored_cats)  # free + diverse
+            if g["category"]:
+                explored_cats.add(g["category"])
             skills_solved_total += int(s1["total_acc"] >= 0.9)
             rules_generated_total += len(g["self_generated_rules"])
             rounds += 1
@@ -61,6 +64,7 @@ def main() -> None:
                  "free_explore_category": g["category"],
                  "free_generated_rules": g["self_generated_rules"][:4],
                  "free_gate": g["gate_pass"],
+                 "distinct_categories_explored": len(explored_cats),
                  "cumulative_skills_solved": skills_solved_total,
                  "cumulative_rules_generated": rules_generated_total})
         except Exception as e:
