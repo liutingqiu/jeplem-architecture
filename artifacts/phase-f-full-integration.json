@@ -1,0 +1,51 @@
+{
+  "protocol": "FULL-INTEGRATION: v17 core + knowledge selection + latent-cause creation + library growth + realizer rendering + shared ledger in ONE event loop, with a multi-module coordination task (knowledge -> realizer -> explicit-core verify -> ledger).  Gate: core holds, each module's criterion holds in the loop, coordination honest >= 0.8, zero false facts, ledger populated.",
+  "results": [
+    {
+      "seed": 444,
+      "belief_query_acc": 1.0,
+      "revision_detected": true,
+      "router_acc": 1.0,
+      "self_ece": 0.001,
+      "knowledge_acc": 1.0,
+      "latent_cause_acc": 1.0,
+      "render_acc": 1.0,
+      "coordination_honest": 1.0,
+      "library_fragments": 40,
+      "ledger_entries": 170,
+      "false_facts": 0,
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "belief_query_acc": 1.0,
+      "revision_detected": true,
+      "router_acc": 1.0,
+      "self_ece": 0.001,
+      "knowledge_acc": 1.0,
+      "latent_cause_acc": 1.0,
+      "render_acc": 1.0,
+      "coordination_honest": 1.0,
+      "library_fragments": 40,
+      "ledger_entries": 170,
+      "false_facts": 0,
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "belief_query_acc": 1.0,
+      "revision_detected": true,
+      "router_acc": 1.0,
+      "self_ece": 0.001,
+      "knowledge_acc": 1.0,
+      "latent_cause_acc": 1.0,
+      "render_acc": 1.0,
+      "coordination_honest": 1.0,
+      "library_fragments": 40,
+      "ledger_entries": 170,
+      "false_facts": 0,
+      "gate_pass": true
+    }
+  ],
+  "verdict": "FULL-INTEGRATION PASS: ALL module families operate together in one body -- no module breaks, the v17 core holds, and a multi-module coordination task chains knowledge -> language -> verification -> ledger with zero false facts.  This is the architecture, not single chains."
+}
