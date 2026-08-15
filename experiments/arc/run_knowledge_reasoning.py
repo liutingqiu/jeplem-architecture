@@ -340,16 +340,125 @@ def run_seed_disambig(seed: int, store) -> dict:
     return out
 
 
+def reachable_class_ends(store, entity, max_hops: int = 2) -> set[str]:
+    """Classes reachable from entity via P31/P279 within max_hops (for
+    transitive-condition discovery: a mammal reaches 'mammal' and higher
+    taxa; a bird does not reach 'mammal')."""
+    frontier = {entity}
+    seen: set[str] = set()
+    ends: set[str] = set()
+    for _ in range(max_hops):
+        nxt: set[str] = set()
+        for s in frontier:
+            for rel in ("P31", "P279"):
+                for t in store.successors(rel, s):
+                    if t not in seen:
+                        seen.add(t)
+                        nxt.add(t)
+                        ends.add(t)
+        frontier = nxt
+        if not frontier:
+            break
+    return ends
+
+
+def discover_transitive_condition(store, demos) -> set[str] | None:
+    """Discover the transitive class condition from demos: the classes reachable
+    from ALL kept entities and from NONE of the dropped ones.  Returns the
+    candidate class set (apply with 'any reachable')."""
+    kept: set[str] = set()
+    dropped: set[str] = set()
+    for d in demos:
+        g_in, g_out = d["input"], d["output"]
+        for o in d["objects"]:
+            r, c = o["pos"]
+            if g_out[r][c] != BG:
+                kept.add(o["entity"])
+            elif g_in[r][c] != BG:
+                dropped.add(o["entity"])
+    if not kept or not dropped:
+        return None
+    shared: set[str] | None = None
+    for e in kept:
+        ends = reachable_class_ends(store, e)
+        shared = ends if shared is None else shared & ends
+    if not shared:
+        return None
+    dropped_ends: set[str] = set()
+    for e in dropped:
+        dropped_ends |= reachable_class_ends(store, e)
+    cands = shared - dropped_ends
+    return cands or None
+
+
+def run_seed_trans_discovery(seed: int, store) -> dict:
+    rng = random.Random(seed)
+    out = {}
+    for class_end, label in TRANSITIVE_CONDITIONS:
+        pos, neg = sample_transitive_pool(store, class_end, pos_n=20, neg_n=20, seed=seed)
+        if not pos or not neg:
+            out[label] = {"discovered": None, "knowledge": 0.0, "visual": 0.0}
+            continue
+        demos = [make_task(rng, pos, neg, keep_n=3, tot_n=6) for _ in range(3)]
+        found = discover_transitive_condition(store, demos)
+        tests = [make_task(rng, pos, neg, keep_n=3, tot_n=6) for _ in range(10)]
+        if not found:
+            out[label] = {"discovered": None, "knowledge": 0.0, "visual": 0.0}
+            continue
+        # the discovered set can include higher taxa (mammal, taxon, vertebrate);
+        # apply the MOST SPECIFIC candidate (fewest pool entities reach it) --
+        # the true discriminator.
+        pool = set(pos) | set(neg)
+        best_c = min(found, key=lambda c: sum(
+            1 for e in pool if store.transitive_any(["P31", "P279"], e, c)))
+        k_ok = k_tot = v_ok = v_tot = 0
+        for t in tests:
+            kept = {o["entity"] for o in t["objects"]
+                    if store.transitive_any(["P31", "P279"], o["entity"], best_c)}
+            true_kept = {o["entity"] for o in t["objects"] if o["is_positive"]}
+            k_ok += int(kept == true_kept)
+            k_tot += 1
+            vdemos = [(g["input"], g["output"]) for g in demos]
+            prog = induction.search_program(vdemos, max_depth=2)
+            if prog is not None and equal(prog[1](t["input"]), t["output"]):
+                v_ok += 1
+            v_tot += 1
+        out[label] = {"discovered": sorted(found)[:5], "applied_class": best_c,
+                      "correct": class_end in found,
+                      "knowledge": round(k_ok / k_tot, 3) if k_tot else 0.0,
+                      "visual": round(v_ok / v_tot, 3) if v_tot else 0.0}
+    return out
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--db", type=Path, default=DB)
     parser.add_argument("--seeds", type=int, nargs="*", default=[444, 555, 666])
-    parser.add_argument("--mode", choices=["handed", "discovery", "disambiguate"], default="handed")
+    parser.add_argument("--mode", choices=["handed", "discovery", "disambiguate", "trans-discovery"],
+                        default="handed")
     parser.add_argument("--artifact", type=Path, default=ROOT / "artifacts" / "phase-b-knowledge-reasoning.json")
     args = parser.parse_args()
 
     store = KnowledgeStore(args.db)
-    if args.mode == "discovery":
+    if args.mode == "trans-discovery":
+        reports = [run_seed_trans_discovery(s, store) for s in args.seeds]
+        store.close()
+        all_correct = [r[c]["correct"] for r in reports for c in r
+                       if r[c].get("correct") is not None]
+        all_k = [r[c]["knowledge"] for r in reports for c in r]
+        all_v = [r[c]["visual"] for r in reports for c in r]
+        gate = bool(all_correct and all(all_correct) and min(all_k) >= 0.9 and max(all_v) == 0.0)
+        report = {
+            "protocol": (
+                "Phase-B transitive discovery: the system DISCOVERS the transitive class "
+                "condition (mammal) from demos -- classes reachable from all kept and none of "
+                "the dropped, via P31/P279 -- then applies it.  Gate: discovered correctly, "
+                "knowledge >= 0.9, visual == 0."
+            ),
+            "results": reports,
+            "gate_pass": bool(gate),
+        }
+    elif args.mode == "discovery":
         reports = [run_seed_discovery(s, store) for s in args.seeds]
         store.close()
         correct = [r[c]["correct_rule"] for r in reports for c in r

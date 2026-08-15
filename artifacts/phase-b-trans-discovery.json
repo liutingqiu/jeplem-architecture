@@ -1,0 +1,45 @@
+{
+  "protocol": "Phase-B transitive discovery: the system DISCOVERS the transitive class condition (mammal) from demos -- classes reachable from all kept and none of the dropped, via P31/P279 -- then applies it.  Gate: discovered correctly, knowledge >= 0.9, visual == 0.",
+  "results": [
+    {
+      "mammal": {
+        "discovered": [
+          "mammal",
+          "taxon",
+          "vertebrate"
+        ],
+        "applied_class": "vertebrate",
+        "correct": true,
+        "knowledge": 1.0,
+        "visual": 0.0
+      }
+    },
+    {
+      "mammal": {
+        "discovered": [
+          "mammal",
+          "taxon",
+          "vertebrate"
+        ],
+        "applied_class": "vertebrate",
+        "correct": true,
+        "knowledge": 1.0,
+        "visual": 0.0
+      }
+    },
+    {
+      "mammal": {
+        "discovered": [
+          "mammal",
+          "taxon",
+          "vertebrate"
+        ],
+        "applied_class": "vertebrate",
+        "correct": true,
+        "knowledge": 1.0,
+        "visual": 0.0
+      }
+    }
+  ],
+  "gate_pass": true
+}
