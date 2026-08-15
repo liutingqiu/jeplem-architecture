@@ -136,6 +136,14 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"category": cat, "discovered": None,
                                    "note": "no stable prototype found for this category"})
             return self._json(d)
+        if u.path == "/profile":
+            # holistic understanding: what do you know about X?  Synthesise
+            # every relation the knowledge base holds about the entity.
+            ent = (parse_qs(u.query).get("entity") or [""])[0].strip()
+            if not ent:
+                return self._json({"error": "missing ?entity=",
+                                   "example": "/profile?entity=Albert Einstein"}, 400)
+            return self._json(entity_profile(_store, ent))
         if u.path == "/":
             html = _UI_PAGE
             body = html.encode("utf-8")
