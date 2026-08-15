@@ -67,6 +67,13 @@ _USED_FOR = re.compile(rf"^(?:is\s+)?({_EG}?)\s+(?:is\s+)?used\s+for\s+{_ART}\s*
 _IS_A = re.compile(rf"^is\s+{_ART}\s*({_EG}?)\s+an?\s+({_EL}?)[.?]?$", re.IGNORECASE)
 _IS_A2 = re.compile(rf"^(.+?)\s+is\s+an?\s+({_EL}?)[.?]?$", re.IGNORECASE)
 _HAS_PROP = re.compile(rf"^(?:is\s+)?{_ART}\s*({_EG}?)\s+is\s+({_EL}?)[.?]?$", re.IGNORECASE)
+# relation-specific questions (use the full 9-relation KB, not just IsA)
+_WHO_WROTE = re.compile(rf"^who\s+wrote\s+({_EL}?)[.?]?$", re.IGNORECASE)
+_WHERE_IS = re.compile(rf"^where\s+is\s+({_EL}?)(?:\s+located)?[.?]?$", re.IGNORECASE)
+_WHAT_OCC = re.compile(rf"^(?:what\s+is\s+the\s+occupation\s+of\s+|what\s+does\s+)({_EL}?)(?:\s+do)?[.?]?$", re.IGNORECASE)
+_WHAT_COUNTRY = re.compile(rf"^what\s+country\s+is\s+({_EL}?)\s+in[.?]?$", re.IGNORECASE)
+_WHAT_PARTOF = re.compile(rf"^what\s+is\s+{_ART}\s*({_EL}?)\s+part\s+of[.?]?$", re.IGNORECASE)
+_WHAT_HAS_PART = re.compile(rf"^what\s+are\s+the\s+parts?\s+of\s+({_EL}?)[.?]?$", re.IGNORECASE)
 
 # confidence model: exact fact near-certain, transitive decays with chain length
 EXACT_CONF = 0.98
@@ -131,6 +138,63 @@ def answer(store: KnowledgeStore, question: str,
     rels = rels or CONCEPTNET_RELS
     is_a = rels["IsA"]
     q = question.strip()
+
+    # ---- relation-specific questions FIRST (more specific than _WHAT_IS /
+    # _HAS_PROP, which would swallow them: "what is the occupation of X") ----
+    def _explain(subj, relname, rows, verb):
+        labels = sorted(rows)[:8]
+        text = ", ".join(k[3:] if k.startswith("en:") else k for k in labels)
+        reps = [Source(relname, subj, k) for k in labels]
+        return MRep(answer_type=EXPLANATION, question=question, answer=text,
+                    confidence=EXACT_CONF, entities=[subj] + labels,
+                    relations=[(relname, subj, k) for k in labels],
+                    reasoning=[f"{subj} {verb} {k[3:] if k.startswith('en:') else k}"
+                               for k in labels], sources=reps)
+
+    m = _WHO_WROTE.match(q)
+    if m:
+        subj = m.group(1)
+        rows = store.successors_any(rels.get("Author", ["P50"]), subj)
+        if rows:
+            return _explain(subj, "Author", rows, "was written by")
+        return MRep.honest_unknown(question)
+    m = _WHAT_OCC.match(q)
+    if m:
+        subj = m.group(1)
+        rows = store.successors_any(rels.get("Occupation", ["P106"]), subj)
+        if rows:
+            return _explain(subj, "Occupation", rows, "works as a")
+        return MRep.honest_unknown(question)
+    m = _WHERE_IS.match(q)
+    if m:
+        subj = m.group(1)
+        rows = store.successors_any(rels.get("LocatedIn", ["P131"]), subj)
+        rows += store.successors_any(rels.get("Country", ["P17"]), subj)
+        if rows:
+            return _explain(subj, "LocatedIn", rows, "is located in")
+        return MRep.honest_unknown(question)
+    m = _WHAT_COUNTRY.match(q)
+    if m:
+        subj = m.group(1)
+        rows = store.successors_any(rels.get("Country", ["P17"]), subj)
+        if rows:
+            return _explain(subj, "Country", rows, "is in the country")
+        return MRep.honest_unknown(question)
+    m = _WHAT_PARTOF.match(q)
+    if m:
+        subj = m.group(1)
+        rows = store.successors_any(rels.get("PartOf", ["P361"]), subj)
+        if rows:
+            return _explain(subj, "PartOf", rows, "is part of")
+        return MRep.honest_unknown(question)
+    m = _WHAT_HAS_PART.match(q)
+    if m:
+        subj = m.group(1)
+        rows = store.successors_any(["P527"], subj)
+        if rows:
+            return _explain(subj, "HasPart", rows, "has part")
+        return MRep.honest_unknown(question)
+
     m = _WHAT_IS.match(q)
     if m:
         subj = m.group(1)
@@ -183,6 +247,7 @@ def answer(store: KnowledgeStore, question: str,
         if store.known_any(hp, subj, prop):
             return MRep.fact(question, "Yes", "HasProperty", subj, prop)
         return MRep.honest_unknown(question)
+
     return MRep.honest_unknown(question)
 
 
