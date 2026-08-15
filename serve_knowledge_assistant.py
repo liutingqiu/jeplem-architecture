@@ -48,6 +48,48 @@ def init() -> None:
     }
 
 
+def discover_prototype(store, rel: str, cat: str, n: int = 24, thr: float = 0.6) -> dict | None:
+    """Phase-E self-discovery, live: sample members of the category, find the
+    properties shared by >= thr of them (a NEW generalisation never stored),
+    validate on held-out members vs random entities."""
+    import random
+    rng = random.Random(7)
+    rows = [r[0] for r in store.conn.execute(
+        f"SELECT start FROM facts WHERE rel=? AND end=? AND length(start)<30 LIMIT ?",
+        (rel, cat, n * 3))]
+    rng.shuffle(rows)
+    members = rows[:n]
+    if len(members) < 16:
+        return {"category": cat, "note": "pool too small"}
+    cut = int(len(members) * 0.7)
+    train, held = members[:cut], members[cut:]
+    counts = {}
+    for e in train:
+        for r, e2 in store.conn.execute(
+                "SELECT rel, end FROM facts WHERE start=? AND length(end)<30 LIMIT 8", (e,)):
+            counts[(r, e2)] = counts.get((r, e2), 0) + 1
+    proto = {p for p, c in counts.items() if c >= thr * len(train)}
+    if not proto:
+        return {"category": cat, "note": "no stable prototype"}
+    def cover(es):
+        return sum(len(set(store.conn.execute(
+            "SELECT rel, end FROM facts WHERE start=? AND length(end)<30 LIMIT 8", (e,)).fetchall()) & proto)
+                   for e in es) / (len(proto) * max(len(es), 1))
+    held_cov = cover(held)
+    rand = [r[0] for r in store.conn.execute("SELECT start FROM facts WHERE rel='P31' LIMIT 200")]
+    rng.shuffle(rand)
+    rand_cov = cover(rand[:60])
+    return {
+        "category": cat, "relation": rel,
+        "prototype": sorted([f"{a}:{b}" for a, b in proto])[:12],
+        "heldout_coverage": round(held_cov, 3),
+        "random_coverage": round(rand_cov, 3),
+        "margin": round(held_cov - rand_cov, 3),
+        "discovered": bool(held_cov >= 0.5 and held_cov - rand_cov >= 0.3),
+        "note": "self-discovery: the system induced this generalisation from its own knowledge (not stored as a fact)",
+    }
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         pass  # quiet
@@ -81,6 +123,19 @@ class Handler(BaseHTTPRequestHandler):
                 "sources": [f"{s.rel}: {s.subject} -> {s.object}" for s in rep.sources[:3]],
                 "note": "JEPLM knowledge engine -- 1.32亿-fact Wikidata base, exact + transitive, honest unknowns",
             })
+        if u.path == "/discover":
+            # self-discovery: the system MINES its own knowledge for a NEW
+            # generalisation about a category (Phase-E mechanism, live).
+            cat = (parse_qs(u.query).get("category") or [""])[0].strip()
+            rel = (parse_qs(u.query).get("rel") or ["P106"])[0].strip()
+            if not cat:
+                return self._json({"error": "missing ?category=",
+                                   "example": "/discover?category=writer&rel=P106"}, 400)
+            d = discover_prototype(_store, rel, cat)
+            if d is None:
+                return self._json({"category": cat, "discovered": None,
+                                   "note": "no stable prototype found for this category"})
+            return self._json(d)
         if u.path == "/":
             html = _UI_PAGE
             body = html.encode("utf-8")
