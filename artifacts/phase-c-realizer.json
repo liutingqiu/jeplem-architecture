@@ -1,0 +1,58 @@
+{
+  "protocol": "Phase-C learned realizer (M4-lite at data scale): word-LSTM trained on a REAL Wikidata corpus (P31/P106/P17).  Scoring-based generation: rank the paraphrase bank across all relations by the realizer's log-likelihood, pick the most natural. Pass: honesty >= 0.9, round-trip >= 0.8, fluency > template >= 0.5, relation-appropriate >= 0.5, 3 seeds.",
+  "n_facts": 3000,
+  "results": [
+    {
+      "seed": 444,
+      "n_holdout": 57,
+      "n_oov_excluded": 543,
+      "vocab": 2636,
+      "honesty_rate": 1.0,
+      "roundtrip_rate": 1.0,
+      "fluency_gt_template": 0.877,
+      "rel_appropriate": 0.947,
+      "diversity_rate": 0.877,
+      "sample": [
+        "a is classified as a human",
+        "the occupation of 6lack is composer",
+        "a human is a human"
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 555,
+      "n_holdout": 47,
+      "n_oov_excluded": 553,
+      "vocab": 2630,
+      "honesty_rate": 1.0,
+      "roundtrip_rate": 1.0,
+      "fluency_gt_template": 0.83,
+      "rel_appropriate": 0.979,
+      "diversity_rate": 0.83,
+      "sample": [
+        "the country of Algeria is Algeria",
+        "a is a spring",
+        "the occupation of 6lack is songwriter"
+      ],
+      "gate_pass": true
+    },
+    {
+      "seed": 666,
+      "n_holdout": 45,
+      "n_oov_excluded": 555,
+      "vocab": 2637,
+      "honesty_rate": 1.0,
+      "roundtrip_rate": 1.0,
+      "fluency_gt_template": 0.889,
+      "rel_appropriate": 0.822,
+      "diversity_rate": 0.889,
+      "sample": [
+        "a #queer revolution morocco counts as a hashtag",
+        "the occupation of basketball player is basketball player",
+        "a is a spring"
+      ],
+      "gate_pass": true
+    }
+  ],
+  "verdict": "PHASE-C PASS: a learned realizer trained on REAL Wikidata knowledge ranks grounded phrasings by learned naturalness (scoring-based generation) -- honest (only the M-rep's entities), round-trip (recovers subject/object), relation-appropriate, more fluent than the fixed template. The scalable learning layer's first brick. (Free auto-regressive decode is shown as a qualitative sample; it is imperfect at this small scale -- the full 0.1-0.3B realizer is phase-4 M4.)"
+}
