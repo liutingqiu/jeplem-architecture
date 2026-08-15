@@ -1,0 +1,201 @@
+{
+  "protocol": "Phase-E knowledge-driven inductive discovery: from its OWN 1.32亿-fact knowledge base, the system discovers category PROTOTYPES (properties shared by >=60% of train members) -- NEW generalisations never stored -- and validates them on held-out members vs random entities.  Gate: held-out coverage >= 0.5 AND margin over random >= 0.3, 3 seeds.",
+  "results": [
+    {
+      "writer": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 2,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.193,
+        "margin": 0.807,
+        "prototype_sample": [
+          "P106:writer",
+          "P31:human"
+        ],
+        "gate": true
+      },
+      "physicist": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 2,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.225,
+        "margin": 0.775,
+        "prototype_sample": [
+          "P106:physicist",
+          "P31:human"
+        ],
+        "gate": true
+      },
+      "composer": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 2,
+        "heldout_coverage": 0.917,
+        "random_coverage": 0.215,
+        "margin": 0.702,
+        "prototype_sample": [
+          "P106:composer",
+          "P31:human"
+        ],
+        "gate": true
+      },
+      "film": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 1,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.02,
+        "margin": 0.98,
+        "prototype_sample": [
+          "P31:film"
+        ],
+        "gate": true
+      },
+      "album": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 1,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.0,
+        "margin": 1.0,
+        "prototype_sample": [
+          "P31:album"
+        ],
+        "gate": true
+      }
+    },
+    {
+      "writer": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 2,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.185,
+        "margin": 0.815,
+        "prototype_sample": [
+          "P106:writer",
+          "P31:human"
+        ],
+        "gate": true
+      },
+      "physicist": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 2,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.193,
+        "margin": 0.807,
+        "prototype_sample": [
+          "P106:physicist",
+          "P31:human"
+        ],
+        "gate": true
+      },
+      "composer": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 2,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.195,
+        "margin": 0.805,
+        "prototype_sample": [
+          "P106:composer",
+          "P31:human"
+        ],
+        "gate": true
+      },
+      "film": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 1,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.005,
+        "margin": 0.995,
+        "prototype_sample": [
+          "P31:film"
+        ],
+        "gate": true
+      },
+      "album": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 1,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.0,
+        "margin": 1.0,
+        "prototype_sample": [
+          "P31:album"
+        ],
+        "gate": true
+      }
+    },
+    {
+      "writer": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 2,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.175,
+        "margin": 0.825,
+        "prototype_sample": [
+          "P106:writer",
+          "P31:human"
+        ],
+        "gate": true
+      },
+      "physicist": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 2,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.23,
+        "margin": 0.77,
+        "prototype_sample": [
+          "P106:physicist",
+          "P31:human"
+        ],
+        "gate": true
+      },
+      "composer": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 2,
+        "heldout_coverage": 0.958,
+        "random_coverage": 0.193,
+        "margin": 0.766,
+        "prototype_sample": [
+          "P106:composer",
+          "P31:human"
+        ],
+        "gate": true
+      },
+      "film": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 1,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.015,
+        "margin": 0.985,
+        "prototype_sample": [
+          "P31:film"
+        ],
+        "gate": true
+      },
+      "album": {
+        "n_train": 28,
+        "n_held": 12,
+        "n_proto": 1,
+        "heldout_coverage": 1.0,
+        "random_coverage": 0.0,
+        "margin": 1.0,
+        "prototype_sample": [
+          "P31:album"
+        ],
+        "gate": true
+      }
+    }
+  ],
+  "verdict": "PHASE-E PASS: the system discovers NEW generalisable knowledge from its existing knowledge base -- category prototypes that predict held-out members far above chance, with traceable provenance."
+}
