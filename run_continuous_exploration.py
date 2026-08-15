@@ -58,7 +58,8 @@ def main() -> None:
             rules_generated_total += len(g["self_generated_rules"])
             rounds += 1
             log({"round": rounds, "seed": seed, "time": time.time(),
-                 "programming_1_acc": s1["total_acc"], "programming_2_acc": s2["total_acc"],
+                 "programming_1_acc": s1["total_acc"], "programming_1_last": s1["last_rounds_acc"],
+                 "programming_2_acc": s2["total_acc"], "programming_2_last": s2["last_rounds_acc"],
                  "programming_gate": s1["gate_pass"] and s2["gate_pass"],
                  "programming_outward": s1["outward_acquired"],
                  "free_explore_category": g["category"],
