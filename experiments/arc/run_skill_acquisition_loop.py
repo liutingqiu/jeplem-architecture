@@ -33,7 +33,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 # --- the skill domain: list transformations, verified by safe execution ----
-# each primitive is a (name, code) that maps a list to a list (or scalar)
+# each primitive is a (name, code) that maps a list to a list (or scalar);
+# COMPOSITIONS are 2-step programs (the richer programming skill)
 PRIMITIVES = [
     ("double", "[x*2 for x in L]"),
     ("square", "[x*x for x in L]"),
@@ -43,6 +44,11 @@ PRIMITIVES = [
     ("evens", "[x for x in L if x%2==0]"),
     ("odds", "[x for x in L if x%2==1]"),
     ("negate", "[-x for x in L]"),
+    # 2-step compositions (raise the programming bar)
+    ("double_reverse", "L[::-1] if False else [x*2 for x in L][::-1]"),
+    ("evens_sum", "sum([x for x in L if x%2==0])"),
+    ("square_sort", "sorted([x*x for x in L])"),
+    ("negate_reverse", "[-x for x in L][::-1]"),
 ]
 
 # spec -> the CORRECT primitive (the problems the system must learn to solve)
@@ -55,6 +61,10 @@ PROBLEMS = {
     "only_evens": "evens",
     "only_odds": "odds",
     "negate_each": "negate",
+    "double_then_reverse": "double_reverse",
+    "evens_then_sum": "evens_sum",
+    "square_then_sort": "square_sort",
+    "negate_then_reverse": "negate_reverse",
 }
 
 TEST_INPUTS = [[3, 1, 4, 1, 5], [2, 7, 1, 8, 2], [0, -3, 5, -1]]
@@ -110,7 +120,8 @@ def run_seed(seed: int) -> dict:
     opt = torch.optim.AdamW(self_model.parameters(), lr=5e-3)
     bce = nn.BCEWithLogitsLoss()
 
-    pool = list(range(6))            # double..sum (no evens/odds/negate yet)
+    pool = list(range(8))            # the 8 simple primitives; compositions are
+                                     # unlocked OUTWARD (the richer skill grows)
     outward_acquired = []
 
     # PRACTISE all specs over many ROUNDS: the self-model learns the

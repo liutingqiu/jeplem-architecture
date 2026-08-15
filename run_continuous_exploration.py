@@ -46,18 +46,21 @@ def main() -> None:
     print(f"continuous self-exploration started (journal: {JOURNAL})", flush=True)
     while True:
         seed += 1
-        rng = random.Random(seed)
         try:
-            s = skill_seed(seed)
-            g = gen_seed(seed, store)
-            skills_solved_total += int(s["total_acc"] >= 0.9)
+            # PROGRAMMING priority: 2 skill rounds per exploration round
+            s1 = skill_seed(seed)
+            s2 = skill_seed(seed + 500)
+            g = gen_seed(seed + 1000, store)          # random category (free)
+            skills_solved_total += int(s1["total_acc"] >= 0.9)
             rules_generated_total += len(g["self_generated_rules"])
             rounds += 1
             log({"round": rounds, "seed": seed, "time": time.time(),
-                 "skill_total_acc": s["total_acc"], "skill_gate": s["gate_pass"],
-                 "skill_outward": s["outward_acquired"],
-                 "generated_rules": g["self_generated_rules"],
-                 "gen_gate": g["gate_pass"],
+                 "programming_1_acc": s1["total_acc"], "programming_2_acc": s2["total_acc"],
+                 "programming_gate": s1["gate_pass"] and s2["gate_pass"],
+                 "programming_outward": s1["outward_acquired"],
+                 "free_explore_category": g["category"],
+                 "free_generated_rules": g["self_generated_rules"][:4],
+                 "free_gate": g["gate_pass"],
                  "cumulative_skills_solved": skills_solved_total,
                  "cumulative_rules_generated": rules_generated_total})
         except Exception as e:
