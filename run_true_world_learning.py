@@ -37,9 +37,10 @@ from experiments.arc.run_arc_integration import latent_cause_solve  # noqa: E402
 
 DATA = ROOT / "data" / "arc"
 JOURNAL = ROOT / "artifacts" / "true_world_journal.jsonl"
-BATCH = 40
+BATCH = 60
 LEARN_EVERY = 5
 MIN_OCCUR = 2
+MAX_COMPOSED = 200
 
 
 def log(entry: dict) -> None:
@@ -72,7 +73,7 @@ def try_solve(task, grown, rng) -> tuple[str | None, bool, bool, object]:
     # 3 schema grammar + grown library (cross-task vocabulary)
     try:
         name, pred = schema_search.solve_task(task, max_steps=2,
-                                              max_composed=800, library=grown)
+                                              max_composed=MAX_COMPOSED, library=grown)
     except Exception:
         name, pred = None, None
     if name is not None:
