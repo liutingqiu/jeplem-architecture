@@ -29,14 +29,25 @@ ROOT = Path(__file__).resolve().parents[0]
 sys.path.insert(0, str(ROOT))
 
 from plwm.knowledge_store import KnowledgeStore  # noqa: E402
-from experiments.arc.run_outward_exploration import (  # noqa: E402
-    web_summary, snapshot_answer,
-)
+from experiments.arc.run_outward_exploration import web_summary  # noqa: E402
+from experiments.arc.knowledge_query import answer, WIKIDATA_RELS  # noqa: E402
 from experiments.resource_guard import start_resource_guard  # noqa: E402
 
 DB = ROOT / "data" / "knowledge" / "wikidata.db"
 JOURNAL = ROOT / "artifacts" / "outward_learning_journal.jsonl"
 BATCH = 20
+
+# REAL relation-question types (the world's basic question grammar, from the
+# verified knowledge_query patterns).  Concrete-relation questions are exactly
+# where the snapshot has gaps (occupation/country/capital/continent coverage is
+# far below the 99% instance-of coverage) -- so outward has real holes to fill.
+REL_QS = [
+    ("instance", "what is {}"),
+    ("occupation", "what is the occupation of {}"),
+    ("country", "what country is {} in"),
+    ("capital", "what is the capital of {}"),
+    ("continent", "what continent is {} in"),
+]
 
 
 def log(entry: dict) -> None:
@@ -69,17 +80,22 @@ def main() -> None:
         batch = sample_entities(store, rng, BATCH)
         round_new = round_covered = round_out = round_honest = 0
         for ent in batch:
-            if ent in tried:
+            rel, qfmt = rng.choice(REL_QS)
+            q = qfmt.format(ent)
+            key = (ent, rel)
+            if key in tried:
                 continue
-            tried.add(ent)
-            if snapshot_answer(store, ent):
-                covered.add(ent)
+            tried.add(key)
+            rep = answer(store, q, rels=WIKIDATA_RELS)
+            if not rep.unknown and rep.answer:
+                covered.add(key)
                 round_covered += 1
                 continue
-            # OUTWARD: the snapshot gap is exactly what it must fetch
+            # OUTWARD: a snapshot gap is exactly what it must fetch
             web = web_summary(ent)
             if web is not None and ent.split()[0].lower() in web["extract"].lower():
-                outward_learned[ent] = {
+                outward_learned[key] = {
+                    "relation": rel, "question": q,
                     "excerpt": web["extract"][:300], "source": web["source"]}
                 round_out += 1
             else:
@@ -87,11 +103,11 @@ def main() -> None:
         tried_n = len(tried)
         covered_rate = len(covered) / tried_n if tried_n else 0.0
         gaps = tried - covered
-        unlock_rate = (sum(1 for e in gaps if e in outward_learned) / len(gaps)
+        unlock_rate = (sum(1 for k in gaps if k in outward_learned) / len(gaps)
                        if gaps else 0.0)
         log({"round": round_no, "time": time.time(),
-             "real_entities_tried": tried_n,
-             "snapshot_covered": len(covered),
+             "real_questions_tried": tried_n,
+             "snapshot_answered": len(covered),
              "snapshot_coverage": round(covered_rate, 4),
              "snapshot_gaps": len(gaps),
              "outward_unlocked": len(outward_learned),
