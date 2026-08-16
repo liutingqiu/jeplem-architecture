@@ -57,9 +57,13 @@ def log(entry: dict) -> None:
 
 
 def sample_entities(store, rng, n: int) -> list[str]:
+    """Real semantic entities: filter out the asteroid-storm (numeric/bracket
+    IDs dominate the raw P31 subjects) so the outward loop faces real-world
+    entities with Wikipedia pages."""
     rows = store.conn.execute(
         "SELECT DISTINCT start FROM facts WHERE rel='P31' AND length(start)<25 "
-        "LIMIT 50000").fetchall()
+        "AND start NOT GLOB '*[0-9]*' AND start NOT LIKE '(%)' "
+        "AND start NOT LIKE '#%' AND start NOT LIKE '@%' LIMIT 200000").fetchall()
     ents = [r[0] for r in rows]
     rng.shuffle(ents)
     return ents[:n]
@@ -100,6 +104,7 @@ def main() -> None:
                 round_out += 1
             else:
                 round_honest += 1
+                honest_fail += 1
         tried_n = len(tried)
         covered_rate = len(covered) / tried_n if tried_n else 0.0
         gaps = tried - covered
