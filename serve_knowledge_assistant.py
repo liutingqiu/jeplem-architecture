@@ -31,6 +31,110 @@ PORT = 8080
 
 _store = None
 _stats = None
+_UA = {"User-Agent": "JEPLM-knowledge/0.1 (research; honest outward exploration)"}
+
+
+def _guess_entity(q: str) -> str | None:
+    """Extract the likely entity from a question (best-effort for the outward
+    Wikipedia fetch)."""
+    import re
+    for pat in [r"^what is (?:an? |the )?(.+?)[.?]?$",
+                r"^who (?:is|wrote) (.+?)[.?]?$",
+                r"^is (?:an? |the )?(.+?) (?:a|an|the) ",
+                r"^do you know (.+?)[.?]?$"]:
+        m = re.match(pat, q, re.IGNORECASE)
+        if m and m.group(1).strip():
+            return m.group(1).strip()
+    return None
+
+
+def web_summary(entity: str) -> dict | None:
+    """Fetch the live Wikipedia summary (grounded: source + excerpt)."""
+    import json as _json
+    import urllib.request as _ur
+    try:
+        url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{entity.replace(' ', '_')}"
+        req = _ur.Request(url, headers=_UA)
+        with _ur.urlopen(req, timeout=8) as r:
+            d = _json.loads(r.read())
+        extract = (d.get("extract") or "").strip()
+        if not extract:
+            return None
+        return {"title": d.get("title", entity), "extract": extract[:400],
+                "source": f"https://en.wikipedia.org/wiki/{d.get('title', entity)}"}
+    except Exception:
+        return None
+
+
+REL_P = {
+    "occupation": ["P106"], "country": ["P27", "P17"], "capital": ["P36"],
+    "continent": ["P30"],
+}
+
+
+def _guess_relation(q: str) -> str | None:
+    """Which real-world relation is the question asking? (the Wikidata grammar)"""
+    import re
+    if re.search(r"occupation|do for a living|profession", q, re.IGNORECASE):
+        return "occupation"
+    if re.search(r"capital", q, re.IGNORECASE):
+        return "capital"
+    if re.search(r"continent", q, re.IGNORECASE):
+        return "continent"
+    if re.search(r"what country|in which country|nationality", q, re.IGNORECASE):
+        return "country"
+    return None
+
+
+def outward_exact(entity: str, rel: str) -> dict | None:
+    """PRECISE outward: entity -> LIVE Wikidata -> relation values (QID-cited).
+    Returns {'values', 'source'} or None (not found / no structured data)."""
+    import json as _json
+    import urllib.parse as _up
+    import urllib.request as _ur
+    props = REL_P[rel]
+    try:
+        d = _json.loads(_ur.urlopen(_ur.Request(
+            "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=%s"
+            "&language=en&limit=1&format=json" % _up.quote(entity), headers=_UA),
+            timeout=12).read())
+    except Exception:
+        return None
+    if not d.get("search"):
+        return None
+    qid = d["search"][0]["id"]
+    try:
+        doc = _json.loads(_ur.urlopen(_ur.Request(
+            f"https://www.wikidata.org/wiki/Special:EntityData/{qid}.json?flavor=dump",
+            headers=_UA), timeout=12).read())
+    except Exception:
+        return None
+    e = doc.get("entities", {}).get(qid, {})
+    vids = []
+    for p in props:
+        for c in e.get("claims", {}).get(p, []):
+            try:
+                v = c["mainsnak"]["datavalue"]["value"]
+                if isinstance(v, dict) and "id" in v and v["id"].startswith("Q"):
+                    vids.append(v["id"])
+            except Exception:
+                continue
+    vids = list(dict.fromkeys(vids))
+    if not vids:
+        return None
+    labels = {}
+    try:
+        dl = _json.loads(_ur.urlopen(_ur.Request(
+            "https://www.wikidata.org/w/api.php?action=wbgetentities&ids=%s"
+            "&props=labels&languages=en&format=json" % "|".join(vids[:10]),
+            headers=_UA), timeout=12).read())
+        for q in vids[:10]:
+            labels[q] = dl.get("entities", {}).get(q, {}).get("labels", {}).get(
+                "en", {}).get("value", q)
+    except Exception:
+        labels = {q: q for q in vids[:10]}
+    return {"values": [labels.get(q, q) for q in vids[:5]],
+            "source": f"https://www.wikidata.org/wiki/{qid}"}
 
 
 def init() -> None:
@@ -114,15 +218,43 @@ class Handler(BaseHTTPRequestHandler):
             if not q:
                 return self._json({"error": "missing ?q=", "example": "/ask?q=is a dog a mammal"}, 400)
             rep = answer(_store, q, rels=WIKIDATA_RELS)
-            return self._json({
+            resp = {
                 "question": q,
-                "answer": render(rep),   # template: clear "Yes + reasoning chain"
                 "type": rep.answer_type,
                 "unknown": rep.unknown,
                 "confidence": rep.confidence,
                 "sources": [f"{s.rel}: {s.subject} -> {s.object}" for s in rep.sources[:3]],
                 "note": "JEPLM knowledge engine -- 1.32亿-fact Wikidata base, exact + transitive, honest unknowns",
-            })
+            }
+            if rep.unknown:
+                # OUTWARD: the snapshot can't answer -> try PRECISE live Wikidata
+                # (structured relation values, QID-cited), else the grounded
+                # Wikipedia text summary -- never fabrication.
+                ent = _guess_entity(q)
+                rel = _guess_relation(q)
+                exact = outward_exact(ent, rel) if (ent and rel) else None
+                if exact is not None:
+                    resp["answer"] = (f"[来自知识库] I don't know this from my snapshot.\n"
+                                      f"[向外精确] {ent}: {', '.join(exact['values'])}\n"
+                                      f"来源: {exact['source']}")
+                    resp["outward"] = True
+                    resp["outward_type"] = "precise"
+                    resp["outward_source"] = exact["source"]
+                else:
+                    w = web_summary(ent) if ent else None
+                    if w is not None:
+                        resp["answer"] = (f"[来自知识库] I don't know this from my snapshot.\n"
+                                          f"[向外探索] {w['title']}: {w['extract']}\n"
+                                          f"来源: {w['source']}")
+                        resp["outward"] = True
+                        resp["outward_type"] = "text"
+                        resp["outward_source"] = w["source"]
+                    else:
+                        resp["answer"] = render(rep)
+                        resp["outward"] = False
+            else:
+                resp["answer"] = render(rep)   # template: clear "Yes + reasoning chain"
+            return self._json(resp)
         if u.path == "/discover":
             # self-discovery: the system MINES its own knowledge for a NEW
             # generalisation about a category (Phase-E mechanism, live).
