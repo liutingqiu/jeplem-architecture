@@ -14,3 +14,15 @@ artifacts/*.out.log
 artifacts/*.log
 .reasonix/
 data/knowledge/
+
+# Weights and large model binary checkpoints
+*.pt
+*.bin
+*.checkpoint
+*.onnx
+
+# Python cache & env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage

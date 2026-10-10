@@ -42,6 +42,6 @@
     "mean_steps": 14.0
   },
   "accepted": true,
-  "checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-goal-policy.pt",
-  "rollout_artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-rollouts.jsonl"
+  "checkpoint": "\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-goal-policy.pt",
+  "rollout_artifact": "\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-rollouts.jsonl"
 }

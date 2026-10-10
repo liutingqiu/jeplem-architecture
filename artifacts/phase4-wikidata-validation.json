@@ -1,6 +1,6 @@
 {
   "protocol": "phase4 Wikidata knowledge-base validation (#43): after the facts join, report knowledge-base SCALE (facts per relation, distinct entities, labels), run the G-K gate (3 seeds) and show REAL query demos (facts sampled from the DB, asked as natural questions, answered by the language interface).",
-  "db": "D:\\Documents\\探索新架构\\.claude\\worktrees\\sweet-wilbur-f3b366\\data\\knowledge\\wikidata.db",
+  "db": "data\\knowledge\\wikidata.db",
   "scale": {
     "labels": 76837633,
     "facts": 132108788,

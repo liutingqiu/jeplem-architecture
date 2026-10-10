@@ -29,6 +29,6 @@
     "mean_steps": 15.5
   },
   "accepted": true,
-  "checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-vision-policy.pt",
-  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-vision-training-report.json"
+  "checkpoint": "\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-vision-policy.pt",
+  "artifact": "\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-vision-training-report.json"
 }

@@ -10,7 +10,7 @@
   "all_checkpoint_restored": true,
   "all_fact_provenance_complete": true,
   "accepted": true,
-  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-two-fact-composition-report.json",
+  "artifact": "\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-two-fact-composition-report.json",
   "with_facts": [
     {
       "seed": 3000000,

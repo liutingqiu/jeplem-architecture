@@ -20,5 +20,5 @@
     "ece": 0.1
   },
   "gate_pass": true,
-  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\sweet-wilbur-f3b366\\artifacts\\phase4-gk-knowledge-eval-conceptnet-41124.json"
+  "artifact": "artifacts\\phase4-gk-knowledge-eval-conceptnet-41124.json"
 }

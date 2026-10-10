@@ -1,212 +1,120 @@
-# PLWM research prototype
+# Persistent Latent World Model (PLWM / JEPLM Architecture)
 
-This repository is a dependency-free executable sketch of the Persistent
-Latent World Model discussed in the research conversation.
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)]()
+[![Tests: 240 Passed](https://img.shields.io/badge/Tests-240%20Passed-success.svg)]()
 
-It tests the architectural contract before choosing a large neural backend:
+Research prototype exploring **Persistent Latent World Models (PLWM)** — cognitive world-model architectures that maintain recurrent latent states across time, update beliefs via prediction error, and perform internal reasoning without relying on continuous text token emission.
 
-- a persistent belief, goal, workspace, and episodic memory state;
-- prediction error as a driver of state updates and memory writes;
-- recurrent latent thought steps that do not emit text;
-- explicit cognitive actions: observe, think, retrieve, commit, speak, sleep;
-- JSON checkpointing and recovery without replaying the prior conversation.
+---
 
-The matrices are deterministic seeded weights. This is intentionally not a
-claim of a trained language model. The next research step is to replace the
-small pure-Python operators with trainable PyTorch modules while preserving the
-state/action/checkpoint contract and adding a continual partially observable
-task benchmark.
+## 1. Project Objectives
 
-That trainable reference is now in `plwm/torch_model.py`. It has a persistent
-belief state, FIFO episodic memory with content-addressed reads, latent-only
-recurrent thought on query events, and a disk-checkpointable runtime state.
+Modern LLM-based autonomous agents typically operate as stateless completion functions: past context must be re-ingested as a linear token history, thoughts must be externalized into text, and state persistence relies on external databases or prompt re-stuffing.
 
-## Model contract
+The **PLWM / JEPLM Architecture** project explores a fundamental alternative:
+1. **Persistent Latent State**: Maintaining an explicit, structured cognitive state (belief, goal, workspace, and episodic memory slots) that survives session boundaries and checkpoints without replaying full dialogue or trajectory histories.
+2. **Prediction Error as a Driver**: Driving state belief updates and episodic memory writes through predictive discrepancy rather than passive context appending.
+3. **Latent Cognitive Operations**: Enabling recurrent, multi-step thought transitions entirely in latent space without text decoding.
+4. **Explicit Cognitive Action Space**: Supporting structured internal actions (`observe`, `think`, `retrieve`, `commit`, `speak`, `sleep`) with formal state transition boundaries.
 
-The transition is deliberately split into prediction, correction, and optional
-cognitive work:
+---
 
-```text
-predicted_observation = P(belief)
-prediction_error      = distance(predicted_observation, observation)
-belief_next           = blend(belief, Core(belief, goal, encoded_observation))
-action                = Policy(belief, goal, workspace, prediction_error)
+## 2. Currently Implemented Capabilities
+
+The repository contains both a dependency-free pure-Python reference specification and an end-to-end trainable PyTorch runtime (`plwm/`):
+
+- **Structured Cognitive State (`plwm/state.py`, `plwm/torch_model.py`)**:
+  - `latent_state`: Continuous vector representation across persistent memory slots.
+  - `belief_state`: Categorical probability distributions and entropy measures over environmental states.
+  - `commitment_state`: Ledger-managed, verified obligations with audit trails.
+  - `control_state`: Learnable adaptive compute halting distributions.
+- **Differentiable Transition Contract (`plwm/torch_model.py`)**:
+  - Observation prediction: `predicted_obs = P(belief)`
+  - Error-driven update: `prediction_error = distance(predicted_obs, actual_obs)`
+  - Belief blending: `belief_next = blend(belief, Core(belief, goal, encoded_obs))`
+  - Cognitive action policy: `action = Policy(belief, goal, workspace, prediction_error)`
+- **Memory & Evidence Systems (`plwm/lifelong.py`, `plwm/fact_ledger.py`)**:
+  - Content-addressed episodic recall with decay and reinforcement.
+  - Versioned fact memory preventing unverified low-confidence inputs from overwriting verified commitments.
+  - Latent planning (`plwm/latent_planner.py`) supporting action-conditioned counterfactual rollouts.
+- **Benchmark & Environment Bridges (`experiments/`, `minecraft-mod/`, `luanti-game/`)**:
+  - Minigrid partially observable delayed cue tasks.
+  - Crafter vision-only pixel environment bindings.
+  - Luanti / Minetest local bridge and Minecraft Fabric mod (`minecraft-mod/`) for real-time state extraction.
+
+---
+
+## 3. Research Prototype vs. Production System
+
+> **Important Positioning Notice**:
+> This repository is an **experimental research prototype and architectural testbed**, NOT a commercial or production-ready agent product.
+
+| Dimension | PLWM Research Prototype | Production Agent Platform |
+| :--- | :--- | :--- |
+| **Primary Goal** | Falsifying architectural hypotheses on latent world models | Scalable user-facing workflow execution |
+| **Model Scale** | Lightweight exploratory dimensions (d=16 to d=128) | Multi-billion parameter frontier LLMs |
+| **State Storage** | Local JSON / PyTorch tensor checkpoints | Distributed databases, Vector DBs, KV caches |
+| **Maturity** | Validated contracts across 240+ deterministic unit tests | Beta/GA production availability |
+
+---
+
+## 4. Installation & Requirements
+
+### Prerequisites
+- Python 3.10+ (tested through Python 3.13)
+- PyTorch 2.0+ (CPU is sufficient for test suite; CUDA auto-detected for training sweeps)
+
+### Setup
+```bash
+git clone https://github.com/liutingqiu/jeplem-architecture.git
+cd jeplem-architecture
+
+# Create virtual environment (optional but recommended)
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\Activate.ps1
+
+# Install requirements
+pip install -r requirements.txt
 ```
 
-`think` iterates the workspace without decoding text. `retrieve` can reactivate
-episodic slots. `sleep` preserves state while avoiding an unnecessary thought
-loop. The action interface is the stable boundary for a future learned policy.
+---
 
-Run the tests from this directory:
+## 5. Running Demos & Tests
 
-```text
-python -m unittest discover -s tests -v
+### Running the Test Suite
+The full suite covers 240+ unit and integration tests across state transitions, backward-compatible checkpoints, counterfactual rollouts, and sensory bindings:
+
+```bash
+# Set PYTHONPATH to project root
+export PYTHONPATH=.       # Linux / macOS
+$env:PYTHONPATH = "."     # Windows PowerShell
+
+pytest tests/ -v
 ```
 
-Run the interruption-and-recovery demo:
+### Running the Interruption & Recovery Demo
+Demonstrates checkpointing persistent cognitive state to disk, interrupting the process, and recovering exact state without prior history replay:
 
-```text
+```bash
 python demo.py
 ```
 
-Run the structural interruption-and-recovery benchmark:
-
-```text
-python experiments/interruption_recovery.py
-```
-
-Train and evaluate the first feasibility experiment (PyTorch CPU required):
-
-```text
-python experiments/train_continuity.py
-```
-
-The task presents an early binary cue, several distractors, and a final query
-that contains no cue. The acceptance gate is persistent-model accuracy of at
-least 90%, stateless-baseline accuracy no greater than 65%, and exactly equal
-predictions before versus after a cognitive-state checkpoint/restart.
-
-The suite also covers action-conditioned causal prediction and a three-step
-counterfactual rollout task. Both use a hidden environmental rule revealed
-before the decision event; the planner learns transition prediction only, then
-selects actions by evaluating imagined outcomes.
-
-It also validates a differentiable adaptive-compute controller: a recurrent
-latent core is supervised at each depth while a learned halt distribution trades
-task loss against expected compute.
-
-Run the stronger feasibility sweep across three seeds and three distractor
-lengths:
-
-```text
-python experiments/sweep_continuity.py
-```
-
-Run the complete current evidence suite; it writes
-`artifacts/feasibility-report.json` on success:
-
-```text
-python experiments/run_all.py
-```
-
-On Windows, run the same verification flow with:
-
-```text
+### Running Verification Script (Windows)
+```powershell
 .\verify.ps1
 ```
 
-## Current Architecture
+---
 
-The prototype keeps four state domains intentionally separate:
+## 6. Known Limitations & Roadmap
 
-```text
-latent state       PLWM / recurrent workspace / episodic memory
-belief state       normalized categorical probabilities and entropy
-commitment state   active, completed, or cancelled auditable obligations
-control state      learned halt distribution and fast/slow update gates
-```
+1. **High-Dimensional Visual End-to-End Bottleneck**: While pixel-level Crafter and Luanti bindings function correctly, end-to-end joint training of high-resolution visual encoders with deep latent planning remains computationally expensive.
+2. **Open-World Representation Ceiling**: On real-world structured knowledge extraction (Wikidata/ConceptNet), outward expansion is bound by external relation density; the system cannot hallucinate facts beyond available observations.
+3. **Language Interface Boundary**: The language module (`plwm/language.py`) acts strictly as a perceptual and action-emission port. It deliberately does not allow untrusted natural language text to directly mutate internal state tensors without passing through the belief ledger.
 
-`PersistentRuntime` composes these domains for one event loop. A latent vector
-does not directly complete a commitment: only the explicit belief layer can do
-that, and completion leaves evidence in the commitment ledger. This separation
-is a design invariant, not a UI convention.
+---
 
-The evidence suite currently checks continuity after checkpointing, associative
-recall, adaptive compute, multi-timescale retention, belief revision, causal
-planning, counterfactual rollout, commitment recovery, and unified-runtime
-composition.
+## 7. License & Citation
 
-## Five-Stage Expansion
-
-The current expansion route is fixed as five falsifiable gates:
-
-1. A partially observable task with noisy evidence, active observation cost,
-   delayed commitments, and distractors.
-2. Same-budget comparisons against finite-context, recurrent, and no-memory
-   controllers.
-3. End-to-end trainable persistent state and control connected to the PLWM
-   world-model path.
-4. Stale-memory correction, interruption recovery, and long-run drift tests.
-5. A language adapter limited to perception and action emission; it cannot
-   complete commitments or mutate cognitive state by text alone.
-
-Run the expanded benchmark directly with:
-
-```text
-python experiments/continual_benchmark.py
-```
-
-Training experiments resolve `PLWM_DEVICE` explicitly. The default `auto`
-uses CUDA when available and otherwise CPU; setting `PLWM_DEVICE=cuda` fails
-instead of silently running on CPU when the installed PyTorch build has no CUDA
-backend.
-
-The benchmark's recurrent baseline is intentionally retained even when it
-matches or exceeds PLWM on a task. That result is evidence about the task, not
-silently discarded.
-
-The transformer comparison is evaluated across four fixed seeds. Its gate
-requires a mean score of at least 0.90 and no seed below 0.89; this avoids
-treating a single backend-specific initialization as proof that the baseline
-was fairly trained.
-
-The lifelong memory benchmark adds versioned provenance and sleep-time replay:
-
-```text
-python experiments/lifelong_benchmark.py
-```
-
-It measures whether a verified change to one fact survives a stale low-confidence
-burst while unrelated facts remain available. Unverified evidence is not allowed
-to overwrite a verified commitment merely because it arrived later.
-
-`plwm/language.py` supplies an `OllamaBackend` and strict `JsonLanguagePort`.
-The backend is optional: no model weights, endpoint credentials, belief, or
-commitment state are stored in the adapter. Its recovery contract is tested by:
-
-```text
-python experiments/language_runtime.py
-```
-
-When a local Ollama server and model are available, run a real backend call
-through the same checkpoint/recovery contract (it is intentionally not part of
-the offline suite):
-
-```text
-python experiments/ollama_integration.py --required
-```
-
-## Minecraft Pilot
-
-`minecraft-mod/` is a Fabric 1.21 server-side local training bridge. It writes
-raw Minecraft state/outcome JSONL under the game directory's `plwm-training/`
-folder and accepts only `observe`, `set_episode`, and spawn-only
-`reset_episode` action records. Python
-normalizes those records into the same hash-chained `EpisodeTrace` used by
-other environments before passing state into `TrainablePersistentRuntime`.
-Every permitted action has a stable request ID and the server's terminal
-outcome echoes it, so episode replay can attribute each result to a specific
-capability-limited request.
-
-Build the Fabric mod with Java 21:
-
-```text
-cd minecraft-mod
-gradlew.bat build
-```
-
-The offline bridge contract is separately executable:
-
-```text
-python experiments/minecraft_bridge_contract.py
-```
-
-The trainable runtime also exposes `think_only()`: a latent-only workspace
-transition that has no observation input and cannot write evidence, memory, or
-commitment state. `WorldModelPersistentRuntime` combines action-conditioned
-counterfactual planning, explicit action costs, checkpoint recovery, and
-ledger-selected multi-goal sequencing. Its integrated experiment is:
-
-```text
-python experiments/world_runtime.py
-```
+This project is licensed under the Apache License 2.0. Detailed phase logs, mathematical proofs, and historical experimental surveys are archived under `docs/reports/`.

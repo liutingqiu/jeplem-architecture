@@ -138,7 +138,7 @@ class TestCheckpointBackwardCompat:
             path = f.name
         try:
             restored = TorchCognitiveState.restore(path, "cpu")
-            assert restored.confidences[0, 0, 0].item() == torch.isclose(torch.tensor(0.8), torch.tensor([0.8]), atol=1e-4).item()
+            assert abs(restored.confidences[0, 0, 0].item() - 0.8) < 1e-4
         finally:
             import os; os.unlink(path)
 

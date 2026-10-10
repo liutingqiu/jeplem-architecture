@@ -10,7 +10,7 @@
   "all_stale_rejected": true,
   "all_checkpoint_restored": true,
   "accepted": true,
-  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-polarity-composition-report.json",
+  "artifact": "\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-polarity-composition-report.json",
   "with_facts": [
     {
       "seed": 4000000,

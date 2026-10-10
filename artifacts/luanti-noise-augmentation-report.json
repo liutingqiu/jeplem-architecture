@@ -33,8 +33,8 @@
       "augmented_successes": 3
     }
   ],
-  "clean_checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-vision-policy.pt",
-  "augmented_checkpoint": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-vision-noise-mixture-policy.pt",
+  "clean_checkpoint": "\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-vision-policy.pt",
+  "augmented_checkpoint": "\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-vision-noise-mixture-policy.pt",
   "accepted": true,
-  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-noise-augmentation-report.json"
+  "artifact": "\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-noise-augmentation-report.json"
 }

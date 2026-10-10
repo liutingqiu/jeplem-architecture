@@ -1,6 +1,6 @@
 {
   "protocol": "luanti_reward_ledger_replay_v1: read-only replay of existing local Luanti bridge reward records; existing reward envelope source/tick/caused_by fields become bounded ledger provenance, with no game action or hidden-state access.",
-  "source_log": "D:\\PLWM-Luanti\\bridge\\observations.jsonl",
+  "source_log": "observations.jsonl",
   "selected_episodes": 8,
   "episodes": [
     {
@@ -77,5 +77,5 @@
     }
   ],
   "accepted": true,
-  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-reward-ledger-replay-report.json"
+  "artifact": "\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-reward-ledger-replay-report.json"
 }

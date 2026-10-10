@@ -36,5 +36,5 @@
   },
   "gate_pass": false,
   "criterion_error": "V1 gate >=10.4% premised a modest hand-built grammar would roughly double real-ARC coverage; evidence shows real-ARC transformation space (position-mapping, arrangement, extraction, symmetry) is far broader than any modest grammar. The schema grammar DOES express tasks the base cannot (marginal vocabulary lift), confirming vocabulary (not learning) was the bottleneck. Criterion documented as a revision; not silently adjusted.",
-  "artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\.claude\\worktrees\\sweet-wilbur-f3b366\\artifacts\\arc-v1-schema-ceiling.json"
+  "artifact": "artifacts\\arc-v1-schema-ceiling.json"
 }

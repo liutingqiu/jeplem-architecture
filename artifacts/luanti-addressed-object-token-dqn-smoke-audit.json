@@ -1,6 +1,6 @@
 {
   "protocol": "luanti_addressed_object_token_smoke_audit_v1: independent recomputation of one capacity-matched CUDA smoke; never an architecture-advantage audit.",
-  "source_artifact": "D:\\Documents\\\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-addressed-object-token-dqn-smoke-report.json",
+  "source_artifact": "\u63a2\u7d22\u65b0\u67b6\u6784\\artifacts\\luanti-addressed-object-token-dqn-smoke-report.json",
   "accepted": false,
   "recomputed_accepted": false,
   "failures": []
